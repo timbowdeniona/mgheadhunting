@@ -1,0 +1,108 @@
+{
+  "contentTypes": [
+    {
+      "sys": { "id": "author" },
+      "name": "Author / Partner Profile",
+      "displayField": "name",
+      "fields": [
+        { "id": "name", "name": "Name", "type": "Symbol", "required": true },
+        { "id": "roleTitle", "name": "Role Title", "type": "Symbol", "required": true },
+        { "id": "organization", "name": "Organization", "type": "Symbol", "required": false },
+        { "id": "email", "name": "Direct Desk Email", "type": "Symbol", "required": false },
+        { "id": "linkedinUrl", "name": "LinkedIn URL", "type": "Symbol", "required": false },
+        { "id": "bioShort", "name": "Short Bio", "type": "Text", "required": false },
+        { "id": "practiceTenure", "name": "Practice Tenure", "type": "Symbol", "required": false },
+        { "id": "placementLevel", "name": "Placement Level", "type": "Symbol", "required": false }
+      ]
+    },
+    {
+      "sys": { "id": "sectorSpecialism" },
+      "name": "Sector Specialism",
+      "displayField": "title",
+      "fields": [
+        { "id": "code", "name": "Practice Code (e.g. SPEC_01)", "type": "Symbol", "required": true },
+        {
+          "id": "category",
+          "name": "Category",
+          "type": "Symbol",
+          "required": true,
+          "validations": [{ "in": ["EXECUTIVE", "COMMERCIAL", "OPERATIONS", "TECHNICAL"] }]
+        },
+        { "id": "title", "name": "Title", "type": "Symbol", "required": true },
+        { "id": "subtitle", "name": "Subtitle", "type": "Symbol", "required": false },
+        { "id": "description", "name": "Description", "type": "Text", "required": true },
+        { "id": "sampleRoles", "name": "Sample Roles", "type": "Array", "items": { "type": "Symbol" }, "required": true },
+        { "id": "keyClients", "name": "Key Clients / Sub-Sectors", "type": "Symbol", "required": true },
+        { "id": "order", "name": "Display Order", "type": "Integer", "required": false }
+      ]
+    },
+    {
+      "sys": { "id": "differencePillar" },
+      "name": "The MGH Difference Pillar",
+      "displayField": "title",
+      "fields": [
+        { "id": "pillarIndex", "name": "Pillar Index (e.g. PILLAR // 01)", "type": "Symbol", "required": true },
+        { "id": "title", "name": "Pillar Title", "type": "Symbol", "required": true },
+        { "id": "highlight", "name": "Highlight Sub-line", "type": "Symbol", "required": true },
+        { "id": "description", "name": "Description", "type": "Text", "required": true },
+        { "id": "retainedAdvantage", "name": "Retained MGH Advantage", "type": "Text", "required": true },
+        { "id": "contingentFlaw", "name": "Contingent Recruitment Flaw", "type": "Text", "required": true },
+        { "id": "iconIdentifier", "name": "Icon Key", "type": "Symbol", "required": false },
+        { "id": "order", "name": "Display Order", "type": "Integer", "required": false }
+      ]
+    },
+    {
+      "sys": { "id": "processStep" },
+      "name": "Search Blueprint Step",
+      "displayField": "title",
+      "fields": [
+        { "id": "stepNumber", "name": "Step Number (e.g. 01)", "type": "Symbol", "required": true },
+        { "id": "phaseName", "name": "Phase Name (e.g. CALIBRATION)", "type": "Symbol", "required": true },
+        { "id": "title", "name": "Step Title", "type": "Symbol", "required": true },
+        { "id": "timeline", "name": "Timeline (e.g. Week 1)", "type": "Symbol", "required": true },
+        { "id": "description", "name": "Description", "type": "Text", "required": true },
+        { "id": "deliverable", "name": "Deliverable Output", "type": "Symbol", "required": true },
+        { "id": "order", "name": "Display Order", "type": "Integer", "required": false }
+      ]
+    },
+    {
+      "sys": { "id": "insightArticle" },
+      "name": "Executive Insight Article",
+      "displayField": "title",
+      "fields": [
+        { "id": "title", "name": "Article Title", "type": "Symbol", "required": true },
+        { "id": "slug", "name": "URL Slug", "type": "Symbol", "required": true, "validations": [{ "unique": true }] },
+        { "id": "category", "name": "Category Tag", "type": "Symbol", "required": true },
+        { "id": "publishedDate", "name": "Published Date / Month", "type": "Symbol", "required": true },
+        { "id": "readTime", "name": "Estimated Read Time", "type": "Symbol", "required": true },
+        { "id": "excerpt", "name": "Executive Excerpt", "type": "Text", "required": true },
+        { "id": "keyTakeaways", "name": "Key Takeaways", "type": "Array", "items": { "type": "Symbol" }, "required": true },
+        { "id": "isFeatured", "name": "Featured on Homepage", "type": "Boolean", "required": false },
+        {
+          "id": "author",
+          "name": "Author Reference",
+          "type": "Link",
+          "linkType": "Entry",
+          "validations": [{ "linkContentType": ["author"] }],
+          "required": false
+        }
+      ]
+    },
+    {
+      "sys": { "id": "siteSettings" },
+      "name": "Site Settings & Config",
+      "displayField": "siteName",
+      "fields": [
+        { "id": "siteName", "name": "Site Name", "type": "Symbol", "required": true },
+        { "id": "tagline", "name": "Tagline", "type": "Symbol", "required": false },
+        { "id": "primaryEmail", "name": "Primary Desk Email", "type": "Symbol", "required": true },
+        { "id": "phone", "name": "Telephone", "type": "Symbol", "required": false },
+        { "id": "headquarters", "name": "Headquarters Location", "type": "Symbol", "required": false },
+        { "id": "linkedinUrl", "name": "LinkedIn URL", "type": "Symbol", "required": false },
+        { "id": "icoRegistrationNumber", "name": "ICO Registration Statement", "type": "Symbol", "required": false },
+        { "id": "metaTitleDefault", "name": "Default SEO Title", "type": "Symbol", "required": false },
+        { "id": "metaDescriptionDefault", "name": "Default SEO Description", "type": "Text", "required": false }
+      ]
+    }
+  ]
+}

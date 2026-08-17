@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand Colors */
+    --color-navy-950: #07111D;
+    --color-navy-900: #0F243A;
+    --color-navy-800: #163A5F;
+    --color-navy-700: #1E4C7A;
+    --color-navy-600: #2A649E;
+    --color-navy-500: #3D7DC0;
+    --color-navy-300: #8BB4DF;
+    --color-navy-100: #D8E6F5;
+    --color-navy-50:  #F1F6FB;
+
+    --color-teal-900: #094648;
+    --color-teal-800: #0D5F61;
+    --color-teal-600: #138D90;
+    --color-teal-500: #17A9AC;
+    --color-teal-400: #22C8CB;
+    --color-teal-200: #8CE5E7;
+    --color-teal-100: #D2F5F6;
+    --color-teal-50:  #F0FBFC;
+
+    --color-steel-900: #252B2E;
+    --color-steel-700: #4B5458;
+    --color-steel-500: #7A858A;
+    --color-steel-400: #A9B2B6;
+    --color-steel-300: #D0D4D6;
+    --color-steel-200: #E2E5E7;
+    --color-steel-100: #EFF1F2;
+    --color-steel-50:  #F8FAFB;
+
+    --color-canvas-white: #FFFFFF;
+    --color-canvas-light: #F8FAFB;
+    --color-canvas-muted: #F1F4F5;
+
+    /* Typography */
+    --font-display: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-sans: 'Inter', 'Public Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+    /* Blueprint Grid */
+    --blueprint-line: rgba(208, 212, 214, 0.35);
+    --blueprint-line-dark: rgba(208, 212, 214, 0.08);
+  }
+
+  body {
+    background-color: var(--color-canvas-light);
+    color: var(--color-navy-900);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: 0.03em;
+  }
+}
+
+@layer utilities {
+  /* Architectural Blueprint Grid Backgrounds */
+  .bg-blueprint {
+    background-image: 
+      linear-gradient(to right, var(--blueprint-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--blueprint-line) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .bg-blueprint-dense {
+    background-image: 
+      linear-gradient(to right, var(--blueprint-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--blueprint-line) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  .bg-blueprint-dark {
+    background-image: 
+      linear-gradient(to right, var(--blueprint-line-dark) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--blueprint-line-dark) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Engineering Hairline Dividers & Crosshairs */
+  .crosshair-corner {
+    position: relative;
+  }
+  .crosshair-corner::before {
+    content: "+";
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-steel-400);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* Architectural corner tick marks */
+  .blueprint-frame {
+    position: relative;
+    border: 1px solid var(--color-steel-300);
+  }
+  .blueprint-frame::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--color-teal-600);
+    border-bottom: 2px solid var(--color-teal-600);
+    pointer-events: none;
+  }
+
+  /* Monogram & Wordmark Fine Teal Rule */
+  .teal-rule {
+    height: 1.5px;
+    background-color: var(--color-teal-600);
+  }
+
+  /* Smooth custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F1F4F5;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #D0D4D6;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #163A5F;
+  }
+}
