@@ -47,7 +47,7 @@ export const Wordmark: React.FC<WordmarkProps> = ({
             isLight ? 'text-white' : 'text-navy-900'
           }`}
         >
-          MG <span className="font-semibold text-navy-800 dark:text-steel-100">HEADHUNTING</span>
+          MG <span className="font-semibold">HEADHUNTING</span>
         </span>
       </div>
 

@@ -48,7 +48,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-2xl bg-white border border-steel-300 shadow-2xl p-6 sm:p-8 rounded-none max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-2xl bg-white border border-steel-300 shadow-2xl p-6 sm:p-8 rounded-lg max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Hairline Teal Accent Rule */}
@@ -58,8 +58,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
         <div className="flex items-start justify-between pb-4 mb-6 border-b border-steel-200">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <Badge variant="navy" size="sm">CONFIDENTIAL INTAKE</Badge>
-              <span className="font-mono text-[11px] text-teal-700 font-semibold uppercase">Ref: MGH-RET-2026</span>
+              <Badge variant="navy" size="sm">Confidential intake</Badge>
             </div>
             <h2 className="font-display text-2xl font-bold text-navy-900 tracking-tight">
               Initiate Retained Search
@@ -104,7 +103,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-display uppercase tracking-wider font-semibold text-navy-900 mb-1">
+                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
                   Your Full Name *
                 </label>
                 <input
@@ -113,12 +112,12 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
                   placeholder="e.g. David Vance"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-none transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-display uppercase tracking-wider font-semibold text-navy-900 mb-1">
+                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
                   Company / Group *
                 </label>
                 <input
@@ -127,14 +126,14 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
                   placeholder="e.g. Saint-Gobain UK / PE Fund"
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-none transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-display uppercase tracking-wider font-semibold text-navy-900 mb-1">
+                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
                   Work Email *
                 </label>
                 <input
@@ -143,12 +142,12 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
                   placeholder="d.vance@company.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-none transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-display uppercase tracking-wider font-semibold text-navy-900 mb-1">
+                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
                   Direct Telephone
                 </label>
                 <input
@@ -156,20 +155,20 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
                   placeholder="+44 7..."
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-none transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-display uppercase tracking-wider font-semibold text-navy-900 mb-1">
+                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
                   Target Level / Role
                 </label>
                 <select
                   value={formData.targetLevel}
                   onChange={(e) => setFormData({ ...formData, targetLevel: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-none transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
                 >
                   <option value="Managing Director / CEO">Managing Director / CEO</option>
                   <option value="Chief Operating Officer (COO)">Chief Operating Officer (COO)</option>
@@ -181,13 +180,13 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-display uppercase tracking-wider font-semibold text-navy-900 mb-1">
+                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
                   Sector Specialism Focus
                 </label>
                 <select
                   value={formData.sectorSpecialism}
                   onChange={(e) => setFormData({ ...formData, sectorSpecialism: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-none transition-colors"
+                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
                 >
                   <option value="Heavy Building Materials">Heavy Building Materials (Concrete, Cement, Aggregates)</option>
                   <option value="Building Envelope & Façades">Building Envelope, Glazing & Façades</option>
@@ -206,7 +205,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-display uppercase tracking-wider font-semibold text-navy-900 mb-1">
+              <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
                 Mandate Context &amp; Confidential Briefing
               </label>
               <textarea
@@ -214,12 +213,12 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
                 placeholder="Key drivers (e.g. strategic growth, PE acquisition, succession planning, technical turnaround)..."
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-none transition-colors"
+                className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
               />
             </div>
 
             {/* Confidentiality Notice */}
-            <div className="flex items-start gap-2.5 p-3 bg-navy-50/60 border border-steel-300 text-xs text-navy-900">
+            <div className="flex items-start gap-2.5 p-3 bg-navy-50/60 border border-steel-300 text-xs text-navy-900 rounded-sm">
               <Lock className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
               <p className="leading-relaxed">
                 <strong>Executive Search Protocol:</strong> All discussions and data transmissions are governed by UK GDPR and strict Non-Disclosure. Placements are conducted exclusively by senior partners.
@@ -228,7 +227,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
 
             {/* Action Buttons */}
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-steel-200">
-              <div className="text-[11px] font-mono text-steel-500">
+              <div className="text-[11px] font-sans text-steel-500">
                 Direct: <span className="text-navy-900 font-semibold">mgoldsmith@mgheadhunting.co.uk</span>
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -242,9 +241,6 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
             </div>
           </form>
         )}
-
-        {/* Blueprint corner mark */}
-        <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-teal-600" />
       </div>
     </div>
   );

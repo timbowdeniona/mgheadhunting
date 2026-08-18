@@ -2,7 +2,6 @@ import React from 'react';
 
 export interface SectionDividerProps {
   label?: string;
-  code?: string;
   tealAccent?: boolean;
   align?: 'left' | 'center' | 'right';
   className?: string;
@@ -10,7 +9,6 @@ export interface SectionDividerProps {
 
 export const SectionDivider: React.FC<SectionDividerProps> = ({
   label,
-  code,
   tealAccent = true,
   align = 'left',
   className = '',
@@ -27,18 +25,11 @@ export const SectionDivider: React.FC<SectionDividerProps> = ({
       </div>
 
       {/* Center / Aligned Content */}
-      {(label || code) && (
+      {label && (
         <div className="flex items-center gap-3 px-4 shrink-0">
-          {code && (
-            <span className="font-mono text-[10px] uppercase tracking-widest text-teal-600 font-semibold bg-steel-100/80 px-2 py-0.5 border border-steel-300/60">
-              {code}
-            </span>
-          )}
-          {label && (
-            <span className="font-display text-xs uppercase tracking-widest text-steel-700 font-medium">
-              {label}
-            </span>
-          )}
+          <span className="font-sans text-xs text-steel-500 font-medium tracking-wide">
+            {label}
+          </span>
           {tealAccent && align === 'center' && (
             <div className="w-8 h-[2px] bg-teal-600" />
           )}

@@ -90,7 +90,7 @@ export const ComponentPlayground: React.FC<ComponentPlaygroundProps> = ({
             <div className="p-4 bg-canvas-light border border-steel-200 space-y-3">
               <span className="text-[10px] font-mono uppercase text-steel-500 block">Blueprint Accent Button</span>
               <div className="flex flex-wrap gap-2">
-                <Button variant="blueprint" size="md" icon={<Target className="w-3.5 h-3.5" />}>
+                <Button variant="primary" size="md" icon={<Target className="w-3.5 h-3.5" />}>
                   Retained Mandate
                 </Button>
               </div>
@@ -123,7 +123,7 @@ export const ComponentPlayground: React.FC<ComponentPlaygroundProps> = ({
             <Badge variant="navy" size="md">Navy Seniority</Badge>
             <Badge variant="teal" size="md" dot>Teal Active State</Badge>
             <Badge variant="steel" size="md">Concrete Neutral</Badge>
-            <Badge variant="mono" size="md">REF // MGH-2026</Badge>
+            <Badge variant="steel" size="md">REF // MGH-2026</Badge>
             <Badge variant="outline" size="md">Minimal Outline</Badge>
             <Badge variant="teal" size="sm" dot>Micro Dot (SM)</Badge>
           </div>
@@ -139,9 +139,9 @@ export const ComponentPlayground: React.FC<ComponentPlaygroundProps> = ({
           </div>
 
           <div className="space-y-4">
-            <SectionDivider code="SEC_01" label="LEFT ALIGNED ACCENT RULE" tealAccent align="left" />
-            <SectionDivider code="SEC_02" label="CENTER TICK COORDINATE" tealAccent align="center" />
-            <SectionDivider code="SEC_03" label="RIGHT ACCENT RULE" tealAccent align="right" />
+            <SectionDivider label="LEFT ALIGNED ACCENT RULE" tealAccent align="left" />
+            <SectionDivider label="CENTER TICK COORDINATE" tealAccent align="center" />
+            <SectionDivider label="RIGHT ACCENT RULE" tealAccent align="right" />
           </div>
         </div>
 

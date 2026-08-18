@@ -22,7 +22,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-navy-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 lg:p-8 animate-in fade-in duration-200">
-      <div className="relative bg-white border border-steel-300 w-full max-w-3xl shadow-2xl overflow-hidden my-8">
+      <div className="relative bg-white border border-steel-300 w-full max-w-3xl shadow-2xl overflow-hidden my-8 rounded-lg">
         
         {/* Top Blueprint Accent Bar */}
         <div className="h-1 bg-teal-600 w-full" />
@@ -33,9 +33,6 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
             <Badge variant="teal" size="sm" dot>
               {article.category}
             </Badge>
-            <span className="font-mono text-[11px] text-steel-500 hidden sm:inline">
-              EXECUTIVE BRIEFING // MGH INTELLIGENCE
-            </span>
           </div>
 
           <button
@@ -51,7 +48,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
         <div className="p-6 sm:p-8 max-h-[75vh] overflow-y-auto space-y-6">
           
           {/* Article Title */}
-          <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-navy-900 uppercase leading-tight tracking-tight">
+          <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-navy-900 leading-tight tracking-tight">
             {article.title}
           </h2>
 
@@ -73,7 +70,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
 
           {/* Executive Summary / Excerpt */}
           <div className="p-4 bg-steel-50 border-l-2 border-teal-600 text-sm text-navy-900 leading-relaxed font-sans">
-            <strong className="block font-mono text-[11px] uppercase tracking-wider text-teal-700 font-bold mb-1">
+            <strong className="block font-sans text-sm tracking-wide text-teal-700 font-bold mb-1">
               Executive Summary
             </strong>
             {article.excerpt}
@@ -82,7 +79,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           {/* Key Findings / Takeaways */}
           {article.keyTakeaways && article.keyTakeaways.length > 0 && (
             <div className="space-y-2">
-              <h4 className="font-mono text-xs font-bold uppercase tracking-widest text-navy-900">
+              <h4 className="font-sans text-sm font-bold tracking-wide text-navy-900">
                 Key Strategic Takeaways:
               </h4>
               <div className="space-y-1.5">
@@ -113,13 +110,13 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           {/* Author Card */}
           <div className="mt-8 p-4 bg-navy-900 text-white border border-navy-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-teal-400">
-                BRIEFING AUTHOR
+              <div className="font-sans text-xs tracking-wide text-teal-400 font-medium">
+                Briefing Author
               </div>
               <div className="font-display text-base font-bold text-white">
                 {article.author?.fields?.name || 'Mark Goldsmith'}
               </div>
-              <div className="text-xs text-steel-300 font-mono">
+              <div className="text-xs text-steel-300 font-sans">
                 {article.author?.fields?.roleTitle || 'Managing Director & Lead Search Partner'}
               </div>
             </div>

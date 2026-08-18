@@ -99,6 +99,10 @@
         { "id": "phone", "name": "Telephone", "type": "Symbol", "required": false },
         { "id": "headquarters", "name": "Headquarters Location", "type": "Symbol", "required": false },
         { "id": "linkedinUrl", "name": "LinkedIn URL", "type": "Symbol", "required": false },
+        { "id": "navLinks", "name": "Navigation Menu Items (JSON)", "type": "Object", "required": false },
+        { "id": "footerSpecialisms", "name": "Footer Specialisms List", "type": "Array", "items": { "type": "Symbol" }, "required": false },
+        { "id": "footerSubSectors", "name": "Footer Sub Sectors List", "type": "Array", "items": { "type": "Symbol" }, "required": false },
+        { "id": "copyrightText", "name": "Copyright Statement", "type": "Symbol", "required": false },
         { "id": "icoRegistrationNumber", "name": "ICO Registration Statement", "type": "Symbol", "required": false },
         { "id": "metaTitleDefault", "name": "Default SEO Title", "type": "Symbol", "required": false },
         { "id": "metaDescriptionDefault", "name": "Default SEO Description", "type": "Text", "required": false }

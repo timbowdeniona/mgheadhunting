@@ -22,6 +22,11 @@ export interface ContentfulAsset {
   };
 }
 
+export interface NavigationItem {
+  label: string;
+  href: string;
+}
+
 export interface AuthorFields {
   name: string;
   roleTitle: string;
@@ -36,10 +41,10 @@ export interface AuthorFields {
 }
 
 export interface SectorSpecialismFields {
-  code: string; // e.g. "SPEC_01 // BOARD & P&L"
+  code?: string;
   category: 'EXECUTIVE' | 'COMMERCIAL' | 'OPERATIONS' | 'TECHNICAL';
-  title: string; // e.g. "Managing Directors & CEOs"
-  subtitle?: string; // e.g. "General Management & Executive Leadership"
+  title: string;
+  subtitle?: string;
   description: string;
   sampleRoles: string[];
   keyClients: string;
@@ -47,7 +52,7 @@ export interface SectorSpecialismFields {
 }
 
 export interface DifferencePillarFields {
-  pillarIndex: string; // e.g. "PILLAR // 01"
+  pillarIndex?: string;
   title: string;
   highlight: string;
   description: string;
@@ -58,10 +63,10 @@ export interface DifferencePillarFields {
 }
 
 export interface ProcessStepFields {
-  stepNumber: string; // e.g. "01"
-  phaseName: string; // e.g. "CALIBRATION"
+  stepNumber: string;
+  phaseName: string;
   title: string;
-  timeline: string; // e.g. "Week 1"
+  timeline: string;
   description: string;
   deliverable: string;
   order?: number;
@@ -70,7 +75,7 @@ export interface ProcessStepFields {
 export interface InsightArticleFields {
   title: string;
   slug: string;
-  category: 'EXECUTIVE COMPENSATION' | 'REGULATORY & COMPLIANCE' | 'M&A & EXPANSION' | 'SUSTAINABILITY & TECH' | string;
+  category: string;
   publishedDate: string;
   readTime: string;
   excerpt: string;
@@ -93,13 +98,112 @@ export interface SiteSettingsFields {
   icoRegistrationNumber?: string;
   metaTitleDefault?: string;
   metaDescriptionDefault?: string;
+  navLinks: NavigationItem[];
+  footerSpecialisms: string[];
+  footerSubSectors: string[];
+  copyrightText: string;
 }
 
-export interface ContentfulEntry<T> {
-  sys: {
-    id: string;
-    createdAt?: string;
-    updatedAt?: string;
-  };
-  fields: T;
+export interface HeroSectionData {
+  badgeOverline: string;
+  badgeCategory: string;
+  headline: string;
+  highlightedPhrase: string;
+  subtitle: string;
+  keyValues: string[];
+  ctaPrimaryText: string;
+  ctaSecondaryText: string;
+  complianceNotice: string;
+  partnerName: string;
+  partnerTitle: string;
+  partnerBio: string;
+  metricPlacements: string;
+  metricTenure: string;
+  metricRetention: string;
+  metricCoverage: string;
+}
+
+export interface SectorMatrixSectionData {
+  sectionLabel: string;
+  title: string;
+  description: string;
+  subDisciplines: string[];
+  specialisms: SectorSpecialismFields[];
+}
+
+export interface DifferenceSectionData {
+  sectionLabel: string;
+  title: string;
+  description: string;
+  assuranceTitle: string;
+  assuranceDescription: string;
+  candidateQualityTitle: string;
+  candidateQualityText: string;
+  replacementGuaranteeTitle: string;
+  replacementGuaranteeText: string;
+  pillars: DifferencePillarFields[];
+}
+
+export interface SearchProcessSectionData {
+  sectionLabel: string;
+  title: string;
+  description: string;
+  steps: ProcessStepFields[];
+}
+
+export interface InsightsSectionData {
+  sectionLabel: string;
+  title: string;
+  description: string;
+  reportBannerCategory: string;
+  reportBannerTitle: string;
+  reportBannerDescription: string;
+  reportBannerCtaText: string;
+  articles: InsightArticleFields[];
+}
+
+export interface AboutPartnerSectionData {
+  sectionLabel: string;
+  badge: string;
+  badgeSecondary: string;
+  headline: string;
+  partnerName: string;
+  partnerRole: string;
+  partnerPracticeTenure: string;
+  partnerSpecialization: string;
+  partnerPlacementLevel: string;
+  partnerEmail: string;
+  partnerLinkedinUrl: string;
+  paragraphs: string[];
+  credentialsChecklist: string[];
+}
+
+export interface ContactFooterSectionData {
+  bannerOverline: string;
+  bannerTitle: string;
+  bannerSubtitle: string;
+  bannerCtaText: string;
+  ndaTitle: string;
+  ndaStatement: string;
+  siteDescription: string;
+  directDeskEmail: string;
+  headquarters: string;
+  responseGuarantee: string;
+  complianceNotice: string;
+  copyright: string;
+  navLinks: NavigationItem[];
+  footerSpecialisms: string[];
+  footerSubSectors: string[];
+  linkedinUrl: string;
+}
+
+export interface HomepageContentfulData {
+  siteSettings: SiteSettingsFields;
+  hero: HeroSectionData;
+  sectorMatrix: SectorMatrixSectionData;
+  difference: DifferenceSectionData;
+  process: SearchProcessSectionData;
+  insights: InsightsSectionData;
+  aboutPartner: AboutPartnerSectionData;
+  contactFooter: ContactFooterSectionData;
 }

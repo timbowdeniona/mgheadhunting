@@ -19,12 +19,12 @@ const renderOptions: Options = {
   },
   renderNode: {
     [BLOCKS.HEADING_1]: (node, children) => (
-      <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight uppercase mt-8 mb-4">
+      <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight mt-8 mb-4">
         {children}
       </h1>
     ),
     [BLOCKS.HEADING_2]: (node, children) => (
-      <h2 className="font-display text-xl sm:text-2xl font-bold text-navy-900 tracking-tight uppercase mt-6 mb-3 border-b border-steel-200 pb-2">
+      <h2 className="font-display text-xl sm:text-2xl font-bold text-navy-900 tracking-tight mt-6 mb-3 border-b border-steel-200 pb-2">
         {children}
       </h2>
     ),
@@ -39,7 +39,7 @@ const renderOptions: Options = {
       </p>
     ),
     [BLOCKS.UL_LIST]: (node, children) => (
-      <ul className="list-square list-inside space-y-2 mb-4 text-sm text-steel-700 pl-2">
+      <ul className="list-disc list-inside space-y-2 mb-4 text-sm text-steel-700 pl-2">
         {children}
       </ul>
     ),

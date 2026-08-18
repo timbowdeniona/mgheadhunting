@@ -2,27 +2,29 @@ import React, { useState } from 'react';
 import { Wordmark } from '../brand/Wordmark';
 import { Button } from '../ui/Button';
 import { Mail, Shield, Lock, Check, Clock } from 'lucide-react';
+import { ContactFooterSectionData } from '../../lib/contentful/types';
+import { fallbackContactFooterData } from '../../lib/contentful/api';
 
 export interface ContactFooterSectionProps {
+  data?: ContactFooterSectionData;
   onInitiateSearch: () => void;
 }
 
 export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
+  data = fallbackContactFooterData,
   onInitiateSearch,
 }) => {
+  const footer = data || fallbackContactFooterData;
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText('mgoldsmith@mgheadhunting.co.uk');
+    navigator.clipboard.writeText(footer.directDeskEmail);
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
   };
 
   return (
     <footer id="contact" className="bg-navy-950 text-white border-t border-navy-800 relative overflow-hidden">
-      {/* Blueprint Grid Dark Canvas */}
-      <div className="absolute inset-0 bg-blueprint-dark pointer-events-none opacity-40" />
-
       {/* Main Executive Contact Hub */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 relative z-10">
         
@@ -33,16 +35,15 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-teal-400" />
-                <span className="font-mono text-xs uppercase tracking-widest text-teal-400 font-semibold">
-                  CONFIDENTIAL EXECUTIVE MANDATES
+                <span className="font-sans text-xs tracking-wide text-teal-400 font-semibold">
+                  {footer.bannerOverline}
                 </span>
               </div>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight uppercase">
-                Discuss an Executive Appointment with Mark Goldsmith
+              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+                {footer.bannerTitle}
               </h2>
               <p className="text-sm text-steel-300 max-w-2xl leading-relaxed">
-                Whether commissioning a confidential Managing Director search, restructuring commercial leadership, or seeking board advisory on compensation, connect directly with our practice leader.
+                {footer.bannerSubtitle}
               </p>
             </div>
 
@@ -53,14 +54,14 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
                 onClick={onInitiateSearch}
                 fullWidth
               >
-                Initiate Confidential Search
+                {footer.bannerCtaText}
               </Button>
               
               <button
                 onClick={handleCopyEmail}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-navy-800 hover:bg-navy-700 border border-steel-400/30 text-xs font-mono uppercase tracking-wider text-steel-200 hover:text-white transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-navy-800 hover:bg-navy-700 border border-steel-400/30 text-xs font-sans tracking-wider text-steel-200 hover:text-white transition-colors"
               >
-                {copiedEmail ? <Check className="w-3.5 h-3.5 text-teal-400" /> : <Mail className="w-3.5 h-3.5 text-teal-400" />}
+                {copiedEmail ? <Check className="w-4 h-4 text-teal-400" /> : <Mail className="w-4 h-4 text-teal-400" />}
                 <span>{copiedEmail ? 'Email Copied' : 'Copy Direct Email'}</span>
               </button>
             </div>
@@ -72,11 +73,11 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
           <div className="flex items-start gap-3">
             <Lock className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <div className="font-mono text-xs text-teal-300 font-bold uppercase tracking-wider">
-                Modular Placement Disclosure Protocol
+              <div className="font-sans text-xs text-steel-400 font-semibold uppercase tracking-wide">
+                {footer.ndaTitle}
               </div>
               <p className="text-xs text-steel-300 leading-relaxed">
-                In strict adherence to executive restrictive covenants and client non-disclosure agreements, specific placement case studies and client references are shared selectively with verified clients during the calibration phase under bilateral NDA.
+                {footer.ndaStatement}
               </p>
             </div>
           </div>
@@ -89,11 +90,11 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
           <div className="space-y-4">
             <Wordmark variant="light" size="sm" showSubtitle />
             <p className="text-xs text-steel-400 leading-relaxed">
-              Boutique retained executive search specializing in C-suite, Board, and Director appointments across the UK and European Building Products and Construction sectors.
+              {footer.siteDescription}
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a
-                href="https://www.linkedin.com"
+                href={footer.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center bg-navy-800 hover:bg-teal-600 text-steel-300 hover:text-white border border-navy-700 transition-colors"
@@ -104,7 +105,7 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
                 </svg>
               </a>
               <a
-                href="mailto:mgoldsmith@mgheadhunting.co.uk"
+                href={`mailto:${footer.directDeskEmail}`}
                 className="w-8 h-8 flex items-center justify-center bg-navy-800 hover:bg-teal-600 text-steel-300 hover:text-white border border-navy-700 transition-colors"
                 aria-label="Direct Email"
               >
@@ -115,57 +116,55 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
 
           {/* Col 2: Sector Matrix */}
           <div className="space-y-3">
-            <div className="font-mono text-xs uppercase tracking-widest text-teal-400 font-semibold pb-1 border-b border-navy-800">
+            <div className="font-sans text-xs text-steel-400 font-semibold uppercase tracking-wide pb-1 border-b border-navy-800">
               Practice Specialisms
             </div>
             <ul className="space-y-2 text-xs text-steel-300">
-              <li><a href="#specialisms" className="hover:text-teal-400 transition-colors">Managing Directors &amp; CEOs</a></li>
-              <li><a href="#specialisms" className="hover:text-teal-400 transition-colors">Commercial &amp; Sales Directors</a></li>
-              <li><a href="#specialisms" className="hover:text-teal-400 transition-colors">Operations &amp; Plant Heads</a></li>
-              <li><a href="#specialisms" className="hover:text-teal-400 transition-colors">Technical &amp; R&amp;D Directors</a></li>
-              <li><a href="#specialisms" className="hover:text-teal-400 transition-colors">Finance &amp; Corporate Development</a></li>
-              <li><a href="#specialisms" className="hover:text-teal-400 transition-colors">Sustainability &amp; ESG Leadership</a></li>
+              {footer.footerSpecialisms.map((spec, idx) => (
+                <li key={idx}>
+                  <a href="#specialisms" className="hover:text-teal-400 transition-colors">
+                    {spec}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Col 3: Sub-Sectors */}
           <div className="space-y-3">
-            <div className="font-mono text-xs uppercase tracking-widest text-teal-400 font-semibold pb-1 border-b border-navy-800">
+            <div className="font-sans text-xs text-steel-400 font-semibold uppercase tracking-wide pb-1 border-b border-navy-800">
               Built Environment Sectors
             </div>
             <ul className="space-y-2 text-xs text-steel-300">
-              <li>Heavy Materials, Concrete &amp; Aggregates</li>
-              <li>Building Envelope, Façades &amp; Glazing</li>
-              <li>HVAC, Mechanical &amp; Building Services</li>
-              <li>Structural Timber &amp; Offsite MMC</li>
-              <li>Builders Merchant &amp; Trade Distribution</li>
-              <li>Roofing, Cladding &amp; Waterproofing</li>
+              {footer.footerSubSectors.map((sub, idx) => (
+                <li key={idx}>{sub}</li>
+              ))}
             </ul>
           </div>
 
           {/* Col 4: Direct Desk & Compliance */}
           <div className="space-y-3">
-            <div className="font-mono text-xs uppercase tracking-widest text-teal-400 font-semibold pb-1 border-b border-navy-800">
+            <div className="font-sans text-xs text-steel-400 font-semibold uppercase tracking-wide pb-1 border-b border-navy-800">
               Direct Practice Desk
             </div>
-            <div className="space-y-2 text-xs text-steel-300 font-mono">
+            <div className="space-y-2 text-xs text-steel-300 font-sans">
               <div>
-                <span className="text-steel-400 block text-[10px]">PRACTICE LEADER:</span>
+                <span className="text-steel-400 block text-[11px]">Practice Leader</span>
                 <span className="text-white font-bold">Mark Goldsmith</span>
               </div>
               <div>
-                <span className="text-steel-400 block text-[10px]">DIRECT MANDATE EMAIL:</span>
-                <a href="mailto:mgoldsmith@mgheadhunting.co.uk" className="text-teal-300 hover:underline">
-                  mgoldsmith@mgheadhunting.co.uk
+                <span className="text-steel-400 block text-[11px]">Direct Mandate Email</span>
+                <a href={`mailto:${footer.directDeskEmail}`} className="text-teal-300 hover:underline">
+                  {footer.directDeskEmail}
                 </a>
               </div>
               <div>
-                <span className="text-steel-400 block text-[10px]">HEADQUARTERS:</span>
-                <span>London &amp; Home Counties, United Kingdom</span>
+                <span className="text-steel-400 block text-[11px]">Headquarters</span>
+                <span>{footer.headquarters}</span>
               </div>
               <div className="pt-2 flex items-center gap-1.5 text-steel-400 text-[11px]">
                 <Clock className="w-3 h-3 text-teal-400" />
-                <span>Confidential Enquiries Responded &lt; 24h</span>
+                <span>{footer.responseGuarantee}</span>
               </div>
             </div>
           </div>
@@ -173,16 +172,16 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
         </div>
 
         {/* Regulatory & GDPR Compliance Statement */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-steel-400 font-mono">
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-steel-400 font-sans">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-teal-400 shrink-0" />
             <span>
-              UK GDPR Compliant • Registered with Information Commissioner's Office (ICO) • Strict Non-Disclosure Assured
+              {footer.complianceNotice}
             </span>
           </div>
 
           <div className="flex items-center gap-6">
-            <span>© 2026 MG Headhunting Ltd. All rights reserved.</span>
+            <span>{footer.copyright}</span>
             <a href="#about" className="hover:text-teal-400 transition-colors">Privacy &amp; Data Policy</a>
           </div>
         </div>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -40,87 +40,28 @@
     --color-canvas-muted: #F1F4F5;
 
     /* Typography */
-    --font-display: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'Space Grotesk', system-ui, sans-serif;
     --font-sans: 'Inter', 'Public Sans', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
-
-    /* Blueprint Grid */
-    --blueprint-line: rgba(208, 212, 214, 0.35);
-    --blueprint-line-dark: rgba(208, 212, 214, 0.08);
   }
 
   body {
     background-color: var(--color-canvas-light);
     color: var(--color-navy-900);
     font-family: var(--font-sans);
-    line-height: 1.65;
+    line-height: 1.7;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    letter-spacing: 0.03em;
+    letter-spacing: 0.01em;
   }
 }
 
 @layer utilities {
-  /* Architectural Blueprint Grid Backgrounds */
-  .bg-blueprint {
-    background-image: 
-      linear-gradient(to right, var(--blueprint-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--blueprint-line) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-
-  .bg-blueprint-dense {
-    background-image: 
-      linear-gradient(to right, var(--blueprint-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--blueprint-line) 1px, transparent 1px);
-    background-size: 16px 16px;
-  }
-
-  .bg-blueprint-dark {
-    background-image: 
-      linear-gradient(to right, var(--blueprint-line-dark) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--blueprint-line-dark) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-
-  /* Engineering Hairline Dividers & Crosshairs */
-  .crosshair-corner {
-    position: relative;
-  }
-  .crosshair-corner::before {
-    content: "+";
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--color-steel-400);
-    line-height: 1;
-    pointer-events: none;
-  }
-
-  /* Architectural corner tick marks */
-  .blueprint-frame {
-    position: relative;
-    border: 1px solid var(--color-steel-300);
-  }
-  .blueprint-frame::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    right: -1px;
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid var(--color-teal-600);
-    border-bottom: 2px solid var(--color-teal-600);
-    pointer-events: none;
-  }
 
   /* Monogram & Wordmark Fine Teal Rule */
   .teal-rule {
-    height: 1.5px;
+    height: 1px;
     background-color: var(--color-teal-600);
   }
 
@@ -137,5 +78,9 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #163A5F;
+  }
+
+  .transition-default {
+    transition: all 150ms ease;
   }
 }

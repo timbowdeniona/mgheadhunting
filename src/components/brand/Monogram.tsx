@@ -32,8 +32,6 @@ export const Monogram: React.FC<MonogramProps> = ({
       <span>MGH</span>
       {/* Precision Engineered Teal Base Accent */}
       <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-teal-600" />
-      {/* Subtle top-left coordinate tick */}
-      <span className="absolute top-0 left-0 w-1 h-1 bg-steel-400/40" />
     </div>
   );
 };

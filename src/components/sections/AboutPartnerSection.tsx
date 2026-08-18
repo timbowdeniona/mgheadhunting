@@ -3,71 +3,74 @@ import { SectionDivider } from '../ui/SectionDivider';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { AboutPartnerSectionData } from '../../lib/contentful/types';
+import { fallbackAboutPartnerData } from '../../lib/contentful/api';
 
 export interface AboutPartnerSectionProps {
+  data?: AboutPartnerSectionData;
   onInitiateSearch: () => void;
 }
 
 export const AboutPartnerSection: React.FC<AboutPartnerSectionProps> = ({
+  data = fallbackAboutPartnerData,
   onInitiateSearch,
 }) => {
+  const about = data || fallbackAboutPartnerData;
+
   return (
     <section id="about" className="py-20 lg:py-28 bg-white border-b border-steel-300 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <SectionDivider code="SECTION // 05" label="LEADERSHIP & PRACTICE ADVISORY" tealAccent align="left" />
+        <SectionDivider label={about.sectionLabel} tealAccent align="left" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Architectural Portrait Card */}
           <div className="lg:col-span-5">
             <div className="relative bg-navy-900 border border-steel-300 p-6 text-white">
-              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-teal-500" />
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-teal-500" />
-              
               <div className="flex items-center justify-between pb-4 mb-4 border-b border-navy-700">
-                <span className="font-mono text-xs text-teal-400 font-bold uppercase tracking-wider">
-                  FOUNDER &amp; MANAGING DIRECTOR
+                <span className="font-sans text-xs text-teal-400 font-semibold tracking-wide">
+                  Founder &amp; Managing Director
                 </span>
-                <span className="font-mono text-[10px] text-steel-400">UK &amp; EUROPE</span>
+                <span className="font-sans text-xs text-steel-400">UK &amp; Europe</span>
               </div>
 
               {/* Graphical Monogram Header */}
               <div className="my-6 text-center py-6 bg-navy-950/80 border border-navy-800">
-                <div className="font-display text-4xl font-extrabold tracking-widest text-white mb-1">
-                  MARK GOLDSMITH
+                <div className="font-display text-4xl font-extrabold tracking-wide text-white mb-1">
+                  {about.partnerName}
                 </div>
                 <div className="h-[2px] w-24 bg-teal-500 mx-auto my-2" />
-                <div className="font-mono text-xs uppercase tracking-widest text-steel-300">
-                  Head of Executive Search
+                <div className="font-sans text-xs text-steel-300 font-medium">
+                  {about.partnerRole}
                 </div>
               </div>
 
-              <div className="space-y-2 text-xs font-mono text-steel-300 border-t border-navy-700 pt-4">
+              <div className="space-y-2 text-xs font-sans text-steel-300 border-t border-navy-700 pt-4">
                 <div className="flex justify-between">
                   <span className="text-steel-400">Practice Tenure:</span>
-                  <span className="text-white font-semibold">20+ Years</span>
+                  <span className="text-white font-semibold">{about.partnerPracticeTenure}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-steel-400">Specialization:</span>
-                  <span className="text-white font-semibold">Building Products &amp; Construction</span>
+                  <span className="text-white font-semibold">{about.partnerSpecialization}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-steel-400">Placement Level:</span>
-                  <span className="text-white font-semibold">Board / MD / C-Suite</span>
+                  <span className="text-white font-semibold">{about.partnerPlacementLevel}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-steel-400">Direct Desk:</span>
-                  <a href="mailto:mgoldsmith@mgheadhunting.co.uk" className="text-teal-300 hover:underline">
-                    mgoldsmith@mgheadhunting.co.uk
+                  <a href={`mailto:${about.partnerEmail}`} className="text-teal-300 hover:underline">
+                    {about.partnerEmail}
                   </a>
                 </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-navy-700 flex items-center justify-between">
                 <a
-                  href="https://www.linkedin.com"
+                  href={about.partnerLinkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs text-teal-300 hover:text-white transition-colors"
@@ -77,7 +80,6 @@ export const AboutPartnerSection: React.FC<AboutPartnerSectionProps> = ({
                   </svg>
                   <span>Connect on LinkedIn</span>
                 </a>
-                <span className="text-[10px] font-mono text-steel-400">STATUS: ACTIVE MANDATES</span>
               </div>
             </div>
           </div>
@@ -85,43 +87,27 @@ export const AboutPartnerSection: React.FC<AboutPartnerSectionProps> = ({
           {/* Right Column: Narrative & Pedigree */}
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2">
-              <Badge variant="navy" size="md">BOUTIQUE EXECUTIVE SEARCH</Badge>
-              <Badge variant="steel" size="md">PARTNER-LED RIGOR</Badge>
+              <Badge variant="navy" size="md">{about.badge}</Badge>
+              <Badge variant="steel" size="md">{about.badgeSecondary}</Badge>
             </div>
 
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight uppercase leading-tight">
-              Two Decades of High-Impact Board &amp; C-Suite Placements
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight leading-tight">
+              {about.headline}
             </h2>
 
             <div className="space-y-4 text-sm sm:text-base text-steel-700 leading-relaxed font-sans">
-              <p>
-                <strong>Mark Goldsmith</strong> founded MG Headhunting to provide a bespoke, rigorously engineered alternative to the impersonal assembly-line recruitment models dominating the built environment sector.
-              </p>
-              <p>
-                Having advised international manufacturing conglomerates, family-owned merchant groups, and Private Equity investment firms, Mark combines an intricate technical understanding of construction products with direct access to non-active, high-performing executive leaders.
-              </p>
-              <p>
-                Every mandate undertaken by MGH is managed with unwavering discretion, meticulous candidate assessment, and a relentless commitment to long-term leadership retention.
-              </p>
+              {about.paragraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
+              ))}
             </div>
 
-            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono text-navy-900">
-              <div className="flex items-center gap-2 p-2.5 bg-steel-50 border border-steel-200">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>Strict Non-Disclosure Protocols</span>
-              </div>
-              <div className="flex items-center gap-2 p-2.5 bg-steel-50 border border-steel-200">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>Proven PE Value-Creation Placements</span>
-              </div>
-              <div className="flex items-center gap-2 p-2.5 bg-steel-50 border border-steel-200">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>Deep European Manufacturing Networks</span>
-              </div>
-              <div className="flex items-center gap-2 p-2.5 bg-steel-50 border border-steel-200">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>Zero Off-Limit Conflicts on Core Searches</span>
-              </div>
+            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-sans text-navy-900 font-medium">
+              {about.credentialsChecklist.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2 p-2.5 bg-steel-50 border border-steel-200">
+                  <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
 
             <div className="pt-4">

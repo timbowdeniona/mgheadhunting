@@ -63,9 +63,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ['"Space Grotesk"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
         sans: ['"Inter"', '"Public Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['"JetBrains Mono"', '"SF Mono"', 'Consolas', 'monospace'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       letterSpacing: {
         tighter: '-0.04em',
@@ -74,14 +74,13 @@ const config: Config = {
         wide: '0.04em',
         wider: '0.08em',
         widest: '0.15em',
-        ultra: '0.22em',
-        blueprint: '0.28em',
       },
       borderRadius: {
         none: '0px',
         sm: '2px',
         DEFAULT: '2px',
         md: '4px',
+        lg: '6px',
       },
       borderWidth: {
         '1': '1px',
@@ -92,18 +91,8 @@ const config: Config = {
         none: 'none',
         subtle: '0 1px 2px 0 rgba(15, 36, 58, 0.05)',
         architectural: '0 4px 14px -2px rgba(15, 36, 58, 0.08)',
-        'flat-steel': '3px 3px 0px 0px #D0D4D6',
-        'flat-teal': '3px 3px 0px 0px #138D90',
-        'flat-navy': '3px 3px 0px 0px #163A5F',
-      },
-      backgroundImage: {
-        'blueprint-grid': 'linear-gradient(to right, rgba(208, 212, 214, 0.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(208, 212, 214, 0.25) 1px, transparent 1px)',
-        'blueprint-grid-dark': 'linear-gradient(to right, rgba(208, 212, 214, 0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(208, 212, 214, 0.07) 1px, transparent 1px)',
-      },
-      backgroundSize: {
-        'grid-sm': '20px 20px',
-        'grid-md': '32px 32px',
-        'grid-lg': '48px 48px',
+        card: '0 1px 3px 0 rgba(15, 36, 58, 0.06), 0 1px 2px -1px rgba(15, 36, 58, 0.04)',
+        elevated: '0 4px 16px -2px rgba(15, 36, 58, 0.10), 0 2px 6px -2px rgba(15, 36, 58, 0.06)',
       },
     },
   },

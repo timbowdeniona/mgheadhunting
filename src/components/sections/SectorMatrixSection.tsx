@@ -1,21 +1,29 @@
 import React, { useState } from 'react';
 import { SectionDivider } from '../ui/SectionDivider';
 import { MatrixCard } from '../ui/MatrixCard';
-import { SectorSpecialismFields } from '../../lib/contentful/types';
-import { fallbackSpecialisms } from '../../lib/contentful/api';
+import { SectorSpecialismFields, SectorMatrixSectionData } from '../../lib/contentful/types';
+import { fallbackSpecialisms, fallbackSubDisciplines } from '../../lib/contentful/api';
 
 export interface SectorMatrixSectionProps {
-  onSelectSector: (sectorName: string) => void;
+  data?: SectorMatrixSectionData;
   specialisms?: SectorSpecialismFields[];
+  onSelectSector: (sectorName: string) => void;
 }
 
 export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
+  data,
+  specialisms,
   onSelectSector,
-  specialisms = fallbackSpecialisms,
 }) => {
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'EXECUTIVE' | 'COMMERCIAL' | 'OPERATIONS' | 'TECHNICAL'>('ALL');
 
-  const filteredSpecialisms = (specialisms || fallbackSpecialisms).filter((item) => {
+  const specialismList = specialisms || data?.specialisms || fallbackSpecialisms;
+  const sectionLabel = data?.sectionLabel || 'Sector Specialism Matrix';
+  const sectionTitle = data?.title || 'Core Practice Matrix';
+  const sectionDesc = data?.description || 'Specialized search focused exclusively on executive roles across manufacturing, distribution, and contracting in the Building Products & Construction materials ecosystem.';
+  const subDisciplines = data?.subDisciplines || fallbackSubDisciplines;
+
+  const filteredSpecialisms = specialismList.filter((item) => {
     if (activeFilter === 'ALL') return true;
     return item.category === activeFilter;
   });
@@ -25,16 +33,16 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Divider Header */}
-        <SectionDivider code="SECTION // 01" label="SECTOR SPECIALISM MATRIX" tealAccent align="left" />
+        <SectionDivider label={sectionLabel} tealAccent align="left" />
 
         {/* Section Title & Positioning */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight uppercase">
-              Core Practice Matrix
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight">
+              {sectionTitle}
             </h2>
             <p className="text-sm sm:text-base text-steel-700 mt-2 max-w-2xl">
-              Specialized search focused exclusively on executive roles across manufacturing, distribution, and contracting in the Building Products &amp; Construction materials ecosystem.
+              {sectionDesc}
             </p>
           </div>
 
@@ -44,7 +52,7 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-3 py-1.5 text-[11px] font-mono tracking-wider transition-all select-none uppercase font-semibold ${
+                className={`px-3 py-1.5 text-xs font-sans tracking-wider transition-all select-none uppercase font-medium ${
                   activeFilter === filter
                     ? 'bg-navy-900 text-white shadow-sm'
                     : 'text-steel-700 hover:text-navy-900 hover:bg-steel-200/60'
@@ -61,7 +69,6 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
           {filteredSpecialisms.map((spec) => (
             <MatrixCard
               key={spec.code || spec.title}
-              code={spec.code}
               title={spec.title}
               subtitle={spec.subtitle}
               description={spec.description}
@@ -79,8 +86,7 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 bg-teal-600" />
-                <span className="font-mono text-xs uppercase tracking-widest text-teal-700 font-bold">
+                <span className="font-sans text-xs uppercase tracking-widest text-teal-700 font-bold">
                   Sector Sub-Disciplines Covered
                 </span>
               </div>
@@ -89,17 +95,8 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
               </h4>
             </div>
 
-            <div className="flex flex-wrap gap-2 text-xs font-mono">
-              {[
-                'Heavy Materials & Aggregates',
-                'Curtain Walling & Glazing',
-                'Structural Timber & Engineered Wood',
-                'Offsite & Modular Manufacturing',
-                'HVAC, M&E and Pumps',
-                'Drylining, Plaster & Insulation',
-                'Builders Merchants & Distribution',
-                'Roofing, Waterproofing & Cladding',
-              ].map((sub, idx) => (
+            <div className="flex flex-wrap gap-2 text-xs font-sans">
+              {subDisciplines.map((sub, idx) => (
                 <span
                   key={idx}
                   className="bg-white border border-steel-300 text-navy-900 px-3 py-1.5 hover:border-teal-600 transition-colors"

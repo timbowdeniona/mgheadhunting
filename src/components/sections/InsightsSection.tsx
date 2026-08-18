@@ -3,23 +3,32 @@ import { SectionDivider } from '../ui/SectionDivider';
 import { InsightCard } from '../ui/InsightCard';
 import { Button } from '../ui/Button';
 import { BookOpen, Download } from 'lucide-react';
-import { InsightArticleFields } from '../../lib/contentful/types';
+import { InsightArticleFields, InsightsSectionData } from '../../lib/contentful/types';
 import { fallbackInsightArticles } from '../../lib/contentful/api';
 
 export interface InsightsSectionProps {
+  data?: InsightsSectionData;
   articles?: InsightArticleFields[];
   onReadArticle?: (article: InsightArticleFields) => void;
   onRequestReport?: () => void;
 }
 
 export const InsightsSection: React.FC<InsightsSectionProps> = ({
-  articles = fallbackInsightArticles,
+  data,
+  articles,
   onReadArticle,
   onRequestReport,
 }) => {
   const [selectedTag, setSelectedTag] = useState<string>('ALL');
 
-  const articleList = articles || fallbackInsightArticles;
+  const articleList = articles || data?.articles || fallbackInsightArticles;
+  const sectionLabel = data?.sectionLabel || 'Market Intelligence';
+  const sectionTitle = data?.title || 'Executive Briefings & Market Insights';
+  const sectionDesc = data?.description || 'Proprietary intelligence on executive talent flows, board compensation dynamics, and regulatory shifts across the Building Products landscape.';
+  const reportCategory = data?.reportBannerCategory || 'Special Research Publication';
+  const reportTitle = data?.reportBannerTitle || '2026/2027 Building Products Executive Salary & Retention Benchmark';
+  const reportDesc = data?.reportBannerDescription || 'Comprehensive compensation analysis covering 400+ board appointments across UK & European manufacturing, merchants, and fabricators.';
+  const reportCta = data?.reportBannerCtaText || 'Request Confidential Report';
 
   const filteredArticles = selectedTag === 'ALL'
     ? articleList
@@ -30,15 +39,15 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <SectionDivider code="SECTION // 04" label="MARKET INTELLIGENCE" tealAccent align="left" />
+        <SectionDivider label={sectionLabel} tealAccent align="left" />
 
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight uppercase">
-              Executive Briefings &amp; Market Insights
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight">
+              {sectionTitle}
             </h2>
             <p className="text-sm sm:text-base text-steel-700 mt-2 max-w-2xl">
-              Proprietary intelligence on executive talent flows, board compensation dynamics, and regulatory shifts across the Building Products landscape.
+              {sectionDesc}
             </p>
           </div>
 
@@ -47,7 +56,7 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
               <button
                 key={tag}
                 onClick={() => setSelectedTag(tag)}
-                className={`px-3 py-1.5 text-[11px] font-mono tracking-wider transition-all select-none uppercase font-semibold ${
+                className={`px-3 py-1.5 text-xs font-sans tracking-wider transition-all select-none uppercase font-medium ${
                   selectedTag === tag
                     ? 'bg-navy-900 text-white shadow-sm'
                     : 'text-steel-700 hover:text-navy-900 hover:bg-steel-200/60'
@@ -86,15 +95,15 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-teal-400" />
-              <span className="font-mono text-xs uppercase tracking-widest text-teal-300 font-bold">
-                Special Research Publication
+              <span className="font-sans font-medium tracking-wide text-teal-300">
+                {reportCategory}
               </span>
             </div>
             <h3 className="font-display text-xl font-bold">
-              2026/2027 Building Products Executive Salary &amp; Retention Benchmark
+              {reportTitle}
             </h3>
             <p className="text-xs text-steel-300 max-w-xl">
-              Comprehensive compensation analysis covering 400+ board appointments across UK &amp; European manufacturing, merchants, and fabricators.
+              {reportDesc}
             </p>
           </div>
 
@@ -110,7 +119,7 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
               }
             }}
           >
-            Request Confidential Report
+            {reportCta}
           </Button>
         </div>
 

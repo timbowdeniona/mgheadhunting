@@ -3,12 +3,13 @@ import { SectionDivider } from '../ui/SectionDivider';
 import { DifferenceCard } from '../ui/DifferenceCard';
 import { Target, UserCheck, ShieldCheck, Compass, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { DifferencePillarFields } from '../../lib/contentful/types';
+import { DifferencePillarFields, DifferenceSectionData } from '../../lib/contentful/types';
 import { fallbackDifferencePillars } from '../../lib/contentful/api';
 
 export interface DifferenceSectionProps {
-  onInitiateSearch: () => void;
+  data?: DifferenceSectionData;
   pillars?: DifferencePillarFields[];
+  onInitiateSearch: () => void;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -19,24 +20,36 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export const DifferenceSection: React.FC<DifferenceSectionProps> = ({
+  data,
+  pillars,
   onInitiateSearch,
-  pillars = fallbackDifferencePillars,
 }) => {
+  const pillarList = pillars || data?.pillars || fallbackDifferencePillars;
+  const sectionLabel = data?.sectionLabel || 'The MGH Difference';
+  const sectionTitle = data?.title || 'Engineered Executive Search vs Recruitment Clichés';
+  const sectionDesc = data?.description || 'Why CEOs, Private Equity investors, and Board Chairs choose MG Headhunting over generic recruitment agencies.';
+  const assuranceTitle = data?.assuranceTitle || '100% Commitment to Mandate Completion';
+  const assuranceDesc = data?.assuranceDescription || 'Unlike transactional agents who drop searches when difficult, MGH guarantees persistence until the exact candidate profile is secured.';
+  const qualityTitle = data?.candidateQualityTitle || 'Candidate quality';
+  const qualityText = data?.candidateQualityText || 'Targeted approach to top 5% performers who are not on job boards.';
+  const warrantyTitle = data?.replacementGuaranteeTitle || 'Replacement guarantee';
+  const warrantyText = data?.replacementGuaranteeText || 'Full 12-month candidate replacement warranty on executive placements.';
+
   return (
     <section id="difference" className="py-20 lg:py-28 bg-canvas-light border-b border-steel-300 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header Divider */}
-        <SectionDivider code="SECTION // 02" label="THE MGH DIFFERENCE" tealAccent align="left" />
+        <SectionDivider label={sectionLabel} tealAccent align="left" />
 
         {/* Section Title */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight uppercase">
-              Engineered Executive Search vs Recruitment Clichés
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight">
+              {sectionTitle}
             </h2>
             <p className="text-sm sm:text-base text-steel-700 mt-2 max-w-2xl">
-              Why CEOs, Private Equity investors, and Board Chairs choose MG Headhunting over generic recruitment agencies.
+              {sectionDesc}
             </p>
           </div>
 
@@ -52,12 +65,11 @@ export const DifferenceSection: React.FC<DifferenceSectionProps> = ({
 
         {/* 4 Pillars Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {(pillars || fallbackDifferencePillars).map((diff, index) => {
+          {pillarList.map((diff, index) => {
             const IconComponent = (diff.iconIdentifier && iconMap[diff.iconIdentifier]) || [Target, UserCheck, Compass, ShieldCheck][index % 4];
             return (
               <DifferenceCard
-                key={diff.pillarIndex || diff.title}
-                index={diff.pillarIndex}
+                key={diff.title}
                 title={diff.title}
                 highlight={diff.highlight}
                 description={diff.description}
@@ -75,28 +87,28 @@ export const DifferenceSection: React.FC<DifferenceSectionProps> = ({
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
             <div className="space-y-1">
-              <div className="font-mono text-xs text-teal-400 uppercase tracking-widest">
-                THE RETAINED ASSURANCE
+              <div className="font-sans text-xs text-teal-400 font-medium tracking-wide">
+                The retained assurance
               </div>
               <h3 className="font-display text-xl font-bold">
-                100% Commitment to Mandate Completion
+                {assuranceTitle}
               </h3>
               <p className="text-xs text-steel-300">
-                Unlike transactional agents who drop searches when difficult, MGH guarantees persistence until the exact candidate profile is secured.
+                {assuranceDesc}
               </p>
             </div>
 
-            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
               <div className="p-3.5 bg-navy-800/80 border border-navy-700">
-                <div className="text-teal-300 font-bold mb-1">CANDIDATE QUALITY</div>
+                <div className="text-teal-300 font-medium tracking-wide mb-1">{qualityTitle}</div>
                 <div className="text-steel-200">
-                  Targeted approach to top 5% performers who are not on job boards.
+                  {qualityText}
                 </div>
               </div>
               <div className="p-3.5 bg-navy-800/80 border border-navy-700">
-                <div className="text-teal-300 font-bold mb-1">REPLACEMENT GUARANTEE</div>
+                <div className="text-teal-300 font-medium tracking-wide mb-1">{warrantyTitle}</div>
                 <div className="text-steel-200">
-                  Full 12-month candidate replacement warranty on executive placements.
+                  {warrantyText}
                 </div>
               </div>
             </div>

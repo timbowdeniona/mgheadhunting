@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'blueprint';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
@@ -18,7 +18,7 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-display font-semibold transition-all duration-150 relative select-none disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-xs';
+  const baseStyles = 'inline-flex items-center justify-center font-display font-semibold transition-all duration-150 relative select-none disabled:opacity-50 disabled:cursor-not-allowed tracking-wide text-sm';
   
   const sizeStyles = {
     sm: 'px-3 py-1.5 text-[11px] gap-1.5',
@@ -28,19 +28,16 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     // Medium Teal (#138D90) CTA - Directional Focus
-    primary: 'bg-teal-600 text-white hover:bg-teal-700 active:bg-teal-800 border border-teal-600 rounded-none shadow-none hover:shadow-[0_2px_8px_rgba(19,141,144,0.3)]',
+    primary: 'bg-teal-600 text-white hover:bg-teal-700 active:bg-teal-800 border border-teal-600 rounded-sm shadow-none hover:shadow-sm',
     
     // Deep Navy (#163A5F) Solid - Executive Seniority
-    secondary: 'bg-navy-800 text-white hover:bg-navy-900 active:bg-navy-950 border border-navy-800 rounded-none shadow-none',
+    secondary: 'bg-navy-800 text-white hover:bg-navy-900 active:bg-navy-950 border border-navy-800 rounded-sm shadow-none',
     
     // Concrete / Steel Grey (#D0D4D6) Hairline Outline
-    outline: 'bg-transparent text-navy-900 hover:text-teal-600 border border-steel-300 hover:border-teal-600 hover:bg-teal-50/40 rounded-none',
+    outline: 'bg-transparent text-navy-900 hover:text-teal-600 border border-steel-300 hover:border-teal-600 hover:bg-teal-50/40 rounded-sm',
     
     // Ghost / Muted
-    ghost: 'bg-transparent text-navy-800 hover:text-teal-600 hover:bg-steel-100/60 border border-transparent rounded-none',
-    
-    // Blueprint Engineered Button with architectural corner accents
-    blueprint: 'bg-navy-900 text-white hover:bg-navy-800 border border-steel-400/40 rounded-none relative after:absolute after:bottom-0 after:right-0 after:w-2 after:h-2 after:border-b after:border-r after:border-teal-400',
+    ghost: 'bg-transparent text-navy-800 hover:text-teal-600 hover:bg-steel-100/60 border border-transparent rounded-sm',
   };
 
   const widthStyle = fullWidth ? 'w-full' : '';

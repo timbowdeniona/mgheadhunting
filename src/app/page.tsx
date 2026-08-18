@@ -1,27 +1,10 @@
 import { HomepageClient } from '../components/HomepageClient';
-import {
-  fetchSectorSpecialisms,
-  fetchDifferencePillars,
-  fetchProcessSteps,
-  fetchInsightArticles,
-} from '../lib/contentful/api';
+import { fetchHomepageData } from '../lib/contentful/api';
 
-export const revalidate = 60; // Incremental Static Regeneration every 60s
+export const revalidate = 60; // Incremental Static Regeneration (ISR) every 60s
 
 export default async function HomePage() {
-  const [specialisms, differencePillars, processSteps, insightArticles] = await Promise.all([
-    fetchSectorSpecialisms(),
-    fetchDifferencePillars(),
-    fetchProcessSteps(),
-    fetchInsightArticles(),
-  ]);
+  const data = await fetchHomepageData();
 
-  return (
-    <HomepageClient
-      specialisms={specialisms}
-      differencePillars={differencePillars}
-      processSteps={processSteps}
-      insightArticles={insightArticles}
-    />
-  );
+  return <HomepageClient data={data} />;
 }

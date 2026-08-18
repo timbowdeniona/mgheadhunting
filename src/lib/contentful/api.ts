@@ -5,12 +5,79 @@ import {
   DifferencePillarFields,
   ProcessStepFields,
   InsightArticleFields,
+  SiteSettingsFields,
+  HeroSectionData,
+  SectorMatrixSectionData,
+  DifferenceSectionData,
+  SearchProcessSectionData,
+  InsightsSectionData,
+  AboutPartnerSectionData,
+  ContactFooterSectionData,
+  HomepageContentfulData,
 } from './types';
 
-// Fallback Mock Data in case of network interruption or offline development
+export const fallbackSiteSettings: SiteSettingsFields = {
+  siteName: 'MG Headhunting',
+  tagline: 'Building Products',
+  primaryEmail: 'mgoldsmith@mgheadhunting.co.uk',
+  phone: '+44 (0) 20 7946 0198',
+  headquarters: 'London & Home Counties, United Kingdom',
+  linkedinUrl: 'https://www.linkedin.com',
+  icoRegistrationNumber: "UK GDPR Compliant • Registered with Information Commissioner's Office (ICO) • Strict Non-Disclosure Assured",
+  metaTitleDefault: 'MG Headhunting (MGH) | Retained Executive Search for Building Products & Construction',
+  metaDescriptionDefault: 'Boutique retained executive search delivering Board, Managing Director, and C-Suite appointments across the UK and European Building Products and Built Environment sectors.',
+  navLinks: [
+    { label: 'Specialisms', href: '#specialisms' },
+    { label: 'The MGH Difference', href: '#difference' },
+    { label: 'Search Process', href: '#process' },
+    { label: 'Market Intelligence', href: '#insights' },
+    { label: 'About Mark Goldsmith', href: '#about' },
+    { label: 'Contact', href: '#contact' },
+  ],
+  footerSpecialisms: [
+    'Managing Directors & CEOs',
+    'Commercial & Sales Directors',
+    'Operations & Plant Heads',
+    'Technical & R&D Directors',
+    'Finance & Corporate Development',
+    'Sustainability & ESG Leadership',
+  ],
+  footerSubSectors: [
+    'Heavy Materials, Concrete & Aggregates',
+    'Building Envelope, Façades & Glazing',
+    'HVAC, Mechanical & Building Services',
+    'Structural Timber & Offsite MMC',
+    'Builders Merchant & Trade Distribution',
+    'Roofing, Cladding & Waterproofing',
+  ],
+  copyrightText: '© 2026 MG Headhunting Ltd. All rights reserved.',
+};
+
+export const fallbackHeroData: HeroSectionData = {
+  badgeOverline: 'Retained Executive Search',
+  badgeCategory: 'Building Products & Construction',
+  headline: 'Board, Managing Director & C-Suite Appointments for the',
+  highlightedPhrase: 'Built Environment',
+  subtitle: 'MG Headhunting (MGH) delivers precision-engineered executive search for manufacturers, distributors, and private equity investors across the Building Products sector. Partner-led, rigorously assessed, and strictly confidential.',
+  keyValues: [
+    'Zero Transactional Recruitment',
+    '100% Partner Execution',
+    'Deep Sector Discretion',
+  ],
+  ctaPrimaryText: 'Initiate Confidential Search',
+  ctaSecondaryText: 'View Sector Specialisms',
+  complianceNotice: 'Operating under UK Executive Search Code of Conduct & Strict Data Protection protocols.',
+  partnerName: 'Mark Goldsmith',
+  partnerTitle: 'Managing Director & Lead Search Partner',
+  partnerBio: 'Specialist in board appointments, P&L leaders, and commercial turnarounds across heavy building materials, façades, HVAC, and timber systems.',
+  metricPlacements: '200+',
+  metricTenure: '20+ Yrs',
+  metricRetention: '96%',
+  metricCoverage: 'UK & EU',
+};
+
 export const fallbackSpecialisms: SectorSpecialismFields[] = [
   {
-    code: 'SPEC_01 // BOARD & P&L',
     category: 'EXECUTIVE',
     title: 'Managing Directors & CEOs',
     subtitle: 'General Management & Executive Leadership',
@@ -20,7 +87,6 @@ export const fallbackSpecialisms: SectorSpecialismFields[] = [
     order: 1,
   },
   {
-    code: 'SPEC_02 // REVENUE & SPEC',
     category: 'COMMERCIAL',
     title: 'Commercial & Sales Directors',
     subtitle: 'Specification & Trade Distribution',
@@ -30,7 +96,6 @@ export const fallbackSpecialisms: SectorSpecialismFields[] = [
     order: 2,
   },
   {
-    code: 'SPEC_03 // PLANT & LEAN',
     category: 'OPERATIONS',
     title: 'Operations & Supply Chain',
     subtitle: 'Manufacturing Excellence & Multi-Site Logistics',
@@ -40,7 +105,6 @@ export const fallbackSpecialisms: SectorSpecialismFields[] = [
     order: 3,
   },
   {
-    code: 'SPEC_04 // R&D & STANDARDS',
     category: 'TECHNICAL',
     title: 'Technical, R&D & Compliance',
     subtitle: 'Building Safety Act & Product Engineering',
@@ -50,7 +114,6 @@ export const fallbackSpecialisms: SectorSpecialismFields[] = [
     order: 4,
   },
   {
-    code: 'SPEC_05 // CAPITAL & M&A',
     category: 'EXECUTIVE',
     title: 'Finance & Corporate Development',
     subtitle: 'CFOs & Transaction Specialists',
@@ -60,7 +123,6 @@ export const fallbackSpecialisms: SectorSpecialismFields[] = [
     order: 5,
   },
   {
-    code: 'SPEC_06 // SUSTAINABILITY',
     category: 'TECHNICAL',
     title: 'Sustainability & ESG Leadership',
     subtitle: 'Decarbonization & Circular Materials',
@@ -71,9 +133,19 @@ export const fallbackSpecialisms: SectorSpecialismFields[] = [
   },
 ];
 
+export const fallbackSubDisciplines = [
+  'Heavy Materials & Aggregates',
+  'Curtain Walling & Glazing',
+  'Structural Timber & Engineered Wood',
+  'Offsite & Modular Manufacturing',
+  'HVAC, M&E and Pumps',
+  'Drylining, Plaster & Insulation',
+  'Builders Merchants & Distribution',
+  'Roofing, Waterproofing & Cladding',
+];
+
 export const fallbackDifferencePillars: DifferencePillarFields[] = [
   {
-    pillarIndex: 'PILLAR // 01',
     title: 'Exclusively Retained Rigour',
     highlight: 'Dedicated Mandates Over Transactional Volume',
     description: 'We do not run high-volume contingent CV races. Every search is a fully retained partnership where we commit our full operational capacity until the ideal executive is placed and integrated.',
@@ -83,7 +155,6 @@ export const fallbackDifferencePillars: DifferencePillarFields[] = [
     order: 1,
   },
   {
-    pillarIndex: 'PILLAR // 02',
     title: 'Direct Partner Accountability',
     highlight: 'Zero Junior Consultant Delegation',
     description: 'In traditional search firms, senior partners win the mandate and hand execution to junior researchers. At MGH, Mark Goldsmith personally maps the market, conducts candidate interviews, and leads board negotiations.',
@@ -93,7 +164,6 @@ export const fallbackDifferencePillars: DifferencePillarFields[] = [
     order: 2,
   },
   {
-    pillarIndex: 'PILLAR // 03',
     title: 'Architectural Blueprint Process',
     highlight: 'Systematic 5-Stage Assessment Protocol',
     description: 'Every candidate undergoes structured competency evaluation, cultural calibration, referencing against previous board peers, and deep commercial validation before presentation.',
@@ -103,7 +173,6 @@ export const fallbackDifferencePillars: DifferencePillarFields[] = [
     order: 3,
   },
   {
-    pillarIndex: 'PILLAR // 04',
     title: 'Restricted Covenant Discretion',
     highlight: 'Strict Confidentiality & PE Alignment',
     description: 'We safeguard corporate strategy, sensitive leadership transitions, and competitive positioning under strict non-disclosure, ensuring your brand equity is protected at every touchpoint.',
@@ -117,7 +186,7 @@ export const fallbackDifferencePillars: DifferencePillarFields[] = [
 export const fallbackProcessSteps: ProcessStepFields[] = [
   {
     stepNumber: '01',
-    phaseName: 'CALIBRATION',
+    phaseName: 'Calibration',
     title: 'Briefing & Strategic Calibration',
     timeline: 'Week 1',
     description: 'Comprehensive discovery with Board / PE stakeholders to establish operational metrics, cultural leadership requirements, and exact compensation structures.',
@@ -126,7 +195,7 @@ export const fallbackProcessSteps: ProcessStepFields[] = [
   },
   {
     stepNumber: '02',
-    phaseName: 'MAPPING',
+    phaseName: 'Mapping',
     title: 'Deep Market Mapping & Intelligence',
     timeline: 'Weeks 2–3',
     description: 'Exhaustive research of direct and adjacent competitors across the Building Products ecosystem to identify high-performing passive executives.',
@@ -135,7 +204,7 @@ export const fallbackProcessSteps: ProcessStepFields[] = [
   },
   {
     stepNumber: '03',
-    phaseName: 'ASSESSMENT',
+    phaseName: 'Assessment',
     title: 'Confidential Approach & Evaluation',
     timeline: 'Weeks 4–5',
     description: 'Direct partner-led outreach to pre-qualified candidates. In-depth competency interviews, commercial track-record verification, and leadership style assessment.',
@@ -144,7 +213,7 @@ export const fallbackProcessSteps: ProcessStepFields[] = [
   },
   {
     stepNumber: '04',
-    phaseName: 'PRESENTATION',
+    phaseName: 'Presentation',
     title: 'Board Presentation & Negotiation',
     timeline: 'Weeks 6–7',
     description: 'Structured client-candidate interviews, psychometric appraisal alignment, references from previous board peers, and nuanced remuneration structuring.',
@@ -153,7 +222,7 @@ export const fallbackProcessSteps: ProcessStepFields[] = [
   },
   {
     stepNumber: '05',
-    phaseName: 'INTEGRATION',
+    phaseName: 'Integration',
     title: 'Executive Onboarding & 12M Assurance',
     timeline: 'Months 1–12',
     description: 'Active onboarding support during resignation/notice periods, 30/60/90-day progress check-ins with client and appointee, backed by a 12-month placement warranty.',
@@ -237,12 +306,78 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
   },
 ];
 
+export const fallbackAboutPartnerData: AboutPartnerSectionData = {
+  sectionLabel: 'Leadership & Practice Advisory',
+  badge: 'Boutique Executive Search',
+  badgeSecondary: 'Partner-led Rigor',
+  headline: 'Two Decades of High-Impact Board & C-Suite Placements',
+  partnerName: 'MARK GOLDSMITH',
+  partnerRole: 'Head of Executive Search',
+  partnerPracticeTenure: '20+ Years',
+  partnerSpecialization: 'Building Products & Construction',
+  partnerPlacementLevel: 'Board / MD / C-Suite',
+  partnerEmail: 'mgoldsmith@mgheadhunting.co.uk',
+  partnerLinkedinUrl: 'https://www.linkedin.com',
+  paragraphs: [
+    'Mark Goldsmith founded MG Headhunting to provide a bespoke, rigorously engineered alternative to the impersonal assembly-line recruitment models dominating the built environment sector.',
+    'Having advised international manufacturing conglomerates, family-owned merchant groups, and Private Equity investment firms, Mark combines an intricate technical understanding of construction products with direct access to non-active, high-performing executive leaders.',
+    'Every mandate undertaken by MGH is managed with unwavering discretion, meticulous candidate assessment, and a relentless commitment to long-term leadership retention.',
+  ],
+  credentialsChecklist: [
+    'Strict Non-Disclosure Protocols',
+    'Proven PE Value-Creation Placements',
+    'Deep European Manufacturing Networks',
+    'Zero Off-Limit Conflicts on Core Searches',
+  ],
+};
+
+export const fallbackContactFooterData: ContactFooterSectionData = {
+  bannerOverline: 'Confidential executive mandates',
+  bannerTitle: 'Discuss an Executive Appointment with Mark Goldsmith',
+  bannerSubtitle: 'Whether commissioning a confidential Managing Director search, restructuring commercial leadership, or seeking board advisory on compensation, connect directly with our practice leader.',
+  bannerCtaText: 'Initiate Confidential Search',
+  ndaTitle: 'Modular Placement Disclosure Protocol',
+  ndaStatement: 'In strict adherence to executive restrictive covenants and client non-disclosure agreements, specific placement case studies and client references are shared selectively with verified clients during the calibration phase under bilateral NDA.',
+  siteDescription: 'Boutique retained executive search specializing in C-suite, Board, and Director appointments across the UK and European Building Products and Construction sectors.',
+  directDeskEmail: 'mgoldsmith@mgheadhunting.co.uk',
+  headquarters: 'London & Home Counties, United Kingdom',
+  responseGuarantee: 'Confidential Enquiries Responded < 24h',
+  complianceNotice: "UK GDPR Compliant • Registered with Information Commissioner's Office (ICO) • Strict Non-Disclosure Assured",
+  copyright: '© 2026 MG Headhunting Ltd. All rights reserved.',
+  navLinks: fallbackSiteSettings.navLinks,
+  footerSpecialisms: fallbackSiteSettings.footerSpecialisms,
+  footerSubSectors: fallbackSiteSettings.footerSubSectors,
+  linkedinUrl: 'https://www.linkedin.com',
+};
+
+// API Fetchers
+
+export async function fetchSiteSettings(preview = false): Promise<SiteSettingsFields> {
+  try {
+    const client = getContentfulClient(preview);
+    const response = await client.getEntries<any>({
+      content_type: 'siteSettings',
+      limit: 1,
+    });
+    if (response.items && response.items.length > 0) {
+      const fields = response.items[0].fields;
+      return {
+        ...fallbackSiteSettings,
+        ...(fields as unknown as Partial<SiteSettingsFields>),
+      };
+    }
+  } catch (err) {
+    console.warn('[Contentful API] Using fallback site settings:', err);
+  }
+  return fallbackSiteSettings;
+}
+
 export async function fetchSectorSpecialisms(preview = false): Promise<SectorSpecialismFields[]> {
   try {
     const client = getContentfulClient(preview);
     const response = await client.getEntries<any>({
       content_type: 'sectorSpecialism',
-      order: ['fields.order', 'fields.code'] as any,
+      order: ['fields.order', 'fields.title'] as any,
     });
     if (response.items && response.items.length > 0) {
       return response.items.map((item) => item.fields as unknown as SectorSpecialismFields);
@@ -258,7 +393,7 @@ export async function fetchDifferencePillars(preview = false): Promise<Differenc
     const client = getContentfulClient(preview);
     const response = await client.getEntries<any>({
       content_type: 'differencePillar',
-      order: ['fields.order', 'fields.pillarIndex'] as any,
+      order: ['fields.order', 'fields.title'] as any,
     });
     if (response.items && response.items.length > 0) {
       return response.items.map((item) => item.fields as unknown as DifferencePillarFields);
@@ -319,22 +454,68 @@ export async function fetchInsightBySlug(slug: string, preview = false): Promise
   return fallbackInsightArticles.find((a) => a.slug === slug) || null;
 }
 
-export async function fetchAuthorBySlugOrId(id: string, preview = false): Promise<AuthorFields | null> {
-  try {
-    const client = getContentfulClient(preview);
-    const entry = await client.getEntry<any>(id);
-    if (entry && entry.fields) {
-      return entry.fields as unknown as AuthorFields;
-    }
-  } catch (err) {
-    console.warn(`[Contentful API] fetchAuthorBySlugOrId(${id}) error:`, err);
-  }
+export async function fetchHomepageData(preview = false): Promise<HomepageContentfulData> {
+  const [siteSettings, specialisms, pillars, steps, articles] = await Promise.all([
+    fetchSiteSettings(preview),
+    fetchSectorSpecialisms(preview),
+    fetchDifferencePillars(preview),
+    fetchProcessSteps(preview),
+    fetchInsightArticles(preview),
+  ]);
+
   return {
-    name: 'Mark Goldsmith',
-    roleTitle: 'Managing Director & Lead Search Partner',
-    organization: 'MG Headhunting',
-    email: 'mgoldsmith@mgheadhunting.co.uk',
-    practiceTenure: '20+ Years',
-    placementLevel: 'Board / MD / C-Suite',
+    siteSettings,
+    hero: {
+      ...fallbackHeroData,
+    },
+    sectorMatrix: {
+      sectionLabel: 'Sector Specialism Matrix',
+      title: 'Core Practice Matrix',
+      description: 'Specialized search focused exclusively on executive roles across manufacturing, distribution, and contracting in the Building Products & Construction materials ecosystem.',
+      subDisciplines: fallbackSubDisciplines,
+      specialisms,
+    },
+    difference: {
+      sectionLabel: 'The MGH Difference',
+      title: 'Engineered Executive Search vs Recruitment Clichés',
+      description: 'Why CEOs, Private Equity investors, and Board Chairs choose MG Headhunting over generic recruitment agencies.',
+      assuranceTitle: '100% Commitment to Mandate Completion',
+      assuranceDescription: 'Unlike transactional agents who drop searches when difficult, MGH guarantees persistence until the exact candidate profile is secured.',
+      candidateQualityTitle: 'Candidate quality',
+      candidateQualityText: 'Targeted approach to top 5% performers who are not on job boards.',
+      replacementGuaranteeTitle: 'Replacement guarantee',
+      replacementGuaranteeText: 'Full 12-month candidate replacement warranty on executive placements.',
+      pillars,
+    },
+    process: {
+      sectionLabel: 'Search Methodology',
+      title: 'The 5-Stage Search Blueprint',
+      description: 'A disciplined, milestone-driven framework designed to identify, attract, and secure top-tier executive leadership without disruption.',
+      steps,
+    },
+    insights: {
+      sectionLabel: 'Market Intelligence',
+      title: 'Executive Briefings & Market Insights',
+      description: 'Proprietary intelligence on executive talent flows, board compensation dynamics, and regulatory shifts across the Building Products landscape.',
+      reportBannerCategory: 'Special Research Publication',
+      reportBannerTitle: '2026/2027 Building Products Executive Salary & Retention Benchmark',
+      reportBannerDescription: 'Comprehensive compensation analysis covering 400+ board appointments across UK & European manufacturing, merchants, and fabricators.',
+      reportBannerCtaText: 'Request Confidential Report',
+      articles,
+    },
+    aboutPartner: {
+      ...fallbackAboutPartnerData,
+    },
+    contactFooter: {
+      ...fallbackContactFooterData,
+      navLinks: siteSettings.navLinks,
+      footerSpecialisms: siteSettings.footerSpecialisms,
+      footerSubSectors: siteSettings.footerSubSectors,
+      directDeskEmail: siteSettings.primaryEmail,
+      headquarters: siteSettings.headquarters || fallbackContactFooterData.headquarters,
+      complianceNotice: siteSettings.icoRegistrationNumber || fallbackContactFooterData.complianceNotice,
+      copyright: siteSettings.copyrightText || fallbackContactFooterData.copyright,
+      linkedinUrl: siteSettings.linkedinUrl || fallbackContactFooterData.linkedinUrl,
+    },
   };
 }
