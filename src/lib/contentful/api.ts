@@ -28,11 +28,10 @@ export const fallbackSiteSettings: SiteSettingsFields = {
   metaDescriptionDefault: 'Boutique retained executive search delivering Board, Managing Director, and C-Suite appointments across the UK and European Building Products and Built Environment sectors.',
   navLinks: [
     { label: 'Specialisms', href: '#specialisms' },
-    { label: 'The MGH Difference', href: '#difference' },
+    { label: 'The Difference', href: '#difference' },
     { label: 'Search Process', href: '#process' },
-    { label: 'Market Intelligence', href: '#insights' },
-    { label: 'About Mark Goldsmith', href: '#about' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Market Intelligence', href: '/insights' },
+    { label: 'About', href: '#about' },
   ],
   footerSpecialisms: [
     'Managing Directors & CEOs',
@@ -242,7 +241,18 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
     keyTakeaways: [
       'PE-backed portfolio MDs seeing equity sweat value outpace base salary expansion',
       'Commercial leadership packages shifting toward EBITDA-linked milestone bonuses',
+      'Co-investment requirements solidifying alignment between sponsor funds and incoming executive teams',
     ],
+    coverImage: {
+      sys: { id: 'asset-cover-c-suite-remuneration' },
+      fields: {
+        title: 'Executive Boardroom & High-Rise Architecture',
+        file: {
+          url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop',
+        },
+      },
+    },
+    isFeatured: true,
     author: {
       fields: {
         name: 'Mark Goldsmith',
@@ -260,7 +270,18 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
     keyTakeaways: [
       'Demand for chartered facade and fire safety engineers in board roles up 42%',
       'Cross-sector recruitment from aerospace and defense entering high-spec cladding',
+      'Gateway 2 and Gateway 3 requirements enforcing personal board liability and documentation integrity',
     ],
+    coverImage: {
+      sys: { id: 'asset-cover-building-safety-act' },
+      fields: {
+        title: 'Modern Facade & Engineering Envelope',
+        file: {
+          url: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?q=80&w=1600&auto=format&fit=crop',
+        },
+      },
+    },
+    isFeatured: true,
     author: {
       fields: {
         name: 'MGH Research Desk',
@@ -278,7 +299,18 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
     keyTakeaways: [
       'Omnichannel merchant leaders commanding significant premium over branch-only profiles',
       'Integration velocity directly correlates with pre-existing supplier framework tenure',
+      'Centralized rebate optimization and ERP harmonization separating successful PE rollups from stalled integrations',
     ],
+    coverImage: {
+      sys: { id: 'asset-cover-merchant-distribution' },
+      fields: {
+        title: 'Modern Distribution Logistics Architecture',
+        file: {
+          url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1600&auto=format&fit=crop',
+        },
+      },
+    },
+    isFeatured: true,
     author: {
       fields: {
         name: 'Mark Goldsmith',
@@ -296,7 +328,18 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
     keyTakeaways: [
       'Carbon-tax implications forcing boards to seek operations leaders with EPD track records',
       'Modern Methods of Construction (MMC) scale-ups prioritizing plant automation experts',
+      'Low-carbon binders and engineered mass timber capturing commercial specification volume',
     ],
+    coverImage: {
+      sys: { id: 'asset-cover-decarbonizing-materials' },
+      fields: {
+        title: 'Sustainable Mass Timber & Structural Engineering',
+        file: {
+          url: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1600&auto=format&fit=crop',
+        },
+      },
+    },
+    isFeatured: true,
     author: {
       fields: {
         name: 'MGH Research Desk',
