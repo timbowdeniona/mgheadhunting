@@ -111,36 +111,39 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
           </nav>
 
           {/* CTA & Actions Area */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {/* Direct Desk Email */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Direct Desk Email - XL Desktops */}
             <a
               href={`mailto:${directEmail}`}
-              className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-sans text-steel-600 hover:text-navy-900 hover:bg-steel-100 transition-colors border border-transparent hover:border-steel-200"
+              className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-sans text-steel-600 hover:text-navy-900 hover:bg-steel-100 transition-colors border border-transparent hover:border-steel-200"
               title={`Direct Mandate Desk: ${directEmail}`}
             >
               <Mail className="w-3.5 h-3.5 text-teal-600 shrink-0" />
-              <span className="hidden xl:inline font-medium">Direct Desk</span>
+              <span className="font-medium">Direct Desk</span>
             </a>
 
-            <span className="hidden sm:block h-4 w-px bg-steel-300" aria-hidden="true" />
+            <span className="hidden xl:block h-4 w-px bg-steel-300" aria-hidden="true" />
 
+            {/* CTA Button: Visible on sm screens and up */}
             <Button
               variant="primary"
               size="md"
               onClick={onInitiateSearch}
               icon={<ArrowRight className="w-3.5 h-3.5" />}
+              className="hidden sm:inline-flex"
             >
               Initiate Search
             </Button>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Visible on mobile/tablet (<lg) */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-navy-900 hover:text-teal-700 hover:bg-steel-100 border border-steel-300 transition-colors focus:outline-none"
+              className="lg:hidden flex items-center justify-center p-2 text-navy-900 hover:text-teal-700 hover:bg-steel-100 border border-steel-300 transition-colors focus:outline-none bg-white shrink-0"
               aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-navy-900" /> : <Menu className="w-5 h-5 text-navy-900" />}
             </button>
           </div>
         </div>
