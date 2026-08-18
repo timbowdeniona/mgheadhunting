@@ -953,8 +953,8 @@ export const BlockStorybook: React.FC<BlockStorybookProps> = ({
               <div className="p-0 border border-steel-200/50 shadow-sm">
                 <PageSectionRenderer
                   section={currentProps}
-                  onOpenSearchModal={onOpenSearchModal}
-                  onOpenArticleModal={onOpenArticleModal}
+                  onInitiateSearch={() => onOpenSearchModal && onOpenSearchModal()}
+                  onReadArticle={(article) => onOpenArticleModal && onOpenArticleModal(article)}
                 />
               </div>
             ) : (
@@ -966,12 +966,13 @@ export const BlockStorybook: React.FC<BlockStorybookProps> = ({
                     </div>
                     <PageSectionRenderer
                       section={block}
-                      onOpenSearchModal={onOpenSearchModal}
-                      onOpenArticleModal={onOpenArticleModal}
+                      onInitiateSearch={() => onOpenSearchModal && onOpenSearchModal()}
+                      onReadArticle={(article) => onOpenArticleModal && onOpenArticleModal(article)}
                     />
                   </div>
                 ))}
               </div>
+
             )}
           </div>
         </main>

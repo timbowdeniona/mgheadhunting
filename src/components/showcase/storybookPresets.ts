@@ -72,10 +72,12 @@ export const BLOCK_CATALOG: BlockMeta[] = [
     contentfulModel: 'blockHero',
     defaultProps: {
       type: 'hero',
-      badge: 'EXECUTIVE SEARCH PRACTICE',
-      title: 'Retained Search for the Built Environment',
-      description: 'Placing Board-Level Executives, Managing Directors, and Functional Heads across Heavy Building Materials, Specialist Distribution, and Construction Technologies.',
+      badgeOverline: 'EXECUTIVE SEARCH PRACTICE',
+      badgeCategory: 'EXCLUSIVE RETAINED SEARCH',
+      headline: 'Retained Search for the Built Environment',
+      subtitle: 'Placing Board-Level Executives, Managing Directors, and Functional Heads across Heavy Building Materials, Specialist Distribution, and Construction Technologies.',
     },
+
   },
 
   // 3. Metrics & Performance Stats Block
@@ -183,9 +185,11 @@ export const BLOCK_CATALOG: BlockMeta[] = [
       subtitle: 'The building materials sector is defined by complex distribution channels, regulatory compliance, and tight margins.',
       layout: 'sidebar',
       leadParagraph: 'In an industry undergoing rapid decarbonisation, regulatory scrutiny under the Building Safety Act, and channel consolidation, generic recruitment algorithms fail. Executive appointments demand granular understanding of heavyside manufacturing, merchant trade dynamics, and installer relationships.',
-      quoteText: 'We do not operate as CV brokers. We act as confidential strategic advisors to boards making decisive leadership appointments.',
-      quoteAuthor: 'Mark Goldsmith',
-      quoteRole: 'Managing Partner',
+      quoteCallout: {
+        quote: 'We do not operate as CV brokers. We act as confidential strategic advisors to boards making decisive leadership appointments.',
+        attribution: 'Mark Goldsmith',
+        role: 'Managing Partner',
+      },
       keyTakeaways: [
         'Proprietary network across 2,400+ verified C-suite & Director-level executives',
         'Strict off-limits protection ensuring uncompromised talent access',
@@ -203,9 +207,11 @@ export const BLOCK_CATALOG: BlockMeta[] = [
           subtitle: 'Why boutique search firms offer broader access to premier leadership than global mega-agencies.',
           layout: 'two-column',
           leadParagraph: 'Global agency conglomerates are constrained by massive client off-limits lists, preventing them from approaching top performers at competitor organizations. Our boutique structure ensures minimal conflicts of interest.',
-          quoteText: 'Boutique retained search is the only model that aligns 100% with client exclusivity and unfettered candidate access.',
-          quoteAuthor: 'Mark Goldsmith',
-          quoteRole: 'Managing Partner',
+          quoteCallout: {
+            quote: 'Boutique retained search is the only model that aligns 100% with client exclusivity and unfettered candidate access.',
+            attribution: 'Mark Goldsmith',
+            role: 'Managing Partner',
+          },
           keyTakeaways: [
             'Full access to 95%+ of target organizations in the sector',
             'Zero passive reliance on job boards or inbound applications',

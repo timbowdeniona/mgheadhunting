@@ -5,11 +5,11 @@ import { DesignSystemNav } from '../../../components/showcase/DesignSystemNav';
 import { BlockStorybook } from '../../../components/showcase/BlockStorybook';
 import { InitiateSearchModal } from '../../../components/ui/InitiateSearchModal';
 import { ArticleModal } from '../../../components/ui/ArticleModal';
-import { InsightArticle } from '../../../lib/contentful/types';
+import { InsightArticleFields } from '../../../lib/contentful/types';
 
 export default function BlockStorybookPage() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [selectedArticle, setSelectedArticle] = useState<InsightArticle | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<InsightArticleFields | null>(null);
 
   return (
     <div className="min-h-screen bg-navy-950 text-white font-sans flex flex-col selection:bg-teal-600 selection:text-white">
@@ -33,7 +33,7 @@ export default function BlockStorybookPage() {
         article={selectedArticle}
         isOpen={!!selectedArticle}
         onClose={() => setSelectedArticle(null)}
-        onOpenSearchModal={() => {
+        onInitiateSearch={() => {
           setSelectedArticle(null);
           setIsSearchModalOpen(true);
         }}
@@ -41,3 +41,4 @@ export default function BlockStorybookPage() {
     </div>
   );
 }
+
