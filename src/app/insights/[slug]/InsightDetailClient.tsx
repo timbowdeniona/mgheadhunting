@@ -9,6 +9,7 @@ import { RichTextRenderer } from '../../../components/ui/RichTextRenderer';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { InsightCard } from '../../../components/ui/InsightCard';
+import { trackInsightView, trackCtaClick } from '../../../lib/analytics';
 import {
   ArrowLeft,
   Calendar,
@@ -34,6 +35,12 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
 }) => {
   // Subscribe to live side-by-side editing events
   const article = useContentfulLiveUpdates(initialArticle);
+
+  React.useEffect(() => {
+    if (article?.slug) {
+      trackInsightView(article.slug, article.title, article.category);
+    }
+  }, [article?.slug, article?.title, article?.category]);
 
   const coverUrl =
     article.coverImage?.fields?.file?.url ||
@@ -192,7 +199,10 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
           </div>
 
           <div className="shrink-0 flex flex-col gap-2 w-full sm:w-auto">
-            <Link href="/#contact">
+            <Link
+              href="/#contact"
+              onClick={() => trackCtaClick('Contact Author', 'article_author_card', `/insights/${article.slug}`)}
+            >
               <Button variant="outline" size="sm" fullWidth icon={<Mail className="w-3.5 h-3.5" />}>
                 Contact Author
               </Button>
@@ -233,6 +243,7 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
                     coverImage={relCover}
                     href={`/insights/${rel.slug}`}
                     variant="compact"
+                    onClick={() => trackInsightView(rel.slug, rel.title, rel.category)}
                   />
                 );
               })}
@@ -257,7 +268,11 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
               </p>
             </div>
 
-            <Link href="/#contact" className="shrink-0">
+            <Link
+              href="/#contact"
+              onClick={() => trackCtaClick('Initiate Confidential Search', 'article_bottom_banner', `/insights/${article.slug}`)}
+              className="shrink-0"
+            >
               <Button
                 variant="primary"
                 size="md"

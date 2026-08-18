@@ -5,6 +5,7 @@ import { Badge } from '../ui/Badge';
 import { StatCard } from '../ui/StatCard';
 import { HeroSectionData } from '../../lib/contentful/types';
 import { fallbackHeroData } from '../../lib/contentful/fallbacks';
+import { trackCtaClick } from '../../lib/analytics';
 
 export interface HeroSectionProps {
   data?: HeroSectionData;
@@ -67,7 +68,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <Button
                 variant="primary"
                 size="lg"
-                onClick={onInitiateSearch}
+                onClick={() => {
+                  trackCtaClick(hero.ctaPrimaryText, 'hero_primary');
+                  onInitiateSearch();
+                }}
                 icon={<ArrowRight className="w-4 h-4" />}
               >
                 {hero.ctaPrimaryText}
@@ -76,7 +80,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <Button
                 variant="outline"
                 size="lg"
-                onClick={onExploreSpecialisms}
+                onClick={() => {
+                  trackCtaClick(hero.ctaSecondaryText, 'hero_secondary');
+                  onExploreSpecialisms();
+                }}
               >
                 {hero.ctaSecondaryText}
               </Button>

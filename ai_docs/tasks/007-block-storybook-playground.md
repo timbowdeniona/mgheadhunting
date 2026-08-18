@@ -16,11 +16,11 @@ Build an interactive, client-side Storybook-like component workbench at `/design
 - [x] <!-- id: 4 --> Add Multi-Block "Live Page Assembler" mode enabling dragging, reordering, and previewing chained blocks as a full simulated page
 - [x] <!-- id: 5 --> Implement JSON Payload & React JSX Code Exporter for copying generated configurations directly into Contentful or codebases
 - [x] <!-- id: 6 --> Create dedicated route `src/app/design-system/blocks/page.tsx` and update `DesignSystemNav` and `src/app/design-system/page.tsx` with prominent links and badges
-- [ ] <!-- id: 7 --> Run TypeScript typechecking (`npx tsc --noEmit`) and build verification (`npm run build`)
+- [x] <!-- id: 7 --> Run TypeScript typechecking (`npx tsc --noEmit`) and build verification (`npm run build`)
 
 ## Verification
-- [ ] Verify that all 14 block components render properly in isolated Storybook mode
-- [ ] Verify that adjusting props/knobs updates the rendered canvas in real time
-- [ ] Verify that viewport controls resize the preview iframe/container accurately
-- [ ] Verify that the JSON/JSX exporter outputs valid data
-- [ ] Verify `npm run build` succeeds with zero errors
+- [x] Verify that all 14 block components render properly in isolated Storybook mode
+- [x] Verify that adjusting props/knobs updates the rendered canvas in real time
+- [x] Verify that viewport controls resize the preview iframe/container accurately
+- [x] Verify that the JSON/JSX exporter outputs valid data
+- [x] Verify `npm run build` succeeds with zero errors

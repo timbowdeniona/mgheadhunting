@@ -21,6 +21,7 @@ import { Badge } from '../../components/ui/Badge';
 import { InitiateSearchModal } from '../../components/ui/InitiateSearchModal';
 import { Wordmark } from '../../components/brand/Wordmark';
 import { Monogram } from '../../components/brand/Monogram';
+import { trackInsightView, trackCtaClick, trackDirectContact, trackEvent } from '../../lib/analytics';
 
 interface InsightsClientProps {
   articles: InsightArticleFields[];
@@ -228,7 +229,10 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                     </span>
                   </div>
 
-                  <Link href={`/insights/${featuredArticle.slug}`}>
+                  <Link
+                    href={`/insights/${featuredArticle.slug}`}
+                    onClick={() => trackInsightView(featuredArticle.slug, featuredArticle.title, featuredArticle.category)}
+                  >
                     <Button
                       variant="outline"
                       size="sm"
@@ -254,7 +258,10 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => {
+                    trackEvent('filter_change', 'Insights Practice Area', cat);
+                    setSelectedCategory(cat);
+                  }}
                   className={`px-3 py-1.5 text-xs font-sans tracking-wider transition-all select-none uppercase font-medium ${
                     selectedCategory === cat
                       ? 'bg-navy-900 text-white shadow-sm'
@@ -273,6 +280,11 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                 placeholder="Search briefings..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onBlur={() => {
+                  if (searchQuery.trim()) {
+                    trackEvent('search_query', 'Insights Search', searchQuery.trim());
+                  }
+                }}
                 className="w-full pl-9 pr-4 py-2 bg-white border border-steel-300 text-xs font-sans text-navy-900 placeholder:text-steel-400 focus:outline-none focus:border-navy-900 focus:ring-1 focus:ring-navy-900 transition-colors"
               />
               <Search className="w-4 h-4 text-steel-400 absolute left-3 top-2.5" />
@@ -338,6 +350,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                           }
                         : undefined
                     }
+                    onClick={() => trackInsightView(article.slug, article.title, article.category)}
                   />
                 );
               })}
@@ -390,7 +403,10 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                   variant="primary"
                   size="lg"
                   icon={<Download className="w-4 h-4" />}
-                  onClick={() => handleOpenSearchModal('Executive Salary Benchmark Report')}
+                  onClick={() => {
+                    trackEvent('file_download', 'Research Report', '2026/2027 Building Products Executive Salary Benchmark');
+                    handleOpenSearchModal('Executive Salary Benchmark Report');
+                  }}
                 >
                   Request Confidential Report
                 </Button>
@@ -415,13 +431,17 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
               <Button
                 variant="primary"
                 size="md"
-                onClick={() => handleOpenSearchModal()}
+                onClick={() => {
+                  trackCtaClick('Initiate Confidential Search', 'insights_cta_footer');
+                  handleOpenSearchModal();
+                }}
                 icon={<ArrowRight className="w-4 h-4" />}
               >
                 Initiate Confidential Search
               </Button>
               <a
                 href={`mailto:${siteSettings.primaryEmail}`}
+                onClick={() => trackDirectContact('email', siteSettings.primaryEmail, 'insights_footer')}
                 className="px-5 py-2.5 bg-white border border-steel-300 text-xs font-sans font-semibold text-navy-900 hover:bg-steel-50 transition-colors shadow-sm"
               >
                 Direct Partner Desk: {siteSettings.primaryEmail}

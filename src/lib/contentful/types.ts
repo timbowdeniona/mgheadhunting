@@ -198,6 +198,63 @@ export interface ContactFooterSectionData {
   linkedinUrl: string;
 }
 
+export interface HomepageEntryFields {
+  // Hero Section
+  heroBadgeOverline?: string;
+  heroBadgeCategory?: string;
+  heroHeadline?: string;
+  heroHighlightedPhrase?: string;
+  heroSubtitle?: string;
+  heroKeyValues?: string[];
+  heroCtaPrimaryText?: string;
+  heroCtaSecondaryText?: string;
+  heroComplianceNotice?: string;
+  heroPartnerName?: string;
+  heroPartnerTitle?: string;
+  heroPartnerBio?: string;
+  heroMetricPlacements?: string;
+  heroMetricTenure?: string;
+  heroMetricRetention?: string;
+  heroMetricCoverage?: string;
+
+  // Sector Matrix Section
+  sectorMatrixSectionLabel?: string;
+  sectorMatrixTitle?: string;
+  sectorMatrixDescription?: string;
+  sectorMatrixSubDisciplines?: string[];
+
+  // Difference Section
+  differenceSectionLabel?: string;
+  differenceTitle?: string;
+  differenceDescription?: string;
+  differenceAssuranceTitle?: string;
+  differenceAssuranceDescription?: string;
+  differenceCandidateQualityTitle?: string;
+  differenceCandidateQualityText?: string;
+  differenceReplacementGuaranteeTitle?: string;
+  differenceReplacementGuaranteeText?: string;
+
+  // Process Section
+  processSectionLabel?: string;
+  processTitle?: string;
+  processDescription?: string;
+
+  // Insights Section
+  insightsSectionLabel?: string;
+  insightsTitle?: string;
+  insightsDescription?: string;
+  insightsReportBannerCategory?: string;
+  insightsReportBannerTitle?: string;
+  insightsReportBannerDescription?: string;
+  insightsReportBannerCtaText?: string;
+
+  // About Partner Section (Reference to blockTeamProfile)
+  aboutPartnerBlock?: any; // Entry reference
+
+  // Contact Footer Section (Reference to blockContactDesk)
+  contactFooterBlock?: any; // Entry reference
+}
+
 export interface HomepageContentfulData {
   siteSettings: SiteSettingsFields;
   hero: HeroSectionData;

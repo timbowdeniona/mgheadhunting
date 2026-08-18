@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { AboutPartnerSectionData } from '../../lib/contentful/types';
 import { fallbackAboutPartnerData } from '../../lib/contentful/fallbacks';
+import { trackDirectContact, trackCtaClick } from '../../lib/analytics';
 
 export interface AboutPartnerSectionProps {
   data?: AboutPartnerSectionData;
@@ -62,7 +63,11 @@ export const AboutPartnerSection: React.FC<AboutPartnerSectionProps> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-steel-400">Direct Desk:</span>
-                  <a href={`mailto:${about.partnerEmail}`} className="text-teal-300 hover:underline">
+                  <a
+                    href={`mailto:${about.partnerEmail}`}
+                    onClick={() => trackDirectContact('email', about.partnerEmail, 'about_partner_card')}
+                    className="text-teal-300 hover:underline"
+                  >
                     {about.partnerEmail}
                   </a>
                 </div>
@@ -73,6 +78,7 @@ export const AboutPartnerSection: React.FC<AboutPartnerSectionProps> = ({
                   href={about.partnerLinkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackDirectContact('linkedin', about.partnerLinkedinUrl, 'about_partner_card')}
                   className="inline-flex items-center gap-1.5 text-xs text-teal-300 hover:text-white transition-colors"
                 >
                   <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -114,7 +120,10 @@ export const AboutPartnerSection: React.FC<AboutPartnerSectionProps> = ({
               <Button
                 variant="primary"
                 size="md"
-                onClick={onInitiateSearch}
+                onClick={() => {
+                  trackCtaClick('Schedule Confidential Consultation', 'about_partner');
+                  onInitiateSearch();
+                }}
                 icon={<ArrowRight className="w-4 h-4" />}
               >
                 Schedule Confidential Consultation

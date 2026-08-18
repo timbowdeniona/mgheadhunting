@@ -6,6 +6,7 @@ import { Button } from '../ui/Button';
 import { BookOpen, Download, ArrowRight } from 'lucide-react';
 import { InsightArticleFields, InsightsSectionData } from '../../lib/contentful/types';
 import { fallbackInsightArticles } from '../../lib/contentful/fallbacks';
+import { trackInsightView, trackEvent } from '../../lib/analytics';
 
 export interface InsightsSectionProps {
   data?: InsightsSectionData;
@@ -63,7 +64,10 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
               {['ALL', 'COMPENSATION', 'REGULATORY', 'M&A', 'SUSTAINABILITY'].map((tag) => (
                 <button
                   key={tag}
-                  onClick={() => setSelectedTag(tag)}
+                  onClick={() => {
+                    trackEvent('filter_change', 'Insights Filter', tag);
+                    setSelectedTag(tag);
+                  }}
                   className={`px-3 py-1.5 text-xs font-sans tracking-wider transition-all select-none uppercase font-medium ${
                     selectedTag === tag
                       ? 'bg-navy-900 text-white shadow-sm'
@@ -77,6 +81,7 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
 
             <Link
               href="/insights"
+              onClick={() => trackEvent('cta_click', 'Navigation', 'View All Intelligence')}
               className="inline-flex items-center gap-1.5 text-xs font-sans font-semibold text-teal-800 hover:text-navy-900 transition-colors px-3 py-2 bg-white border border-steel-300 hover:border-steel-400"
             >
               <span>View All Intelligence</span>
@@ -111,7 +116,10 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
                       }
                     : undefined
                 }
-                onClick={onReadArticle ? () => onReadArticle(article) : undefined}
+                onClick={() => {
+                  trackInsightView(article.slug, article.title, article.category);
+                  if (onReadArticle) onReadArticle(article);
+                }}
               />
             );
           })}
@@ -141,6 +149,7 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
             size="md"
             icon={<Download className="w-4 h-4" />}
             onClick={() => {
+              trackEvent('file_download', 'Research Report', reportTitle);
               if (onRequestReport) {
                 onRequestReport();
               } else {

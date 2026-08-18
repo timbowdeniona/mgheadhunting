@@ -5,6 +5,7 @@ import { Badge } from './Badge';
 import { Button } from './Button';
 import { RichTextRenderer } from './RichTextRenderer';
 import { InsightArticleFields } from '../../lib/contentful/types';
+import { trackCtaClick } from '../../lib/analytics';
 
 export interface ArticleModalProps {
   article: InsightArticleFields | null;
@@ -126,6 +127,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
               variant="primary"
               size="sm"
               onClick={() => {
+                trackCtaClick('Discuss Mandate', 'article_modal_author_card', `/insights/${article.slug}`);
                 onClose();
                 onInitiateSearch();
               }}
@@ -142,7 +144,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           <Link
             href={`/insights/${article.slug}`}
             className="text-xs font-sans text-teal-800 hover:text-navy-900 font-semibold inline-flex items-center gap-1.5"
-            onClick={onClose}
+            onClick={() => {
+              trackCtaClick('Open Dedicated Briefing Page', 'article_modal_footer', `/insights/${article.slug}`);
+              onClose();
+            }}
           >
             <span>Open Dedicated Briefing Page</span>
             <ArrowRight className="w-3.5 h-3.5" />

@@ -552,6 +552,66 @@ async function runSetup() {
     },
   ]);
 
+  // 9. Homepage Content Type
+  await ensureContentType('homepage', 'Homepage Configuration', 'internalTitle', [
+    { id: 'internalTitle', name: 'Internal Title', type: 'Symbol', required: true, validations: [{ unique: true }] },
+    
+    // Hero Section
+    { id: 'heroBadgeOverline', name: 'Hero Badge Overline', type: 'Symbol', required: false },
+    { id: 'heroBadgeCategory', name: 'Hero Badge Category', type: 'Symbol', required: false },
+    { id: 'heroHeadline', name: 'Hero Headline', type: 'Symbol', required: false },
+    { id: 'heroHighlightedPhrase', name: 'Hero Highlighted Phrase', type: 'Symbol', required: false },
+    { id: 'heroSubtitle', name: 'Hero Subtitle', type: 'Text', required: false },
+    { id: 'heroKeyValues', name: 'Hero Key Values', type: 'Array', items: { type: 'Symbol' }, required: false },
+    { id: 'heroCtaPrimaryText', name: 'Hero CTA Primary Text', type: 'Symbol', required: false },
+    { id: 'heroCtaSecondaryText', name: 'Hero CTA Secondary Text', type: 'Symbol', required: false },
+    { id: 'heroComplianceNotice', name: 'Hero Compliance Notice', type: 'Symbol', required: false },
+    { id: 'heroPartnerName', name: 'Hero Partner Name', type: 'Symbol', required: false },
+    { id: 'heroPartnerTitle', name: 'Hero Partner Title', type: 'Symbol', required: false },
+    { id: 'heroPartnerBio', name: 'Hero Partner Bio', type: 'Text', required: false },
+    { id: 'heroMetricPlacements', name: 'Hero Metric Placements', type: 'Symbol', required: false },
+    { id: 'heroMetricTenure', name: 'Hero Metric Tenure', type: 'Symbol', required: false },
+    { id: 'heroMetricRetention', name: 'Hero Metric Retention', type: 'Symbol', required: false },
+    { id: 'heroMetricCoverage', name: 'Hero Metric Coverage', type: 'Symbol', required: false },
+    
+    // Sector Matrix Section
+    { id: 'sectorMatrixSectionLabel', name: 'Sector Matrix Section Label', type: 'Symbol', required: false },
+    { id: 'sectorMatrixTitle', name: 'Sector Matrix Title', type: 'Symbol', required: false },
+    { id: 'sectorMatrixDescription', name: 'Sector Matrix Description', type: 'Text', required: false },
+    { id: 'sectorMatrixSubDisciplines', name: 'Sector Matrix Sub Disciplines', type: 'Array', items: { type: 'Symbol' }, required: false },
+    
+    // Difference Section
+    { id: 'differenceSectionLabel', name: 'Difference Section Label', type: 'Symbol', required: false },
+    { id: 'differenceTitle', name: 'Difference Title', type: 'Symbol', required: false },
+    { id: 'differenceDescription', name: 'Difference Description', type: 'Text', required: false },
+    { id: 'differenceAssuranceTitle', name: 'Difference Assurance Title', type: 'Symbol', required: false },
+    { id: 'differenceAssuranceDescription', name: 'Difference Assurance Description', type: 'Text', required: false },
+    { id: 'differenceCandidateQualityTitle', name: 'Difference Candidate Quality Title', type: 'Symbol', required: false },
+    { id: 'differenceCandidateQualityText', name: 'Difference Candidate Quality Text', type: 'Text', required: false },
+    { id: 'differenceReplacementGuaranteeTitle', name: 'Difference Replacement Guarantee Title', type: 'Symbol', required: false },
+    { id: 'differenceReplacementGuaranteeText', name: 'Difference Replacement Guarantee Text', type: 'Text', required: false },
+    
+    // Process Section
+    { id: 'processSectionLabel', name: 'Process Section Label', type: 'Symbol', required: false },
+    { id: 'processTitle', name: 'Process Title', type: 'Symbol', required: false },
+    { id: 'processDescription', name: 'Process Description', type: 'Text', required: false },
+    
+    // Insights Section
+    { id: 'insightsSectionLabel', name: 'Insights Section Label', type: 'Symbol', required: false },
+    { id: 'insightsTitle', name: 'Insights Title', type: 'Symbol', required: false },
+    { id: 'insightsDescription', name: 'Insights Description', type: 'Text', required: false },
+    { id: 'insightsReportBannerCategory', name: 'Insights Report Banner Category', type: 'Symbol', required: false },
+    { id: 'insightsReportBannerTitle', name: 'Insights Report Banner Title', type: 'Symbol', required: false },
+    { id: 'insightsReportBannerDescription', name: 'Insights Report Banner Description', type: 'Text', required: false },
+    { id: 'insightsReportBannerCtaText', name: 'Insights Report Banner CTA Text', type: 'Symbol', required: false },
+    
+    // About Partner Section
+    { id: 'aboutPartnerBlock', name: 'About Partner Block', type: 'Link', linkType: 'Entry', validations: [{ linkContentType: ['blockTeamProfile'] }], required: false },
+    
+    // Contact Footer Section
+    { id: 'contactFooterBlock', name: 'Contact Footer Block', type: 'Link', linkType: 'Entry', validations: [{ linkContentType: ['blockContactDesk', 'blockCtaBanner'] }], required: false },
+  ]);
+
 
 
   console.log(`\n===========================================================`);
@@ -1599,6 +1659,11 @@ async function runSetup() {
     ],
   });
 
+  await seedEntry('homepage', 'homepage-default', {
+    internalTitle: 'MGH Global Homepage (Seeded)',
+    aboutPartnerBlock: entryLink('block-about-team'),
+    contactFooterBlock: entryLink('block-contact-desk'),
+  });
 
   console.log(`\n===========================================================`);
   console.log(`✓ [MGH CMS Setup] All Content Types, Assets, & Rich Text Articles Provisioned in Space: ${SPACE_ID}!`);

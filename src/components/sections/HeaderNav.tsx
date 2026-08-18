@@ -6,6 +6,7 @@ import { Wordmark } from '../brand/Wordmark';
 import { Monogram } from '../brand/Monogram';
 import { Button } from '../ui/Button';
 import { NavigationItem } from '../../lib/contentful/types';
+import { trackCtaClick, trackDirectContact, trackEvent } from '../../lib/analytics';
 
 export interface HeaderNavProps {
   navLinks?: NavigationItem[];
@@ -93,6 +94,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 <Link
                   key={link.label}
                   href={targetHref}
+                  onClick={() => trackEvent('navigation_click', 'Header Nav', link.label)}
                   className={`px-3 py-2 text-sm font-sans font-medium transition-colors relative group whitespace-nowrap ${
                     isActive
                       ? 'text-teal-700 font-semibold'
@@ -115,6 +117,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             {/* Direct Desk Email - XL Desktops */}
             <a
               href={`mailto:${directEmail}`}
+              onClick={() => trackDirectContact('email', directEmail, 'header_nav')}
               className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-sans text-steel-600 hover:text-navy-900 hover:bg-steel-100 transition-colors border border-transparent hover:border-steel-200"
               title={`Direct Mandate Desk: ${directEmail}`}
             >
@@ -128,7 +131,10 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             <Button
               variant="primary"
               size="md"
-              onClick={onInitiateSearch}
+              onClick={() => {
+                trackCtaClick('Initiate Search', 'header_desktop');
+                onInitiateSearch();
+              }}
               icon={<ArrowRight className="w-3.5 h-3.5" />}
               className="hidden sm:inline-flex"
             >
@@ -160,7 +166,10 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 <Link
                   key={link.label}
                   href={targetHref}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    trackEvent('navigation_click', 'Header Nav Mobile', link.label);
+                    setMobileMenuOpen(false);
+                  }}
                   className={`flex items-center justify-between py-3 px-2 text-sm font-sans font-medium transition-colors ${
                     isActive
                       ? 'bg-teal-50/60 text-teal-800 font-semibold pl-3 border-l-2 border-teal-600'
@@ -177,6 +186,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
           <div className="pt-3 border-t border-steel-200 flex flex-col gap-3">
             <a
               href={`mailto:${directEmail}`}
+              onClick={() => trackDirectContact('email', directEmail, 'header_mobile')}
               className="flex items-center gap-2 text-xs text-steel-700 bg-steel-50 border border-steel-200 px-3 py-2.5 font-sans hover:bg-steel-100 transition-colors"
             >
               <Mail className="w-4 h-4 text-teal-600 shrink-0" />
@@ -187,6 +197,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               size="md"
               fullWidth
               onClick={() => {
+                trackCtaClick('Initiate Search Mandate', 'header_mobile');
                 setMobileMenuOpen(false);
                 onInitiateSearch();
               }}

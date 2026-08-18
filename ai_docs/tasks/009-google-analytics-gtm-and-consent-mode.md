@@ -15,8 +15,8 @@ Implement a comprehensive, performant, and UK GDPR-compliant analytics tracking 
 - [x] <!-- id: 3 --> Create a lightweight, accessible, and on-brand `CookieConsent` component (`src/components/ui/CookieConsent.tsx`) implementing Google Consent Mode v2 (`analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization`).
 - [x] <!-- id: 4 --> Update `src/app/layout.tsx` to embed the Google Analytics script loader with Consent Mode v2 default initialization and the `CookieConsent` banner.
 - [x] <!-- id: 5 --> Instrument custom event telemetry in `ContactFooterSection.tsx` and `InitiateSearchModal.tsx` for mandate inquiries and email/LinkedIn clicks.
-- [ ] <!-- id: 6 --> Instrument CTA click tracking across remaining sections (`HeroSection.tsx`, `AboutPartnerSection.tsx`, and `SectorMatrixSection.tsx`).
-- [ ] <!-- id: 7 --> Instrument insights consumption tracking (article views, scroll milestones, and external social shares) in `src/app/insights/`.
+- [x] <!-- id: 6 --> Instrument CTA click tracking across remaining sections (`HeaderNav.tsx`, `HeroSection.tsx`, `AboutPartnerSection.tsx`, and `SectorMatrixSection.tsx`).
+- [x] <!-- id: 7 --> Instrument insights consumption tracking (article views, search queries, report requests, and dedicated article detail tracking) in `src/app/insights/` and `InsightsSection.tsx`.
 
 ## Verification
 - [ ] Run `npm run build` locally to verify type safety, linting, and Next.js static/dynamic build completion.

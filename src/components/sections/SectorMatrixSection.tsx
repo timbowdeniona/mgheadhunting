@@ -3,6 +3,7 @@ import { SectionDivider } from '../ui/SectionDivider';
 import { MatrixCard } from '../ui/MatrixCard';
 import { SectorSpecialismFields, SectorMatrixSectionData } from '../../lib/contentful/types';
 import { fallbackSpecialisms, fallbackSubDisciplines } from '../../lib/contentful/fallbacks';
+import { trackSectorInteraction, trackEvent } from '../../lib/analytics';
 
 export interface SectorMatrixSectionProps {
   data?: SectorMatrixSectionData;
@@ -51,7 +52,10 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
             {(['ALL', 'EXECUTIVE', 'COMMERCIAL', 'OPERATIONS', 'TECHNICAL'] as const).map((filter) => (
               <button
                 key={filter}
-                onClick={() => setActiveFilter(filter)}
+                onClick={() => {
+                  trackEvent('filter_change', 'Sector Matrix', filter);
+                  setActiveFilter(filter);
+                }}
                 className={`px-3 py-1.5 text-xs font-sans tracking-wider transition-all select-none uppercase font-medium ${
                   activeFilter === filter
                     ? 'bg-navy-900 text-white shadow-sm'
@@ -74,7 +78,10 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
               description={spec.description}
               sampleRoles={spec.sampleRoles}
               keyClients={spec.keyClients}
-              onClick={() => onSelectSector(spec.title)}
+              onClick={() => {
+                trackSectorInteraction(spec.title, 'select_tab');
+                onSelectSector(spec.title);
+              }}
             />
           ))}
         </div>
