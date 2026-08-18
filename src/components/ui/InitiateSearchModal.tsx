@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, Lock } from 'lucide-react';
 import { Button } from './Button';
 import { Badge } from './Badge';
+import { trackLeadSubmission } from '../../lib/analytics';
 
 export interface InitiateSearchModalProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    trackLeadSubmission('mandate', formData.sectorSpecialism);
     setSubmitted(true);
   };
 

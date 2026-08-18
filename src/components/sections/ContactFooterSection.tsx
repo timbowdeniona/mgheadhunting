@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { Mail, Shield, Lock, Check, Clock } from 'lucide-react';
 import { ContactFooterSectionData } from '../../lib/contentful/types';
 import { fallbackContactFooterData } from '../../lib/contentful/fallbacks';
+import { trackDirectContact, trackCtaClick } from '../../lib/analytics';
 
 export interface ContactFooterSectionProps {
   data?: ContactFooterSectionData;
@@ -19,6 +20,7 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   const handleCopyEmail = () => {
+    trackDirectContact('email', footer.directDeskEmail, 'footer_copy_email');
     navigator.clipboard.writeText(footer.directDeskEmail);
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
@@ -52,7 +54,10 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
               <Button
                 variant="primary"
                 size="lg"
-                onClick={onInitiateSearch}
+                onClick={() => {
+                  trackCtaClick(footer.bannerCtaText, 'footer_banner');
+                  onInitiateSearch();
+                }}
                 fullWidth
               >
                 {footer.bannerCtaText}
@@ -98,6 +103,7 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
                 href={footer.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackDirectContact('linkedin', footer.linkedinUrl, 'footer_social')}
                 className="w-8 h-8 flex items-center justify-center bg-navy-800 hover:bg-teal-600 text-steel-300 hover:text-white border border-navy-700 transition-colors"
                 aria-label="MG Headhunting LinkedIn"
               >
@@ -107,6 +113,7 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
               </a>
               <a
                 href={`mailto:${footer.directDeskEmail}`}
+                onClick={() => trackDirectContact('email', footer.directDeskEmail, 'footer_icon')}
                 className="w-8 h-8 flex items-center justify-center bg-navy-800 hover:bg-teal-600 text-steel-300 hover:text-white border border-navy-700 transition-colors"
                 aria-label="Direct Email"
               >
