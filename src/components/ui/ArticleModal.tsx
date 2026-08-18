@@ -1,5 +1,6 @@
 import React from 'react';
-import { X, Calendar, Clock, BookOpen, User, CheckCircle2, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { X, Calendar, Clock, User, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Badge } from './Badge';
 import { Button } from './Button';
 import { RichTextRenderer } from './RichTextRenderer';
@@ -137,9 +138,17 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="bg-canvas-light px-6 py-3 border-t border-steel-200 flex justify-end">
+        <div className="bg-canvas-light px-6 py-3 border-t border-steel-200 flex items-center justify-between">
+          <Link
+            href={`/insights/${article.slug}`}
+            className="text-xs font-sans text-teal-800 hover:text-navy-900 font-semibold inline-flex items-center gap-1.5"
+            onClick={onClose}
+          >
+            <span>Open Dedicated Briefing Page</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
           <Button variant="outline" size="sm" onClick={onClose}>
-            Close Briefing
+            Close
           </Button>
         </div>
 

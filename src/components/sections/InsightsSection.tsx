@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { SectionDivider } from '../ui/SectionDivider';
 import { InsightCard } from '../ui/InsightCard';
 import { Button } from '../ui/Button';
-import { BookOpen, Download } from 'lucide-react';
+import { BookOpen, Download, ArrowRight } from 'lucide-react';
 import { InsightArticleFields, InsightsSectionData } from '../../lib/contentful/types';
 import { fallbackInsightArticles } from '../../lib/contentful/api';
 
@@ -24,15 +25,21 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
   const articleList = articles || data?.articles || fallbackInsightArticles;
   const sectionLabel = data?.sectionLabel || 'Market Intelligence';
   const sectionTitle = data?.title || 'Executive Briefings & Market Insights';
-  const sectionDesc = data?.description || 'Proprietary intelligence on executive talent flows, board compensation dynamics, and regulatory shifts across the Building Products landscape.';
+  const sectionDesc =
+    data?.description ||
+    'Proprietary intelligence on executive talent flows, board compensation dynamics, and regulatory shifts across the Building Products landscape.';
   const reportCategory = data?.reportBannerCategory || 'Special Research Publication';
-  const reportTitle = data?.reportBannerTitle || '2026/2027 Building Products Executive Salary & Retention Benchmark';
-  const reportDesc = data?.reportBannerDescription || 'Comprehensive compensation analysis covering 400+ board appointments across UK & European manufacturing, merchants, and fabricators.';
+  const reportTitle =
+    data?.reportBannerTitle || '2026/2027 Building Products Executive Salary & Retention Benchmark';
+  const reportDesc =
+    data?.reportBannerDescription ||
+    'Comprehensive compensation analysis covering 400+ board appointments across UK & European manufacturing, merchants, and fabricators.';
   const reportCta = data?.reportBannerCtaText || 'Request Confidential Report';
 
-  const filteredArticles = selectedTag === 'ALL'
-    ? articleList
-    : articleList.filter((a) => a.category.toUpperCase().includes(selectedTag));
+  const filteredArticles =
+    selectedTag === 'ALL'
+      ? articleList
+      : articleList.filter((a) => a.category.toUpperCase().includes(selectedTag));
 
   return (
     <section id="insights" className="py-20 lg:py-28 bg-canvas-light border-b border-steel-300 relative">
@@ -51,41 +58,63 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-steel-100 border border-steel-300">
-            {['ALL', 'COMPENSATION', 'REGULATORY', 'M&A', 'SUSTAINABILITY'].map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setSelectedTag(tag)}
-                className={`px-3 py-1.5 text-xs font-sans tracking-wider transition-all select-none uppercase font-medium ${
-                  selectedTag === tag
-                    ? 'bg-navy-900 text-white shadow-sm'
-                    : 'text-steel-700 hover:text-navy-900 hover:bg-steel-200/60'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-1.5 p-1 bg-steel-100 border border-steel-300">
+              {['ALL', 'COMPENSATION', 'REGULATORY', 'M&A', 'SUSTAINABILITY'].map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(tag)}
+                  className={`px-3 py-1.5 text-xs font-sans tracking-wider transition-all select-none uppercase font-medium ${
+                    selectedTag === tag
+                      ? 'bg-navy-900 text-white shadow-sm'
+                      : 'text-steel-700 hover:text-navy-900 hover:bg-steel-200/60'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+
+            <Link
+              href="/insights"
+              className="inline-flex items-center gap-1.5 text-xs font-sans font-semibold text-teal-800 hover:text-navy-900 transition-colors px-3 py-2 bg-white border border-steel-300 hover:border-steel-400"
+            >
+              <span>View All Intelligence</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
 
         {/* Insights Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredArticles.map((article) => (
-            <InsightCard
-              key={article.slug || article.title}
-              category={article.category}
-              readTime={article.readTime}
-              date={article.publishedDate}
-              title={article.title}
-              excerpt={article.excerpt}
-              keyTakeaways={article.keyTakeaways}
-              author={article.author ? {
-                name: article.author.fields?.name || 'Mark Goldsmith',
-                title: article.author.fields?.roleTitle || 'Managing Director, MGH',
-              } : undefined}
-              onClick={() => onReadArticle && onReadArticle(article)}
-            />
-          ))}
+          {filteredArticles.map((article) => {
+            const coverUrl =
+              article.coverImage?.fields?.file?.url ||
+              article.featuredImage?.fields?.file?.url;
+
+            return (
+              <InsightCard
+                key={article.slug || article.title}
+                category={article.category}
+                readTime={article.readTime}
+                date={article.publishedDate}
+                title={article.title}
+                excerpt={article.excerpt}
+                keyTakeaways={article.keyTakeaways}
+                coverImage={coverUrl}
+                href={`/insights/${article.slug}`}
+                author={
+                  article.author
+                    ? {
+                        name: article.author.fields?.name || 'Mark Goldsmith',
+                        title: article.author.fields?.roleTitle || 'Managing Director, MGH',
+                      }
+                    : undefined
+                }
+                onClick={onReadArticle ? () => onReadArticle(article) : undefined}
+              />
+            );
+          })}
         </div>
 
         {/* Annual Executive Salary Report Download Bar */}

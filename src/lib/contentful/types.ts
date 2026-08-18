@@ -84,6 +84,7 @@ export interface InsightArticleFields {
   author?: {
     fields: AuthorFields;
   };
+  coverImage?: ContentfulAsset;
   featuredImage?: ContentfulAsset;
   isFeatured?: boolean;
 }

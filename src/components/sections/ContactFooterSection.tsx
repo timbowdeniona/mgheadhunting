@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Wordmark } from '../brand/Wordmark';
 import { Button } from '../ui/Button';
 import { Mail, Shield, Lock, Check, Clock } from 'lucide-react';
@@ -182,6 +183,9 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
 
           <div className="flex items-center gap-6">
             <span>{footer.copyright}</span>
+            <Link href="/design-system" className="hover:text-teal-400 transition-colors">
+              Design System
+            </Link>
             <a href="#about" className="hover:text-teal-400 transition-colors">Privacy &amp; Data Policy</a>
           </div>
         </div>
