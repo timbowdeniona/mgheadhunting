@@ -15,7 +15,8 @@ import {
   Sparkles,
   ExternalLink,
   ChevronRight,
-  Maximize2
+  Maximize2,
+  Sliders,
 } from 'lucide-react';
 import { DesignSystemNav } from '../../components/showcase/DesignSystemNav';
 import { Badge } from '../../components/ui/Badge';
@@ -46,6 +47,31 @@ export default function DesignSystemHubPage() {
   };
 
   const sections = [
+    {
+      title: 'Block Storybook & Workbench',
+      description:
+        'Interactive client-side Storybook sandbox to test, configure with live prop controls, inspect responsive viewports, and chain all 14 modular page-builder blocks.',
+      href: '/design-system/blocks',
+      icon: Sliders,
+      badge: 'INTERACTIVE SANDBOX',
+      stats: '14 Composable Blocks • Live Knobs • Page Assembler',
+      preview: (
+        <div className="flex flex-wrap items-center gap-1.5 pt-2">
+          <span className="px-2 py-0.5 bg-teal-950 text-teal-300 font-mono text-[9px] border border-teal-800">
+            PAGE HEADER
+          </span>
+          <span className="px-2 py-0.5 bg-navy-900 text-steel-300 font-mono text-[9px] border border-navy-700">
+            METRICS STATS
+          </span>
+          <span className="px-2 py-0.5 bg-navy-900 text-steel-300 font-mono text-[9px] border border-navy-700">
+            CTA BANNER
+          </span>
+          <span className="px-2 py-0.5 bg-navy-900 text-steel-300 font-mono text-[9px] border border-navy-700">
+            EDITORIAL
+          </span>
+        </div>
+      ),
+    },
     {
       title: 'Design Tokens & Foundations',
       description:

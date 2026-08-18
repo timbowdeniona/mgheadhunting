@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { StatCard } from '../ui/StatCard';
 import { HeroSectionData } from '../../lib/contentful/types';
-import { fallbackHeroData } from '../../lib/contentful/api';
+import { fallbackHeroData } from '../../lib/contentful/fallbacks';
 
 export interface HeroSectionProps {
   data?: HeroSectionData;

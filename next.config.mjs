@@ -22,6 +22,8 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  serverExternalPackages: ['contentful', 'contentful-management'],
 };
+
 
 export default nextConfig;

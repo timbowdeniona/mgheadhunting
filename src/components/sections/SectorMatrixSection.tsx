@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SectionDivider } from '../ui/SectionDivider';
 import { MatrixCard } from '../ui/MatrixCard';
 import { SectorSpecialismFields, SectorMatrixSectionData } from '../../lib/contentful/types';
-import { fallbackSpecialisms, fallbackSubDisciplines } from '../../lib/contentful/api';
+import { fallbackSpecialisms, fallbackSubDisciplines } from '../../lib/contentful/fallbacks';
 
 export interface SectorMatrixSectionProps {
   data?: SectorMatrixSectionData;

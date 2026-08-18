@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft, Palette, Box, BookOpen, Layers, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Palette, Box, BookOpen, Layers, ExternalLink, Sliders } from 'lucide-react';
 import { Monogram } from '../brand/Monogram';
 
 export interface DesignSystemNavProps {
@@ -23,15 +23,21 @@ export const DesignSystemNav: React.FC<DesignSystemNavProps> = ({
       exact: true,
     },
     {
-      label: 'Design Tokens',
-      href: '/design-system/tokens',
-      icon: Palette,
+      label: 'Block Storybook',
+      href: '/design-system/blocks',
+      icon: Sliders,
       exact: false,
     },
     {
       label: 'Component Kit',
       href: '/design-system/components',
       icon: Box,
+      exact: false,
+    },
+    {
+      label: 'Design Tokens',
+      href: '/design-system/tokens',
+      icon: Palette,
       exact: false,
     },
     {

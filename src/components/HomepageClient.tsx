@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useContentfulLiveUpdates } from '@contentful/live-preview/react';
 import { HeaderNav } from './sections/HeaderNav';
 import { HeroSection } from './sections/HeroSection';
 import { SectorMatrixSection } from './sections/SectorMatrixSection';
@@ -20,10 +21,12 @@ export interface HomepageClientProps {
   data: HomepageContentfulData;
 }
 
-export function HomepageClient({ data }: HomepageClientProps) {
+export function HomepageClient({ data: initialData }: HomepageClientProps) {
+  const data = useContentfulLiveUpdates(initialData);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const [selectedArticle, setSelectedArticle] = useState<InsightArticleFields | null>(null);
+
 
   const handleOpenSearchModal = (sector?: string) => {
     if (sector) {

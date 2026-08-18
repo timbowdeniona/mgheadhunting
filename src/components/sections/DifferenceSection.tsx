@@ -4,7 +4,7 @@ import { DifferenceCard } from '../ui/DifferenceCard';
 import { Target, UserCheck, ShieldCheck, Compass, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { DifferencePillarFields, DifferenceSectionData } from '../../lib/contentful/types';
-import { fallbackDifferencePillars } from '../../lib/contentful/api';
+import { fallbackDifferencePillars } from '../../lib/contentful/fallbacks';
 
 export interface DifferenceSectionProps {
   data?: DifferenceSectionData;

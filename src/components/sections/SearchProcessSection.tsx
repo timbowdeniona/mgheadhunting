@@ -1,7 +1,7 @@
 import React from 'react';
 import { SectionDivider } from '../ui/SectionDivider';
 import { ProcessStepFields, SearchProcessSectionData } from '../../lib/contentful/types';
-import { fallbackProcessSteps } from '../../lib/contentful/api';
+import { fallbackProcessSteps } from '../../lib/contentful/fallbacks';
 
 export interface SearchProcessSectionProps {
   data?: SearchProcessSectionData;

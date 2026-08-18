@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { draftMode } from 'next/headers';
 import { fetchInsightArticles, fetchSiteSettings } from '../../lib/contentful/api';
 import { InsightsClient } from './InsightsClient';
 
@@ -15,10 +16,12 @@ export const metadata: Metadata = {
 };
 
 export default async function InsightsPage() {
+  const { isEnabled } = await draftMode();
   const [articles, siteSettings] = await Promise.all([
-    fetchInsightArticles(),
-    fetchSiteSettings(),
+    fetchInsightArticles(isEnabled),
+    fetchSiteSettings(isEnabled),
   ]);
 
   return <InsightsClient articles={articles} siteSettings={siteSettings} />;
 }
+

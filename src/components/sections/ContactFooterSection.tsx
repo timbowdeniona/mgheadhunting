@@ -4,7 +4,7 @@ import { Wordmark } from '../brand/Wordmark';
 import { Button } from '../ui/Button';
 import { Mail, Shield, Lock, Check, Clock } from 'lucide-react';
 import { ContactFooterSectionData } from '../../lib/contentful/types';
-import { fallbackContactFooterData } from '../../lib/contentful/api';
+import { fallbackContactFooterData } from '../../lib/contentful/fallbacks';
 
 export interface ContactFooterSectionProps {
   data?: ContactFooterSectionData;

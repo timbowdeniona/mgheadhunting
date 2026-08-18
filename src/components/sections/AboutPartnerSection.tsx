@@ -4,7 +4,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { AboutPartnerSectionData } from '../../lib/contentful/types';
-import { fallbackAboutPartnerData } from '../../lib/contentful/api';
+import { fallbackAboutPartnerData } from '../../lib/contentful/fallbacks';
 
 export interface AboutPartnerSectionProps {
   data?: AboutPartnerSectionData;

@@ -31,6 +31,7 @@ export function getContentfulClient(preview = false): ContentfulClientApi<undefi
         accessToken: PREVIEW_TOKEN,
         host: 'preview.contentful.com',
         environment: ENVIRONMENT,
+        retryOnError: false,
       });
     }
     return previewClient!;
@@ -41,8 +42,10 @@ export function getContentfulClient(preview = false): ContentfulClientApi<undefi
       space: SPACE_ID,
       accessToken: ACCESS_TOKEN,
       environment: ENVIRONMENT,
+      retryOnError: false,
     });
   }
 
   return deliveryClient!;
 }
+

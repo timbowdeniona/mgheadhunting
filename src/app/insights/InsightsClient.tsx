@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useContentfulLiveUpdates } from '@contentful/live-preview/react';
 import {
   Search,
   ArrowRight,
@@ -34,8 +35,11 @@ const CATEGORIES = [
   'SUSTAINABILITY & TECH',
 ];
 
-export function InsightsClient({ articles, siteSettings }: InsightsClientProps) {
+export function InsightsClient({ articles: initialArticles, siteSettings: initialSiteSettings }: InsightsClientProps) {
+  const articles = useContentfulLiveUpdates(initialArticles);
+  const siteSettings = useContentfulLiveUpdates(initialSiteSettings);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
   const [modalDefaultSector, setModalDefaultSector] = useState<string | undefined>(undefined);

@@ -5,7 +5,7 @@ import { InsightCard } from '../ui/InsightCard';
 import { Button } from '../ui/Button';
 import { BookOpen, Download, ArrowRight } from 'lucide-react';
 import { InsightArticleFields, InsightsSectionData } from '../../lib/contentful/types';
-import { fallbackInsightArticles } from '../../lib/contentful/api';
+import { fallbackInsightArticles } from '../../lib/contentful/fallbacks';
 
 export interface InsightsSectionProps {
   data?: InsightsSectionData;

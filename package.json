@@ -12,6 +12,7 @@
     "contentful:test": "tsx scripts/test-delivery.ts"
   },
   "dependencies": {
+    "@contentful/live-preview": "^4.10.20",
     "@contentful/rich-text-react-renderer": "^16.2.2",
     "@contentful/rich-text-types": "^17.2.7",
     "clsx": "^2.1.1",

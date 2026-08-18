@@ -98,16 +98,54 @@ async function runSetup() {
     try {
       const existing = await client.contentType.get({ contentTypeId: id });
       console.log(`  - Updating existing content type: ${id} ("${name}")`);
-      contentType = await client.contentType.update(
-        { contentTypeId: id },
-        {
-          name,
-          description: name,
-          displayField,
-          fields,
-          sys: existing.sys,
-        }
-      );
+      try {
+        contentType = await client.contentType.update(
+          { contentTypeId: id },
+          {
+            name,
+            description: name,
+            displayField,
+            fields,
+            sys: existing.sys,
+          }
+        );
+      } catch (updateErr: any) {
+        console.log(`  ! Incompatible field change detected for "${id}". Recreating content type cleanly...`);
+        // If field types changed incompatibly (e.g. Object -> Array), unpublish and delete old entries
+        try {
+          const entries = await client.entry.getMany({
+            query: { content_type: id, limit: 100 },
+          });
+          for (const item of entries.items) {
+            try {
+              await client.entry.unpublish({ entryId: item.sys.id });
+            } catch (_) {}
+            try {
+              await client.entry.delete({ entryId: item.sys.id });
+            } catch (_) {}
+          }
+        } catch (_) {}
+
+        // Unpublish content type
+        try {
+          await client.contentType.unpublish({ contentTypeId: id });
+        } catch (_) {}
+        // Delete content type
+        try {
+          await client.contentType.delete({ contentTypeId: id });
+        } catch (_) {}
+
+        // Create new content type with updated fields
+        contentType = await client.contentType.createWithId(
+          { contentTypeId: id },
+          {
+            name,
+            description: name,
+            displayField,
+            fields,
+          }
+        );
+      }
     } catch (e: any) {
       console.log(`  + Creating new content type: ${id} ("${name}")`);
       contentType = await client.contentType.createWithId(
@@ -289,6 +327,232 @@ async function runSetup() {
     { id: 'metaTitleDefault', name: 'Default SEO Title', type: 'Symbol', required: false },
     { id: 'metaDescriptionDefault', name: 'Default SEO Description', type: 'Text', required: false },
   ]);
+
+  // -----------------------------------------------------------
+  // 7. Composable Design System Block Content Types
+  // -----------------------------------------------------------
+
+  // 7a. Block: Page Header
+  await ensureContentType('blockPageHeader', 'Block: Page Header', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'badge', name: 'Badge Label', type: 'Symbol', required: false },
+    { id: 'overline', name: 'Overline', type: 'Symbol', required: false },
+    { id: 'title', name: 'Headline Prefix', type: 'Symbol', required: true },
+    { id: 'highlightedPhrase', name: 'Highlighted Phrase', type: 'Symbol', required: false },
+    { id: 'subtitle', name: 'Subtitle / Description', type: 'Text', required: false },
+    { id: 'coordinate', name: 'Technical Coordinate', type: 'Symbol', required: false },
+    { id: 'breadcrumbs', name: 'Breadcrumbs List', type: 'Array', items: { type: 'Symbol' }, required: false },
+  ]);
+
+  // 7b. Block: Metric Item
+  await ensureContentType('blockMetricItem', 'Block: Metric Item', 'label', [
+    { id: 'label', name: 'Metric Label', type: 'Symbol', required: true },
+    { id: 'value', name: 'Metric Value', type: 'Symbol', required: true },
+    { id: 'description', name: 'Audit Note / Description', type: 'Symbol', required: false },
+    { id: 'tag', name: 'Category Tag', type: 'Symbol', required: false },
+  ]);
+
+  // 7c. Block: Metrics & Stats Section
+  await ensureContentType('blockMetricsStats', 'Block: Metrics & Stats Section', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Section Title', type: 'Symbol', required: true },
+    { id: 'subtitle', name: 'Section Subtitle', type: 'Text', required: false },
+    {
+      id: 'stats',
+      name: 'Metric Cards List',
+      type: 'Array',
+      items: {
+        type: 'Link',
+        linkType: 'Entry',
+        validations: [{ linkContentType: ['blockMetricItem'] }],
+      },
+      required: true,
+    },
+  ]);
+
+  // 7d. Block: FAQ Item
+  await ensureContentType('blockFaqItem', 'Block: FAQ Item', 'question', [
+    { id: 'question', name: 'Question', type: 'Symbol', required: true },
+    { id: 'category', name: 'Category Label', type: 'Symbol', required: false },
+    { id: 'answer', name: 'Answer', type: 'Text', required: true },
+  ]);
+
+  // 7e. Block: FAQ Accordion Section
+  await ensureContentType('blockFaqAccordion', 'Block: FAQ Accordion Section', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Section Title', type: 'Symbol', required: true },
+    { id: 'description', name: 'Section Description', type: 'Text', required: false },
+    {
+      id: 'items',
+      name: 'FAQ Questions List',
+      type: 'Array',
+      items: {
+        type: 'Link',
+        linkType: 'Entry',
+        validations: [{ linkContentType: ['blockFaqItem'] }],
+      },
+      required: true,
+    },
+  ]);
+
+  // 7f. Block: CTA Banner
+  await ensureContentType('blockCtaBanner', 'Block: CTA Banner', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    {
+      id: 'variant',
+      name: 'Theme Variant',
+      type: 'Symbol',
+      required: false,
+      validations: [{ in: ['navy', 'blueprint', 'outline'] }],
+    },
+    { id: 'overline', name: 'Overline Badge', type: 'Symbol', required: false },
+    { id: 'title', name: 'Banner Headline', type: 'Symbol', required: true },
+    { id: 'description', name: 'Banner Subtitle', type: 'Text', required: false },
+    { id: 'primaryCtaText', name: 'Primary Button Label', type: 'Symbol', required: false },
+    {
+      id: 'primaryCtaAction',
+      name: 'Primary Button Action',
+      type: 'Symbol',
+      required: false,
+      validations: [{ in: ['searchModal', 'link'] }],
+    },
+    { id: 'primaryCtaHref', name: 'Primary Button Link', type: 'Symbol', required: false },
+    { id: 'secondaryCtaText', name: 'Secondary Button Label', type: 'Symbol', required: false },
+    { id: 'secondaryCtaHref', name: 'Secondary Button Link', type: 'Symbol', required: false },
+    { id: 'guaranteeNotice', name: 'Guarantee Notice', type: 'Symbol', required: false },
+  ]);
+
+  // 7g. Block: Editorial Rich Text
+  await ensureContentType('blockEditorialRichText', 'Block: Editorial Rich Text', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Article Title', type: 'Symbol', required: true },
+    { id: 'subtitle', name: 'Article Subtitle', type: 'Text', required: false },
+    {
+      id: 'layout',
+      name: 'Layout Variant',
+      type: 'Symbol',
+      required: false,
+      validations: [{ in: ['sidebar', 'two-column', 'single-column'] }],
+    },
+    { id: 'leadParagraph', name: 'Lead Intro Paragraph', type: 'Text', required: false },
+    { id: 'quoteText', name: 'Pull Quote Text', type: 'Text', required: false },
+    { id: 'quoteAuthor', name: 'Pull Quote Author', type: 'Symbol', required: false },
+    { id: 'quoteRole', name: 'Pull Quote Role', type: 'Symbol', required: false },
+    { id: 'keyTakeaways', name: 'Key Takeaways Checklist', type: 'Array', items: { type: 'Symbol' }, required: false },
+  ]);
+
+  // 7h. Block: Contact Direct Desk
+  await ensureContentType('blockContactDesk', 'Block: Contact Direct Desk', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Section Title', type: 'Symbol', required: true },
+    { id: 'description', name: 'Section Description', type: 'Text', required: false },
+    { id: 'email', name: 'Desk Email Address', type: 'Symbol', required: false },
+    { id: 'phone', name: 'Direct Phone Number', type: 'Symbol', required: false },
+    { id: 'headquarters', name: 'Headquarters Location', type: 'Symbol', required: false },
+    { id: 'ndaNotice', name: 'NDA Notice', type: 'Text', required: false },
+  ]);
+
+  // 7i. Block: Sector Specialisms Grid
+  await ensureContentType('blockSectorGrid', 'Block: Sector Specialisms Grid', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Section Title', type: 'Symbol', required: true },
+    { id: 'description', name: 'Section Description', type: 'Text', required: false },
+  ]);
+
+  // 7j. Block: Difference Pillars
+  await ensureContentType('blockDifferencePillars', 'Block: Difference Pillars', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Section Title', type: 'Symbol', required: true },
+    { id: 'description', name: 'Section Description', type: 'Text', required: false },
+  ]);
+
+  // 7k. Block: Process Timeline
+  await ensureContentType('blockProcessTimeline', 'Block: Process Timeline', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Section Title', type: 'Symbol', required: true },
+    { id: 'description', name: 'Section Description', type: 'Text', required: false },
+  ]);
+
+  // 7l. Block: Team / Partner Profile
+  await ensureContentType('blockTeamProfile', 'Block: Team / Partner Profile', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'badge', name: 'Primary Badge', type: 'Symbol', required: false },
+    { id: 'badgeSecondary', name: 'Secondary Badge', type: 'Symbol', required: false },
+    { id: 'headline', name: 'Dossier Headline', type: 'Symbol', required: true },
+    { id: 'partnerName', name: 'Partner Full Name', type: 'Symbol', required: true },
+    { id: 'partnerRole', name: 'Partner Role Title', type: 'Symbol', required: false },
+    { id: 'partnerPracticeTenure', name: 'Practice Tenure', type: 'Symbol', required: false },
+    { id: 'partnerSpecialization', name: 'Specialization Focus', type: 'Symbol', required: false },
+    { id: 'partnerPlacementLevel', name: 'Placement Level', type: 'Symbol', required: false },
+    { id: 'partnerEmail', name: 'Direct Email', type: 'Symbol', required: false },
+    { id: 'partnerLinkedinUrl', name: 'LinkedIn URL', type: 'Symbol', required: false },
+    { id: 'paragraphs', name: 'Biography Paragraphs', type: 'Array', items: { type: 'Symbol' }, required: false },
+    { id: 'credentialsChecklist', name: 'Credentials Checklist', type: 'Array', items: { type: 'Symbol' }, required: false },
+  ]);
+
+  // 7m. Block: Insights Teaser
+  await ensureContentType('blockInsightsTeaser', 'Block: Insights Teaser', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'sectionLabel', name: 'Section Label', type: 'Symbol', required: false },
+    { id: 'title', name: 'Section Title', type: 'Symbol', required: true },
+    { id: 'description', name: 'Section Description', type: 'Text', required: false },
+  ]);
+
+  // 7n. Block: Architectural Hero
+  await ensureContentType('blockHero', 'Block: Architectural Hero', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    { id: 'badge', name: 'Top Badge', type: 'Symbol', required: false },
+    { id: 'title', name: 'Hero Headline', type: 'Symbol', required: true },
+    { id: 'description', name: 'Hero Subtitle', type: 'Text', required: false },
+  ]);
+
+  // 8. Modular Drag-and-Drop Page Content Type
+  await ensureContentType('modularPage', 'Modular Componentised Page', 'title', [
+    { id: 'title', name: 'Page Title', type: 'Symbol', required: true },
+    { id: 'slug', name: 'URL Slug', type: 'Symbol', required: true, validations: [{ unique: true }] },
+    { id: 'metaTitle', name: 'Meta SEO Title', type: 'Symbol', required: false },
+    { id: 'metaDescription', name: 'Meta SEO Description', type: 'Text', required: false },
+    { id: 'showHeader', name: 'Show Header Navigation', type: 'Boolean', required: false },
+    { id: 'showFooter', name: 'Show Contact Footer', type: 'Boolean', required: false },
+    {
+      id: 'sections',
+      name: 'Sections (Drag & Drop Blocks)',
+      type: 'Array',
+      items: {
+        type: 'Link',
+        linkType: 'Entry',
+        validations: [
+          {
+            linkContentType: [
+              'blockPageHeader',
+              'blockMetricsStats',
+              'blockFaqAccordion',
+              'blockCtaBanner',
+              'blockEditorialRichText',
+              'blockContactDesk',
+              'blockSectorGrid',
+              'blockDifferencePillars',
+              'blockProcessTimeline',
+              'blockTeamProfile',
+              'blockInsightsTeaser',
+              'blockHero',
+            ],
+          },
+        ],
+      },
+      required: true,
+    },
+  ]);
+
+
 
   console.log(`\n===========================================================`);
   console.log(`[MGH CMS Setup] Provisioning Cover Image Assets`);
@@ -878,9 +1142,468 @@ async function runSetup() {
     metaDescriptionDefault: 'Boutique retained executive search delivering Board, Managing Director, and C-Suite appointments across the UK and European Building Products and Built Environment sectors.',
   });
 
+  // Seed Default Modular Pages
+  console.log(`\n===========================================================`);
+  console.log(`[MGH CMS Setup] Seeding Modular Componentised Pages`);
+  console.log(`===========================================================\n`);
+
+  // Helper for entry links
+  function entryLink(id: string) {
+    return { sys: { type: 'Link', linkType: 'Entry', id } };
+  }
+
+  // Seed Default Modular Pages & Linked Drag-and-Drop Blocks
+  console.log(`\n===========================================================`);
+  console.log(`[MGH CMS Setup] Seeding Modular Componentised Pages & Drag-and-Drop Blocks`);
+  console.log(`===========================================================\n`);
+
+  // --- 1. ABOUT PAGE BLOCKS ---
+  await seedEntry('blockPageHeader', 'block-about-header', {
+    internalName: 'About - Hero Header',
+    badge: 'FIRM OVERVIEW',
+    overline: 'BOUTIQUE RETAINED SEARCH',
+    title: 'Executive Search Precision Engineered for',
+    highlightedPhrase: 'Building Products & Construction Leadership',
+    subtitle: 'Dedicated partner-led executive search connecting leading manufacturers, merchants, and private equity investors with board-level and operational leadership.',
+    coordinate: 'MGH // PRACTICE-OVERVIEW',
+    breadcrumbs: ['About:/about'],
+  });
+
+  await seedEntry('blockTeamProfile', 'block-about-team', {
+    internalName: 'About - Mark Goldsmith Dossier',
+    sectionLabel: 'PRACTICE LEADERSHIP',
+    badge: 'MANAGING PARTNER',
+    badgeSecondary: '20+ YEARS SECTOR FOCUS',
+    headline: 'Direct Partner Delivery on Every Single Mandate',
+    partnerName: 'Mark Goldsmith',
+    partnerRole: 'Founder & Managing Partner',
+    partnerPracticeTenure: '20+ Years in Executive Search',
+    partnerSpecialization: 'Building Products, Materials & Offsite Systems',
+    partnerPlacementLevel: 'Board, CEO, Managing Director & Operations Heads',
+    partnerEmail: 'mgoldsmith@mgheadhunting.co.uk',
+    partnerLinkedinUrl: 'https://www.linkedin.com',
+    paragraphs: [
+      'MG Headhunting was founded on a singular principle: executive search in the Building Products sector requires deep domain mastery, rigorous competency assessment, and personal accountability from start to finish.',
+      'Unlike volume recruitment agencies that delegate critical assignments to junior resourcers, Managing Partner Mark Goldsmith personally leads every search—from initial board scoping through direct confidential headhunting to final placement.',
+    ],
+    credentialsChecklist: [
+      'Member of the Association of Executive Search and Leadership Consultants (AESC)',
+      'Certified in British Psychological Society (BPS) Level A & B Assessment',
+      'Over 250 Successful Board and Executive Appointments across UK & Europe',
+      'Strict Single-Point Confidentiality for Sensitive Succession Planning',
+    ],
+  });
+
+  await seedEntry('blockMetricItem', 'metric-about-completion', {
+    label: 'Mandate Completion Rate',
+    value: '100%',
+    description: 'Every retained search is pursued to completion with zero drop-off.',
+    tag: 'AUDIT',
+  });
+  await seedEntry('blockMetricItem', 'metric-about-retention', {
+    label: 'Executive Retention (24 Mo)',
+    value: '98.4%',
+    description: 'Placed executives who remain in role and deliver measurable ROI beyond 2 years.',
+    tag: 'LONGEVITY',
+  });
+  await seedEntry('blockMetricItem', 'metric-about-shortlist', {
+    label: 'Average Shortlist Delivery',
+    value: '22 Days',
+    description: 'Comprehensive market mapping and rigorous assessment delivered in under 4 weeks.',
+    tag: 'SPEED',
+  });
+  await seedEntry('blockMetricItem', 'metric-about-guarantee', {
+    label: 'Candidate Replacement Guarantee',
+    value: '12 Months',
+    description: 'Complete fee-free replacement backing every executive appointment.',
+    tag: 'SECURITY',
+  });
+
+  await seedEntry('blockMetricsStats', 'block-about-metrics', {
+    internalName: 'About - Verified Performance Benchmarks',
+    sectionLabel: 'TRACK RECORD',
+    title: 'Verified Performance Benchmarks',
+    subtitle: 'Our boutique model delivers industry-leading completion rates, shortlist velocity, and executive retention longevity.',
+    stats: [
+      entryLink('metric-about-completion'),
+      entryLink('metric-about-retention'),
+      entryLink('metric-about-shortlist'),
+      entryLink('metric-about-guarantee'),
+    ],
+  });
+
+  await seedEntry('blockEditorialRichText', 'block-about-editorial', {
+    internalName: 'About - Why Domain Expertise Matters',
+    sectionLabel: 'OPERATING ETHOS',
+    title: 'Why Domain Expertise Matters in Executive Search',
+    subtitle: 'Understanding the commercial, technical, and regulatory dynamics of the Building Products market is what separates successful hires from costly mis-hires.',
+    layout: 'sidebar',
+    leadParagraph: 'A Managing Director in heavy clay or precast concrete requires fundamentally different leadership instincts than one in architectural glazing or building management systems. Generic executive recruiters lack the industry vocabulary to differentiate true operators from polished interviewees.',
+    quoteText: 'In executive recruitment, domain immersion is not optional—it is the single highest determinant of candidate quality and cultural retention.',
+    quoteAuthor: 'Mark Goldsmith',
+    quoteRole: 'Managing Partner',
+    keyTakeaways: [
+      'Deep understanding of UK Building Regulations (Part L, Future Homes Standard, Fire Safety)',
+      'Extensive passive network of senior leaders across manufacturers and merchant chains',
+      'Rigorous structured competency & psychometric evaluation',
+      'Complete discretion protecting sensitive market positioning',
+    ],
+  });
+
+  await seedEntry('blockCtaBanner', 'block-about-cta', {
+    internalName: 'About - Confidential Mandates CTA',
+    variant: 'navy',
+    overline: 'CONFIDENTIAL MANDATES',
+    title: 'Discuss Your Executive Hiring Requirements',
+    description: 'Schedule a private consultation with Mark Goldsmith to evaluate your upcoming leadership requirements.',
+    primaryCtaText: 'Initiate Search Mandate',
+    primaryCtaAction: 'searchModal',
+    secondaryCtaText: 'Explore Specialisms',
+    secondaryCtaHref: '/sectors',
+    guaranteeNotice: 'Strict Single-Point Confidentiality & Non-Disclosure Assured',
+  });
+
+  await seedEntry('modularPage', 'page-about', {
+    title: 'About MG Headhunting',
+    slug: 'about',
+    metaTitle: 'About Mark Goldsmith & MG Headhunting | Retained Search Practice',
+    metaDescription: 'Specialist retained executive search for Building Products and Built Environment leadership. Founded and personally led by Mark Goldsmith.',
+    showHeader: true,
+    showFooter: true,
+    sections: [
+      entryLink('block-about-header'),
+      entryLink('block-about-team'),
+      entryLink('block-about-metrics'),
+      entryLink('block-about-editorial'),
+      entryLink('block-about-cta'),
+    ],
+  });
+
+  // --- 2. SECTORS PAGE BLOCKS ---
+  await seedEntry('blockPageHeader', 'block-sectors-header', {
+    internalName: 'Sectors - Hero Header',
+    badge: 'PRACTICE COVERAGE',
+    overline: 'SECTOR SPECIALISM MATRIX',
+    title: 'Comprehensive Practice Coverage Across the',
+    highlightedPhrase: 'Building Products & Construction Supply Chain',
+    subtitle: 'From heavy masonry and offsite manufacturing to advanced building envelopes and architectural interior products.',
+    coordinate: 'MGH // SECTOR-MATRIX',
+    breadcrumbs: ['Specialisms:/sectors'],
+  });
+
+  await seedEntry('blockMetricItem', 'metric-sectors-focus', {
+    label: 'Practice Focus',
+    value: '100%',
+    description: 'Exclusively focused on Building Products and the Built Environment.',
+    tag: 'SECTOR',
+  });
+  await seedEntry('blockMetricItem', 'metric-sectors-breadth', {
+    label: 'Sub-Sectors Covered',
+    value: '18+',
+    description: 'From heavy building materials and MMC to HVAC and smart building controls.',
+    tag: 'BREADTH',
+  });
+  await seedEntry('blockMetricItem', 'metric-sectors-level', {
+    label: 'Placements by Seniority',
+    value: 'C-Suite',
+    description: 'Chairs, CEOs, Managing Directors, and functional Board heads.',
+    tag: 'LEVEL',
+  });
+  await seedEntry('blockMetricItem', 'metric-sectors-markets', {
+    label: 'Geographic Reach',
+    value: 'UK & EU',
+    description: 'Cross-border search capability across the UK, Nordics, DACH, and Western Europe.',
+    tag: 'MARKETS',
+  });
+
+  await seedEntry('blockMetricsStats', 'block-sectors-metrics', {
+    internalName: 'Sectors - Practice Metrics',
+    sectionLabel: 'PRACTICE METRICS',
+    title: 'Built Environment Domain Depth',
+    subtitle: 'Our recruitment practice is strictly dedicated to Building Products, Construction Materials, and Associated Technologies.',
+    stats: [
+      entryLink('metric-sectors-focus'),
+      entryLink('metric-sectors-breadth'),
+      entryLink('metric-sectors-level'),
+      entryLink('metric-sectors-markets'),
+    ],
+  });
+
+  await seedEntry('blockSectorGrid', 'block-sectors-grid', {
+    internalName: 'Sectors - Practice Divisions Grid',
+    sectionLabel: 'CORE SPECIALISMS',
+    title: 'Sector Specialism Matrix',
+    description: 'Explore our dedicated practice divisions across Executive Leadership, Commercial & Sales, Operations & Manufacturing, and Technical & R&D.',
+  });
+
+  await seedEntry('blockCtaBanner', 'block-sectors-cta', {
+    internalName: 'Sectors - Practice Advisory CTA',
+    variant: 'blueprint',
+    overline: 'RETAINED SEARCH ADVISORY',
+    title: 'Commission a Dedicated Sector Mandate',
+    description: 'Target specific leadership talent across our four core building products practice disciplines.',
+    primaryCtaText: 'Initiate Practice Search',
+    primaryCtaAction: 'searchModal',
+    secondaryCtaText: 'View Search Blueprint',
+    secondaryCtaHref: '/retained-search',
+    guaranteeNotice: 'Backed by our 12-Month Executive Replacement Guarantee',
+  });
+
+  await seedEntry('modularPage', 'page-sectors', {
+    title: 'Sector Specialisms',
+    slug: 'sectors',
+    metaTitle: 'Building Products Sector Matrix | MG Headhunting Practice Areas',
+    metaDescription: 'Specialised executive search across Executive, Commercial, Operations, and Technical leadership in the Building Products industry.',
+    showHeader: true,
+    showFooter: true,
+    sections: [
+      entryLink('block-sectors-header'),
+      entryLink('block-sectors-metrics'),
+      entryLink('block-sectors-grid'),
+      entryLink('block-sectors-cta'),
+    ],
+  });
+
+  // --- 3. RETAINED SEARCH PAGE BLOCKS ---
+  await seedEntry('blockPageHeader', 'block-search-header', {
+    internalName: 'Search - Hero Header',
+    badge: 'METHODOLOGY',
+    overline: 'THE MGH SEARCH BLUEPRINT',
+    title: 'A Disciplined 5-Stage Framework for',
+    highlightedPhrase: 'Securing Transformational Executive Talent',
+    subtitle: 'Our rigorous search process combines exhaustive market mapping, structured psychometric assessment, and 100-day post-placement integration.',
+    coordinate: 'MGH // SEARCH-METHODOLOGY',
+    breadcrumbs: ['Search Process:/retained-search'],
+  });
+
+  await seedEntry('blockProcessTimeline', 'block-search-timeline', {
+    internalName: 'Search - 5-Stage Execution Timeline',
+    sectionLabel: '5-STAGE BLUEPRINT',
+    title: 'Structured Milestone-Driven Execution',
+    description: 'From initial mandate scoping to the 100-day onboarding review, every stage is transparently reported and partner-executed.',
+  });
+
+  await seedEntry('blockDifferencePillars', 'block-search-pillars', {
+    internalName: 'Search - Retained vs Contingent Advantage',
+    sectionLabel: 'RETAINED ADVANTAGE',
+    title: 'Retained Search vs Contingent Recruitment',
+    description: 'Why leading building products manufacturers and PE funds mandate MGH for their most critical leadership hires.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-search-timelines', {
+    question: 'How quickly will we receive the initial assessed shortlist?',
+    category: 'TIMELINES & SPEED',
+    answer: 'Our standard search timeline delivers a fully assessed, benchmarked shortlist of 3 to 5 qualified candidates within 20 to 25 working days from mandate approval. We provide weekly pipeline dashboards throughout the mapping phase.',
+  });
+  await seedEntry('blockFaqItem', 'faq-search-offlimits', {
+    question: 'How do you handle off-limits agreements and talent poaching?',
+    category: 'OFF-LIMITS & ACCESS',
+    answer: 'As a boutique practice, we maintain very limited off-limits constraints compared to massive global search firms. This gives us unrestricted access to tap top-performing executives across 95%+ of the Building Products market.',
+  });
+  await seedEntry('blockFaqItem', 'faq-search-assessment', {
+    question: 'What psychometric and competency assessment tools do you use?',
+    category: 'ASSESSMENT RIGOUR',
+    answer: 'Mark Goldsmith is BPS Level A & B certified. Every shortlisted finalist undergoes structured competency-based interviewing, leadership derailer profiling, and verified peer referencing before presentation.',
+  });
+  await seedEntry('blockFaqItem', 'faq-search-warranty', {
+    question: 'What happens if a placed executive leaves within the first year?',
+    category: 'WARRANTY & RISK',
+    answer: 'Every retained executive appointment is backed by our comprehensive 12-Month Placement Guarantee. In the unlikely event an appointee departs or fails probation within 12 months, we execute a full replacement search at zero additional professional fee.',
+  });
+
+  await seedEntry('blockFaqAccordion', 'block-search-faq', {
+    internalName: 'Search - Retained Mandates FAQ',
+    sectionLabel: 'PRACTICE ADVISORY',
+    title: 'Frequently Asked Questions on Retained Mandates',
+    description: 'Clear answers on fee structures, timelines, confidentiality, and candidate warranties.',
+    items: [
+      entryLink('faq-search-timelines'),
+      entryLink('faq-search-offlimits'),
+      entryLink('faq-search-assessment'),
+      entryLink('faq-search-warranty'),
+    ],
+  });
+
+  await seedEntry('blockCtaBanner', 'block-search-cta', {
+    internalName: 'Search - Retained Protocol CTA',
+    variant: 'navy',
+    overline: 'EXECUTIVE MANDATES',
+    title: 'Ready to Commission a Retained Mandate?',
+    description: 'Speak directly with Managing Partner Mark Goldsmith to outline your requirements and establish a timeline.',
+    primaryCtaText: 'Initiate Search Protocol',
+    primaryCtaAction: 'searchModal',
+    secondaryCtaText: 'Contact Direct Desk',
+    secondaryCtaHref: '/contact',
+  });
+
+  await seedEntry('modularPage', 'page-retained-search', {
+    title: 'Retained Search Blueprint',
+    slug: 'retained-search',
+    metaTitle: '5-Stage Executive Search Blueprint | MG Headhunting Methodology',
+    metaDescription: 'Discover our disciplined, milestone-driven executive search framework designed to secure top-tier leadership without business disruption.',
+    showHeader: true,
+    showFooter: true,
+    sections: [
+      entryLink('block-search-header'),
+      entryLink('block-search-timeline'),
+      entryLink('block-search-pillars'),
+      entryLink('block-search-faq'),
+      entryLink('block-search-cta'),
+    ],
+  });
+
+  // --- 4. DIFFERENCE PAGE BLOCKS ---
+  await seedEntry('blockPageHeader', 'block-diff-header', {
+    internalName: 'Difference - Hero Header',
+    badge: 'THE MGH DIFFERENCE',
+    overline: 'STRUCTURAL ADVANTAGES',
+    title: 'Engineered Executive Search vs',
+    highlightedPhrase: 'Transactional Recruitment Clichés',
+    subtitle: 'Why CEOs, Private Equity investors, and Board Chairs choose MG Headhunting for high-stakes leadership appointments.',
+    coordinate: 'MGH // VALUE-PROPOSITION',
+    breadcrumbs: ['The Difference:/difference'],
+  });
+
+  await seedEntry('blockDifferencePillars', 'block-diff-pillars', {
+    internalName: 'Difference - 4 Core Pillars',
+    sectionLabel: 'FOUR CORE PILLARS',
+    title: 'Built on Accountability, Rigour, and Domain Depth',
+    description: 'How our boutique retained search model eliminates the flaws inherent in high-volume contingency agencies.',
+  });
+
+  await seedEntry('blockMetricItem', 'metric-diff-exclusivity', {
+    label: 'Exclusivity Guarantee',
+    value: '100%',
+    description: 'Your mandate receives our undivided focus until completed.',
+    tag: 'DEDICATION',
+  });
+  await seedEntry('blockMetricItem', 'metric-diff-warranty', {
+    label: 'Placement Warranty',
+    value: '12 Months',
+    description: 'Full fee-free replacement policy on all executive appointments.',
+    tag: 'SECURITY',
+  });
+  await seedEntry('blockMetricItem', 'metric-diff-coverage', {
+    label: 'Market Coverage',
+    value: '360°',
+    description: 'Systematic mapping of both active and passive candidates.',
+    tag: 'RIGOUR',
+  });
+  await seedEntry('blockMetricItem', 'metric-diff-partner', {
+    label: 'Direct Partner Contact',
+    value: 'Single Point',
+    description: 'Zero delegation to junior researchers or account handlers.',
+    tag: 'ACCOUNTABILITY',
+  });
+
+  await seedEntry('blockMetricsStats', 'block-diff-metrics', {
+    internalName: 'Difference - Assurance Metrics',
+    sectionLabel: 'ASSURANCE METRICS',
+    title: 'Commitment Backed by Proof',
+    subtitle: 'Measurable standards that protect your capital and leadership continuity.',
+    stats: [
+      entryLink('metric-diff-exclusivity'),
+      entryLink('metric-diff-warranty'),
+      entryLink('metric-diff-coverage'),
+      entryLink('metric-diff-partner'),
+    ],
+  });
+
+  await seedEntry('blockCtaBanner', 'block-diff-cta', {
+    internalName: 'Difference - Experience Precision CTA',
+    variant: 'blueprint',
+    overline: 'STRATEGIC APPOINTMENTS',
+    title: 'Experience Precision Retained Search',
+    description: 'Commission a mandate backed by full 12-month warranties and direct partner accountability.',
+    primaryCtaText: 'Initiate Search Mandate',
+    primaryCtaAction: 'searchModal',
+  });
+
+  await seedEntry('modularPage', 'page-difference', {
+    title: 'The MGH Difference',
+    slug: 'difference',
+    metaTitle: 'The MGH Difference | Retained Search vs Contingency Recruitment',
+    metaDescription: 'Explore the structural advantages of retained executive search over transactional contingency recruitment in the Building Products sector.',
+    showHeader: true,
+    showFooter: true,
+    sections: [
+      entryLink('block-diff-header'),
+      entryLink('block-diff-pillars'),
+      entryLink('block-diff-metrics'),
+      entryLink('block-diff-cta'),
+    ],
+  });
+
+  // --- 5. CONTACT PAGE BLOCKS ---
+  await seedEntry('blockPageHeader', 'block-contact-header', {
+    internalName: 'Contact - Hero Header',
+    badge: 'CONFIDENTIAL ENGAGEMENT',
+    overline: 'DIRECT PARTNER DESK',
+    title: 'Engage Mark Goldsmith Directly for',
+    highlightedPhrase: 'Board & Executive Search Mandates',
+    subtitle: 'All inquiries and consultations are conducted under strict non-disclosure with ICO-registered data compliance.',
+    coordinate: 'MGH // DESK-CONTACT',
+    breadcrumbs: ['Contact:/contact'],
+  });
+
+  await seedEntry('blockContactDesk', 'block-contact-desk', {
+    internalName: 'Contact - Direct Desk Consultation',
+    sectionLabel: 'DIRECT ENGAGEMENT',
+    title: 'Schedule a Confidential Strategic Consultation',
+    description: 'Reach out directly to Managing Partner Mark Goldsmith to discuss executive recruitment, succession planning, or compensation benchmarking.',
+    email: 'mgoldsmith@mgheadhunting.co.uk',
+    phone: '+44 (0) 20 7946 0198',
+    headquarters: 'London & Home Counties, United Kingdom',
+    ndaNotice: 'All conversations and documents exchanged are subject to strict non-disclosure obligations and professional confidentiality standards.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-contact-initial', {
+    question: 'What is covered during the initial consultation call?',
+    category: 'INITIAL CALL',
+    answer: 'We review the strategic mandate objectives, organizational reporting lines, ideal candidate profile, compensation parameters, target market landscape, and timeline requirements.',
+  });
+  await seedEntry('blockFaqItem', 'faq-contact-fees', {
+    question: 'How are retained search fees structured?',
+    category: 'FEES & RETAINERS',
+    answer: 'Our professional fees are billed on a standard milestone basis (typically 1/3 at mandate initiation, 1/3 at delivery of the agreed shortlist, and 1/3 upon completion/signing of the executive appointee).',
+  });
+  await seedEntry('blockFaqItem', 'faq-contact-confidentiality', {
+    question: 'Can a search be conducted covertly without market leakage?',
+    category: 'CONFIDENTIALITY',
+    answer: 'Yes. Over 40% of our mandates are confidential succession or sensitive replacements. We maintain strict non-disclosure, anonymised candidate briefs, and NDAs signed prior to disclosing client identities.',
+  });
+
+  await seedEntry('blockFaqAccordion', 'block-contact-faq', {
+    internalName: 'Contact - Scoping FAQ',
+    sectionLabel: 'ENGAGEMENT FAQ',
+    title: 'Mandate Scoping & Initial Consultation',
+    description: 'Common questions regarding initial discovery calls, mandate scoping, and fee structures.',
+    items: [
+      entryLink('faq-contact-initial'),
+      entryLink('faq-contact-fees'),
+      entryLink('faq-contact-confidentiality'),
+    ],
+  });
+
+  await seedEntry('modularPage', 'page-contact', {
+    title: 'Contact Direct Desk',
+    slug: 'contact',
+    metaTitle: 'Contact Mark Goldsmith | Retained Search Direct Partner Desk',
+    metaDescription: 'Get in direct contact with Managing Partner Mark Goldsmith for confidential Board, C-Suite, and Managing Director retained search inquiries.',
+    showHeader: true,
+    showFooter: true,
+    sections: [
+      entryLink('block-contact-header'),
+      entryLink('block-contact-desk'),
+      entryLink('block-contact-faq'),
+    ],
+  });
+
+
   console.log(`\n===========================================================`);
   console.log(`✓ [MGH CMS Setup] All Content Types, Assets, & Rich Text Articles Provisioned in Space: ${SPACE_ID}!`);
   console.log(`===========================================================\n`);
+
 }
 
 runSetup().catch((err) => {
