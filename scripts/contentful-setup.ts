@@ -1663,6 +1663,68 @@ async function runSetup() {
     internalTitle: 'MGH Global Homepage (Seeded)',
     aboutPartnerBlock: entryLink('block-about-team'),
     contactFooterBlock: entryLink('block-contact-desk'),
+    
+    // Hero Section
+    heroBadgeOverline: 'Retained Executive Search',
+    heroBadgeCategory: 'Building Products & Construction',
+    heroHeadline: 'Board, Managing Director & C-Suite Appointments for the',
+    heroHighlightedPhrase: 'Built Environment',
+    heroSubtitle: 'MG Headhunting (MGH) delivers precision-engineered executive search for manufacturers, distributors, and private equity investors across the Building Products sector. Partner-led, rigorously assessed, and strictly confidential.',
+    heroKeyValues: [
+      'Zero Transactional Recruitment',
+      '100% Partner Execution',
+      'Deep Sector Discretion',
+    ],
+    heroCtaPrimaryText: 'Initiate Confidential Search',
+    heroCtaSecondaryText: 'View Sector Specialisms',
+    heroComplianceNotice: 'Operating under UK Executive Search Code of Conduct & Strict Data Protection protocols.',
+    heroPartnerName: 'Mark Goldsmith',
+    heroPartnerTitle: 'Managing Director & Lead Search Partner',
+    heroPartnerBio: 'Specialist in board appointments, P&L leaders, and commercial turnarounds across heavy building materials, façades, HVAC, and timber systems.',
+    heroMetricPlacements: '200+',
+    heroMetricTenure: '20+ Yrs',
+    heroMetricRetention: '96%',
+    heroMetricCoverage: 'UK & EU',
+
+    // Sector Matrix Section
+    sectorMatrixSectionLabel: 'Sector Specialism Matrix',
+    sectorMatrixTitle: 'Core Practice Matrix',
+    sectorMatrixDescription: 'Specialized search focused exclusively on executive roles across manufacturing, distribution, and contracting in the Building Products & Construction materials ecosystem.',
+    sectorMatrixSubDisciplines: [
+      'Heavy Materials & Aggregates',
+      'Curtain Walling & Glazing',
+      'Structural Timber & Engineered Wood',
+      'Offsite & Modular Manufacturing',
+      'HVAC, M&E and Pumps',
+      'Drylining, Plaster & Insulation',
+      'Builders Merchants & Distribution',
+      'Roofing, Waterproofing & Cladding',
+    ],
+
+    // Difference Section
+    differenceSectionLabel: 'The MGH Difference',
+    differenceTitle: 'Engineered Executive Search vs Recruitment Clichés',
+    differenceDescription: 'Why CEOs, Private Equity investors, and Board Chairs choose MG Headhunting over generic recruitment agencies.',
+    differenceAssuranceTitle: '100% Commitment to Mandate Completion',
+    differenceAssuranceDescription: 'Unlike transactional agents who drop searches when difficult, MGH guarantees persistence until the exact candidate profile is secured.',
+    differenceCandidateQualityTitle: 'Candidate quality',
+    differenceCandidateQualityText: 'Targeted approach to top 5% performers who are not on job boards.',
+    differenceReplacementGuaranteeTitle: 'Replacement guarantee',
+    differenceReplacementGuaranteeText: 'Full 12-month candidate replacement warranty on executive placements.',
+
+    // Process Section
+    processSectionLabel: 'Search Methodology',
+    processTitle: 'The 5-Stage Search Blueprint',
+    processDescription: 'A disciplined, milestone-driven framework designed to identify, attract, and secure top-tier executive leadership without disruption.',
+
+    // Insights Section
+    insightsSectionLabel: 'Market Intelligence',
+    insightsTitle: 'Executive Briefings & Market Insights',
+    insightsDescription: 'Proprietary intelligence on executive talent flows, board compensation dynamics, and regulatory shifts across the Building Products landscape.',
+    insightsReportBannerCategory: 'Special Research Publication',
+    insightsReportBannerTitle: '2026/2027 Building Products Executive Salary & Retention Benchmark',
+    insightsReportBannerDescription: 'Comprehensive compensation analysis covering 400+ board appointments across UK & European manufacturing, merchants, and fabricators.',
+    insightsReportBannerCtaText: 'Request Confidential Report',
   });
 
   console.log(`\n===========================================================`);
