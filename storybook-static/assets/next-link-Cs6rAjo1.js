@@ -1,0 +1,1 @@
+import"./iframe-BAhNAMJG.js";import{t as e}from"./react-BLLmnUNM.js";import{t}from"./jsx-runtime-DrN_svkz.js";e();var n=t();function r({href:e,children:t,className:r=``,...i}){return(0,n.jsx)(`a`,{href:e,className:r,...i,children:t})}r.__docgenInfo={description:``,methods:[],displayName:`Link`,props:{className:{defaultValue:{value:`''`,computed:!1},required:!1}}};export{r as t};

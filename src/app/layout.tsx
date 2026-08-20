@@ -5,9 +5,14 @@ import './globals.css';
 import { ContentfulLivePreviewProvider } from '../components/contentful/ContentfulLivePreviewProvider';
 import { DraftModeBar } from '../components/ui/DraftModeBar';
 import { CookieConsent } from '../components/ui/CookieConsent';
+import { OrganizationSchema } from '../components/seo/JsonLd';
 
 export const metadata: Metadata = {
-  title: 'MG Headhunting (MGH) | Retained Executive Search for Building Products & Construction',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://mgheadhunting.com'),
+  title: {
+    default: 'MG Headhunting (MGH) | Retained Executive Search for Building Products & Construction',
+    template: '%s | MG Headhunting (MGH)',
+  },
   description:
     'Boutique retained executive search delivering Board, Managing Director, and C-Suite appointments across the UK and European Building Products and Built Environment sectors. Partner-led, rigorously assessed, and strictly confidential.',
   keywords: [
@@ -23,12 +28,34 @@ export const metadata: Metadata = {
     'MG Headhunting',
   ],
   authors: [{ name: 'Mark Goldsmith' }],
+  creator: 'MG Headhunting',
+  publisher: 'MG Headhunting',
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
     title: 'MG Headhunting (MGH) | Retained Executive Search',
     description:
       'Precision-engineered executive search for manufacturers, distributors, and PE investors across the Building Products sector.',
+    url: '/',
+    siteName: 'MG Headhunting (MGH)',
     type: 'website',
     locale: 'en_GB',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MG Headhunting (MGH) | Retained Executive Search',
+    description: 'Precision-engineered executive search for manufacturers, distributors, and PE investors across the Building Products sector.',
+    creator: '@mgheadhunting',
   },
 };
 
@@ -88,6 +115,7 @@ export default async function RootLayout({
         )}
       </head>
       <body className="min-h-screen bg-canvas-light text-navy-900 font-sans selection:bg-teal-600 selection:text-white antialiased">
+        <OrganizationSchema />
         <ContentfulLivePreviewProvider locale="en-US" enableLiveUpdates={true} enableInspectorMode={true}>
           {children}
           <DraftModeBar isEnabled={isEnabled} />

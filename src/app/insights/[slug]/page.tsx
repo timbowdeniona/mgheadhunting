@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { fetchInsightBySlug, fetchInsightArticles, fetchSiteSettings } from '../../../lib/contentful/api';
 import { InsightDetailClient } from './InsightDetailClient';
+import { ArticleSchema } from '../../../components/seo/JsonLd';
 
 interface InsightPageProps {
   params: Promise<{ slug: string }>;
@@ -70,10 +71,13 @@ export default async function InsightDetailPage({ params }: InsightPageProps) {
     .slice(0, 2);
 
   return (
-    <InsightDetailClient
-      initialArticle={article}
-      relatedArticles={relatedArticles}
-      siteSettings={siteSettings}
-    />
+    <>
+      <ArticleSchema article={article} />
+      <InsightDetailClient
+        initialArticle={article}
+        relatedArticles={relatedArticles}
+        siteSettings={siteSettings}
+      />
+    </>
   );
 }
