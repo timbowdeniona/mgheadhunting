@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     articles.forEach((article) => {
       sitemapData.push({
         url: `${baseUrl}/insights/${article.slug}`,
-        lastModified: article.publishDate ? new Date(article.publishDate) : new Date(),
+        lastModified: article.publishedDate ? new Date(article.publishedDate) : new Date(),
         changeFrequency: 'monthly',
         priority: 0.7,
       });

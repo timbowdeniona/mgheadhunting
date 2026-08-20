@@ -42,3 +42,27 @@ export function PersonSchema({ name, role, url }: { name: string, role?: string,
   };
   return <JsonLd schema={schema} />;
 }
+
+export function ArticleSchema({ article }: { article: any }) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.excerpt,
+    "image": article.coverImage?.fields?.file?.url ? (article.coverImage.fields.file.url.startsWith('//') ? `https:${article.coverImage.fields.file.url}` : article.coverImage.fields.file.url) : "",
+    "datePublished": article.publishedDate,
+    "author": [{
+      "@type": "Person",
+      "name": article.author?.fields?.name || "Mark Goldsmith"
+    }],
+    "publisher": {
+      "@type": "Organization",
+      "name": "MG Headhunting",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://mgheadhunting.com/logo.png"
+      }
+    }
+  };
+  return <JsonLd schema={schema} />;
+}

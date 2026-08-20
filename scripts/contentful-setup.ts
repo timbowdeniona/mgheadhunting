@@ -309,6 +309,8 @@ async function runSetup() {
       validations: [{ linkContentType: ['author'] }],
       required: false,
     },
+    { id: 'metaTitle', name: 'SEO Meta Title', type: 'Symbol', required: false, validations: [{ size: { max: 60 } }] },
+    { id: 'metaDescription', name: 'SEO Meta Description', type: 'Text', required: false, validations: [{ size: { max: 160 } }] },
   ]);
 
   // 6. Site Settings Content Type
@@ -555,6 +557,8 @@ async function runSetup() {
   // 9. Homepage Content Type
   await ensureContentType('homepage', 'Homepage Configuration', 'internalTitle', [
     { id: 'internalTitle', name: 'Internal Title', type: 'Symbol', required: true, validations: [{ unique: true }] },
+    { id: 'metaTitle', name: 'SEO Meta Title', type: 'Symbol', required: false, validations: [{ size: { max: 60 } }] },
+    { id: 'metaDescription', name: 'SEO Meta Description', type: 'Text', required: false, validations: [{ size: { max: 160 } }] },
     
     // Hero Section
     { id: 'heroBadgeOverline', name: 'Hero Badge Overline', type: 'Symbol', required: false },
