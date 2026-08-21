@@ -51,6 +51,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_GB',
   },
+  icons: {
+    icon: [
+      { url: '/mgh-favicon.svg', type: 'image/svg+xml' }
+    ],
+    apple: [
+      { url: '/mgh-favicon.svg', type: 'image/svg+xml' }
+    ],
+  },
   twitter: {
     card: 'summary_large_image',
     title: 'MG Headhunting (MGH) | Retained Executive Search',
