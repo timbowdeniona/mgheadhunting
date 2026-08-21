@@ -5,6 +5,7 @@ import { InsightCard } from '../ui/InsightCard';
 import { Button } from '../ui/Button';
 import { BookOpen, Download, ArrowRight } from 'lucide-react';
 import { InsightArticleFields, InsightsSectionData } from '../../lib/contentful/types';
+import { getArticleCoverAlt, getArticleCoverUrl } from '../../lib/contentful/api';
 import { fallbackInsightArticles } from '../../lib/contentful/fallbacks';
 import { trackInsightView, trackEvent } from '../../lib/analytics';
 
@@ -93,9 +94,8 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
         {/* Insights Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredArticles.map((article) => {
-            const coverUrl =
-              article.coverImage?.fields?.file?.url ||
-              article.featuredImage?.fields?.file?.url;
+            const coverUrl = getArticleCoverUrl(article);
+            const coverAlt = getArticleCoverAlt(article);
 
             return (
               <InsightCard
@@ -107,6 +107,7 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
                 excerpt={article.excerpt}
                 keyTakeaways={article.keyTakeaways}
                 coverImage={coverUrl}
+                coverImageAlt={coverAlt}
                 href={`/insights/${article.slug}`}
                 author={
                   article.author

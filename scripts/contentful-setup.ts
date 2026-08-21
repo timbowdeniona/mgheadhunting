@@ -283,7 +283,22 @@ async function runSetup() {
     { id: 'order', name: 'Display Order', type: 'Integer', required: false },
   ]);
 
-  // 5. Insight Article Content Type (Extended with body and coverImage)
+  // 5. Media Asset Wrapper (image + alt text + caption)
+  await ensureContentType('mediaAsset', 'Media Asset', 'internalName', [
+    { id: 'internalName', name: 'Internal Name', type: 'Symbol', required: true },
+    {
+      id: 'image',
+      name: 'Image',
+      type: 'Link',
+      linkType: 'Asset',
+      required: true,
+    },
+    { id: 'altText', name: 'Alt Text (Accessibility)', type: 'Symbol', required: true },
+    { id: 'caption', name: 'Caption', type: 'Symbol', required: false },
+    { id: 'credit', name: 'Credit / Source', type: 'Symbol', required: false },
+  ]);
+
+  // 6. Insight Article Content Type (Extended with body and coverImage)
   await ensureContentType('insightArticle', 'Executive Insight Article', 'title', [
     { id: 'title', name: 'Article Title', type: 'Symbol', required: true },
     { id: 'slug', name: 'URL Slug', type: 'Symbol', required: true, validations: [{ unique: true }] },
@@ -297,7 +312,8 @@ async function runSetup() {
       id: 'coverImage',
       name: 'Cover Image',
       type: 'Link',
-      linkType: 'Asset',
+      linkType: 'Entry',
+      validations: [{ linkContentType: ['mediaAsset'] }],
       required: false,
     },
     { id: 'isFeatured', name: 'Featured on Homepage', type: 'Boolean', required: false },
@@ -313,7 +329,7 @@ async function runSetup() {
     { id: 'metaDescription', name: 'SEO Meta Description', type: 'Text', required: false, validations: [{ size: { max: 160 } }] },
   ]);
 
-  // 6. Site Settings Content Type
+  // 7. Site Settings Content Type
   await ensureContentType('siteSettings', 'Site Settings & Config', 'siteName', [
     { id: 'siteName', name: 'Site Name', type: 'Symbol', required: true },
     { id: 'tagline', name: 'Tagline', type: 'Symbol', required: false },
@@ -331,7 +347,7 @@ async function runSetup() {
   ]);
 
   // -----------------------------------------------------------
-  // 7. Composable Design System Block Content Types
+  // 8. Composable Design System Block Content Types
   // -----------------------------------------------------------
 
   // 7a. Block: Page Header
@@ -715,6 +731,38 @@ async function runSetup() {
     placementLevel: 'Executive Advisory',
   });
 
+  // Seed Media Asset Wrappers (image + alt text)
+  console.log(`\n  --- Seeding Media Asset Wrappers ---`);
+
+  const mediaAsset1 = await seedEntry('mediaAsset', 'media-cover-c-suite-remuneration', {
+    internalName: 'Cover: C-Suite Remuneration Benchmarks',
+    image: { sys: { type: 'Link', linkType: 'Asset', id: asset1.sys.id } },
+    altText: 'Executive boardroom and high-rise glass architecture reflecting corporate governance and executive compensation',
+    caption: 'Executive boardroom & architectural high-rise',
+  });
+
+  const mediaAsset2 = await seedEntry('mediaAsset', 'media-cover-building-safety-act', {
+    internalName: 'Cover: Building Safety Act Technical Directors',
+    image: { sys: { type: 'Link', linkType: 'Asset', id: asset2.sys.id } },
+    altText: 'Precision engineered architectural building facade demonstrating Building Safety Act technical compliance',
+    caption: 'Modern facade & engineering envelope',
+  });
+
+  const mediaAsset3 = await seedEntry('mediaAsset', 'media-cover-merchant-distribution', {
+    internalName: 'Cover: Merchant Distribution Consolidation',
+    image: { sys: { type: 'Link', linkType: 'Asset', id: asset3.sys.id } },
+    altText: 'High-volume commercial distribution and building merchant logistics facility',
+    caption: 'Modern distribution logistics architecture',
+  });
+
+  const mediaAsset4 = await seedEntry('mediaAsset', 'media-cover-decarbonizing-materials', {
+    internalName: 'Cover: Decarbonizing Heavy Materials',
+    image: { sys: { type: 'Link', linkType: 'Asset', id: asset4.sys.id } },
+    altText: 'Engineered sustainable mass timber and low-carbon structural building components',
+    caption: 'Sustainable mass timber & structural engineering',
+  });
+
+
   // Seed Sector Specialisms
   const specialismsData = [
     {
@@ -1088,7 +1136,7 @@ async function runSetup() {
       ],
       body: bodyArticle1,
       coverImage: {
-        sys: { type: 'Link', linkType: 'Asset', id: asset1.sys.id },
+        sys: { type: 'Link', linkType: 'Entry', id: mediaAsset1.sys.id },
       },
       isFeatured: true,
       author: {
@@ -1110,7 +1158,7 @@ async function runSetup() {
       ],
       body: bodyArticle2,
       coverImage: {
-        sys: { type: 'Link', linkType: 'Asset', id: asset2.sys.id },
+        sys: { type: 'Link', linkType: 'Entry', id: mediaAsset2.sys.id },
       },
       isFeatured: true,
       author: {
@@ -1132,7 +1180,7 @@ async function runSetup() {
       ],
       body: bodyArticle3,
       coverImage: {
-        sys: { type: 'Link', linkType: 'Asset', id: asset3.sys.id },
+        sys: { type: 'Link', linkType: 'Entry', id: mediaAsset3.sys.id },
       },
       isFeatured: true,
       author: {
@@ -1154,7 +1202,7 @@ async function runSetup() {
       ],
       body: bodyArticle4,
       coverImage: {
-        sys: { type: 'Link', linkType: 'Asset', id: asset4.sys.id },
+        sys: { type: 'Link', linkType: 'Entry', id: mediaAsset4.sys.id },
       },
       isFeatured: true,
       author: {
@@ -1735,6 +1783,262 @@ async function runSetup() {
   console.log(`✓ [MGH CMS Setup] All Content Types, Assets, & Rich Text Articles Provisioned in Space: ${SPACE_ID}!`);
   console.log(`===========================================================\n`);
 
+  // Configure Editor Interfaces (field grouping)
+  await configureEditorInterfaces();
+}
+
+// -----------------------------------------------------------
+// Editor Interface Field Grouping
+// Uses entity-based client for editorLayout + groupControls API
+// -----------------------------------------------------------
+
+async function configureEditorInterfaces() {
+  console.log(`\n===========================================================`);
+  console.log(`[MGH CMS Setup] Configuring Editor Interface Field Groups`);
+  console.log(`===========================================================\n`);
+
+  // Entity-based client for editor interface API
+  const entityClient = createClient({ accessToken: MANAGEMENT_TOKEN });
+  const space = await entityClient.getSpace(SPACE_ID);
+  const environment = await space.getEnvironment(ENVIRONMENT_ID);
+
+  async function setFieldGroups(
+    contentTypeId: string,
+    groups: Array<{
+      groupId: string;
+      name: string;
+      fieldIds: string[];
+      helpText?: string;
+      collapsedByDefault?: boolean;
+    }>
+  ) {
+    try {
+      const contentType = await environment.getContentType(contentTypeId);
+      const editorInterface = await contentType.getEditorInterface();
+
+      // Build editorLayout: each group contains items referencing field IDs
+      editorInterface.editorLayout = groups.map((g) => ({
+        groupId: g.groupId,
+        name: g.name,
+        items: g.fieldIds.map((fieldId) => ({ fieldId })),
+      }));
+
+      // Build groupControls: settings for each group
+      editorInterface.groupControls = groups.map((g) => ({
+        groupId: g.groupId,
+        widgetNamespace: 'builtin',
+        widgetId: 'fieldset',
+        settings: {
+          helpText: g.helpText || '',
+          collapsedByDefault: g.collapsedByDefault ?? false,
+        },
+      }));
+
+      await editorInterface.update();
+      console.log(`  ✓ Field groups configured for: ${contentTypeId}`);
+    } catch (err: any) {
+      console.log(`  ! Could not configure field groups for ${contentTypeId}: ${err.message}`);
+    }
+  }
+
+  // --- homepage (45+ fields) ---
+  await setFieldGroups('homepage', [
+    {
+      groupId: 'homepage-meta',
+      name: 'Page Meta & SEO',
+      fieldIds: ['internalTitle', 'metaTitle', 'metaDescription'],
+    },
+    {
+      groupId: 'homepage-hero',
+      name: 'Hero Section',
+      fieldIds: [
+        'heroBadgeOverline', 'heroBadgeCategory', 'heroHeadline', 'heroHighlightedPhrase',
+        'heroSubtitle', 'heroKeyValues', 'heroCtaPrimaryText', 'heroCtaSecondaryText',
+        'heroComplianceNotice', 'heroPartnerName', 'heroPartnerTitle', 'heroPartnerBio',
+        'heroMetricPlacements', 'heroMetricTenure', 'heroMetricRetention', 'heroMetricCoverage',
+      ],
+    },
+    {
+      groupId: 'homepage-sector-matrix',
+      name: 'Sector Matrix Section',
+      fieldIds: ['sectorMatrixSectionLabel', 'sectorMatrixTitle', 'sectorMatrixDescription', 'sectorMatrixSubDisciplines'],
+    },
+    {
+      groupId: 'homepage-difference',
+      name: 'Difference Section',
+      fieldIds: [
+        'differenceSectionLabel', 'differenceTitle', 'differenceDescription',
+        'differenceAssuranceTitle', 'differenceAssuranceDescription',
+        'differenceCandidateQualityTitle', 'differenceCandidateQualityText',
+        'differenceReplacementGuaranteeTitle', 'differenceReplacementGuaranteeText',
+      ],
+    },
+    {
+      groupId: 'homepage-process',
+      name: 'Process Section',
+      fieldIds: ['processSectionLabel', 'processTitle', 'processDescription'],
+    },
+    {
+      groupId: 'homepage-insights',
+      name: 'Insights Section',
+      fieldIds: [
+        'insightsSectionLabel', 'insightsTitle', 'insightsDescription',
+        'insightsReportBannerCategory', 'insightsReportBannerTitle',
+        'insightsReportBannerDescription', 'insightsReportBannerCtaText',
+      ],
+    },
+    {
+      groupId: 'homepage-blocks',
+      name: 'Referenced Blocks',
+      fieldIds: ['aboutPartnerBlock', 'contactFooterBlock'],
+    },
+  ]);
+
+  // --- insightArticle ---
+  await setFieldGroups('insightArticle', [
+    {
+      groupId: 'article-content',
+      name: 'Article Content',
+      fieldIds: ['title', 'slug', 'category', 'publishedDate', 'readTime', 'excerpt', 'body'],
+    },
+    {
+      groupId: 'article-taxonomy',
+      name: 'Taxonomy & Discovery',
+      fieldIds: ['keyTakeaways', 'isFeatured', 'author'],
+    },
+    {
+      groupId: 'article-media',
+      name: 'Media',
+      fieldIds: ['coverImage'],
+    },
+    {
+      groupId: 'article-seo',
+      name: 'SEO',
+      fieldIds: ['metaTitle', 'metaDescription'],
+      collapsedByDefault: true,
+    },
+  ]);
+
+  // --- blockCtaBanner ---
+  await setFieldGroups('blockCtaBanner', [
+    {
+      groupId: 'cta-content',
+      name: 'Content',
+      fieldIds: ['internalName', 'variant', 'overline', 'title', 'description'],
+    },
+    {
+      groupId: 'cta-primary',
+      name: 'Primary CTA',
+      fieldIds: ['primaryCtaText', 'primaryCtaAction', 'primaryCtaHref'],
+    },
+    {
+      groupId: 'cta-secondary',
+      name: 'Secondary CTA',
+      fieldIds: ['secondaryCtaText', 'secondaryCtaHref'],
+    },
+    {
+      groupId: 'cta-assurance',
+      name: 'Assurance',
+      fieldIds: ['guaranteeNotice'],
+      collapsedByDefault: true,
+    },
+  ]);
+
+  // --- blockTeamProfile ---
+  await setFieldGroups('blockTeamProfile', [
+    {
+      groupId: 'team-section',
+      name: 'Section Config',
+      fieldIds: ['internalName', 'sectionLabel', 'badge', 'badgeSecondary', 'headline'],
+    },
+    {
+      groupId: 'team-partner',
+      name: 'Partner Details',
+      fieldIds: ['partnerName', 'partnerRole', 'partnerPracticeTenure', 'partnerSpecialization', 'partnerPlacementLevel'],
+    },
+    {
+      groupId: 'team-contact',
+      name: 'Contact & Links',
+      fieldIds: ['partnerEmail', 'partnerLinkedinUrl'],
+    },
+    {
+      groupId: 'team-bio',
+      name: 'Biography',
+      fieldIds: ['paragraphs', 'credentialsChecklist'],
+    },
+  ]);
+
+  // --- blockEditorialRichText ---
+  await setFieldGroups('blockEditorialRichText', [
+    {
+      groupId: 'editorial-header',
+      name: 'Section Header',
+      fieldIds: ['internalName', 'sectionLabel', 'title', 'subtitle', 'layout'],
+    },
+    {
+      groupId: 'editorial-content',
+      name: 'Content',
+      fieldIds: ['leadParagraph', 'keyTakeaways'],
+    },
+    {
+      groupId: 'editorial-quote',
+      name: 'Pull Quote',
+      fieldIds: ['quoteText', 'quoteAuthor', 'quoteRole'],
+      collapsedByDefault: true,
+    },
+  ]);
+
+  // --- siteSettings ---
+  await setFieldGroups('siteSettings', [
+    {
+      groupId: 'settings-brand',
+      name: 'Brand',
+      fieldIds: ['siteName', 'tagline'],
+    },
+    {
+      groupId: 'settings-contact',
+      name: 'Contact Details',
+      fieldIds: ['primaryEmail', 'phone', 'headquarters', 'linkedinUrl'],
+    },
+    {
+      groupId: 'settings-navigation',
+      name: 'Navigation',
+      fieldIds: ['navLinks'],
+    },
+    {
+      groupId: 'settings-footer',
+      name: 'Footer Content',
+      fieldIds: ['footerSpecialisms', 'footerSubSectors', 'copyrightText', 'icoRegistrationNumber'],
+    },
+    {
+      groupId: 'settings-seo',
+      name: 'SEO Defaults',
+      fieldIds: ['metaTitleDefault', 'metaDescriptionDefault'],
+      collapsedByDefault: true,
+    },
+  ]);
+
+  // --- modularPage ---
+  await setFieldGroups('modularPage', [
+    {
+      groupId: 'page-config',
+      name: 'Page Config',
+      fieldIds: ['title', 'slug', 'showHeader', 'showFooter'],
+    },
+    {
+      groupId: 'page-seo',
+      name: 'SEO',
+      fieldIds: ['metaTitle', 'metaDescription'],
+      collapsedByDefault: true,
+    },
+    {
+      groupId: 'page-builder',
+      name: 'Page Builder',
+      fieldIds: ['sections'],
+    },
+  ]);
+
+  console.log(`\n  ✓ Editor Interface field groups configured for all content types.`);
 }
 
 runSetup().catch((err) => {

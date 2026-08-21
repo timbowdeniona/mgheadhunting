@@ -247,6 +247,7 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
         },
       },
     },
+    coverImageAlt: 'Executive boardroom and high-rise glass architecture reflecting corporate governance and executive compensation',
     isFeatured: true,
     author: {
       fields: {
@@ -276,6 +277,7 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
         },
       },
     },
+    coverImageAlt: 'Precision engineered architectural building facade demonstrating Building Safety Act technical compliance',
     isFeatured: true,
     author: {
       fields: {
@@ -305,6 +307,7 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
         },
       },
     },
+    coverImageAlt: 'High-volume commercial distribution and building merchant logistics facility',
     isFeatured: true,
     author: {
       fields: {
@@ -334,6 +337,7 @@ export const fallbackInsightArticles: InsightArticleFields[] = [
         },
       },
     },
+    coverImageAlt: 'Engineered sustainable mass timber and low-carbon structural building components',
     isFeatured: true,
     author: {
       fields: {

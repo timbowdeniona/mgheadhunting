@@ -15,6 +15,7 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { InsightArticleFields, SiteSettingsFields } from '../../lib/contentful/types';
+import { getArticleCoverAlt, getArticleCoverUrl } from '../../lib/contentful/api';
 import { InsightCard } from '../../components/ui/InsightCard';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -75,10 +76,10 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
     return articles.find((a) => a.isFeatured) || articles[0];
   }, [articles]);
 
-  const featuredCoverUrl =
-    featuredArticle?.coverImage?.fields?.file?.url ||
-    featuredArticle?.featuredImage?.fields?.file?.url ||
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop';
+  const featuredCoverUrl = featuredArticle
+    ? getArticleCoverUrl(featuredArticle)
+    : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop';
+  const featuredCoverAlt = featuredArticle ? getArticleCoverAlt(featuredArticle) : '';
 
   const normalizedFeaturedCover = featuredCoverUrl.startsWith('//')
     ? `https:${featuredCoverUrl}`
@@ -170,7 +171,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
               <div className="relative lg:col-span-7 h-64 sm:h-80 lg:h-auto min-h-[300px] overflow-hidden bg-steel-100">
                 <Image
                   src={normalizedFeaturedCover}
-                  alt={featuredArticle.title}
+                  alt={featuredCoverAlt || featuredArticle.title}
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 60vw"
@@ -326,10 +327,8 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
           {filteredArticles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredArticles.map((article) => {
-                const coverUrl =
-                  article.coverImage?.fields?.file?.url ||
-                  article.featuredImage?.fields?.file?.url ||
-                  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop';
+                const coverUrl = getArticleCoverUrl(article);
+                const coverAlt = getArticleCoverAlt(article);
                 
                 return (
                   <InsightCard
@@ -341,6 +340,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                     excerpt={article.excerpt}
                     keyTakeaways={article.keyTakeaways}
                     coverImage={coverUrl}
+                    coverImageAlt={coverAlt}
                     href={`/insights/${article.slug}`}
                     author={
                       article.author

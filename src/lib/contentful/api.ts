@@ -34,6 +34,22 @@ import {
   fallbackModularPages,
 } from './fallbacks';
 
+// Helper utilities for Insight Articles
+export function getArticleCoverAlt(article: InsightArticleFields): string {
+  if (article.coverImageAlt) return article.coverImageAlt;
+  const cover = article.coverImage as any;
+  if (cover?.fields?.altText) return cover.fields.altText;
+  if (cover?.fields?.description) return cover.fields.description;
+  return article.title;
+}
+
+export function getArticleCoverUrl(
+  article: InsightArticleFields,
+  fallback = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop'
+): string {
+  const cover = article.coverImage as any;
+  return cover?.fields?.file?.url || cover?.fields?.image?.fields?.file?.url || fallback;
+}
 
 // API Fetchers
 

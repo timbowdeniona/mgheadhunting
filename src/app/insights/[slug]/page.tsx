@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
-import { fetchInsightBySlug, fetchInsightArticles, fetchSiteSettings } from '../../../lib/contentful/api';
+import { fetchInsightBySlug, fetchInsightArticles, fetchSiteSettings, getArticleCoverAlt, getArticleCoverUrl } from '../../../lib/contentful/api';
 import { InsightDetailClient } from './InsightDetailClient';
 import { ArticleSchema } from '../../../components/seo/JsonLd';
 
@@ -18,12 +18,9 @@ export async function generateMetadata({ params }: InsightPageProps): Promise<Me
     };
   }
 
-  const coverUrl =
-    article.coverImage?.fields?.file?.url ||
-    article.featuredImage?.fields?.file?.url ||
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop';
-
+  const coverUrl = getArticleCoverUrl(article);
   const normalizedCover = coverUrl.startsWith('//') ? `https:${coverUrl}` : coverUrl;
+  const coverAlt = getArticleCoverAlt(article);
 
   return {
     title: `${article.title} | MG Headhunting Intelligence`,
@@ -38,7 +35,7 @@ export async function generateMetadata({ params }: InsightPageProps): Promise<Me
           url: normalizedCover,
           width: 1200,
           height: 630,
-          alt: article.title,
+          alt: coverAlt,
         },
       ],
     },

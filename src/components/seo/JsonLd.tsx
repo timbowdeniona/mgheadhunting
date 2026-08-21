@@ -44,12 +44,14 @@ export function PersonSchema({ name, role, url }: { name: string, role?: string,
 }
 
 export function ArticleSchema({ article }: { article: any }) {
+  const coverUrl = article.coverImage?.fields?.file?.url || article.coverImage?.fields?.image?.fields?.file?.url || "";
+  const imageUrl = coverUrl ? (coverUrl.startsWith('//') ? `https:${coverUrl}` : coverUrl) : "";
   const schema = {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": article.title,
     "description": article.excerpt,
-    "image": article.coverImage?.fields?.file?.url ? (article.coverImage.fields.file.url.startsWith('//') ? `https:${article.coverImage.fields.file.url}` : article.coverImage.fields.file.url) : "",
+    "image": imageUrl,
     "datePublished": article.publishedDate,
     "author": [{
       "@type": "Person",

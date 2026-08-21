@@ -72,6 +72,14 @@ export interface ProcessStepFields {
   order?: number;
 }
 
+export interface MediaAssetFields {
+  internalName: string;
+  image?: ContentfulAsset;
+  altText: string;
+  caption?: string;
+  credit?: string;
+}
+
 export interface InsightArticleFields {
   title: string;
   slug: string;
@@ -84,8 +92,8 @@ export interface InsightArticleFields {
   author?: {
     fields: AuthorFields;
   };
-  coverImage?: ContentfulAsset;
-  featuredImage?: ContentfulAsset;
+  coverImage?: ContentfulAsset | { fields: MediaAssetFields; sys: { id: string } };
+  coverImageAlt?: string;
   isFeatured?: boolean;
 }
 

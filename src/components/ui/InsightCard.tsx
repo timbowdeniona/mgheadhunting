@@ -11,6 +11,7 @@ export interface InsightCardProps {
   excerpt: string;
   keyTakeaways?: string[];
   coverImage?: string;
+  coverImageAlt?: string;
   href?: string;
   author?: {
     name: string;
@@ -29,6 +30,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   excerpt,
   keyTakeaways,
   coverImage,
+  coverImageAlt,
   href,
   author,
   onClick,
@@ -45,7 +47,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-steel-100 border-b border-steel-200">
           <Image
             src={coverImage.startsWith('//') ? `https:${coverImage}` : coverImage}
-            alt={title}
+            alt={coverImageAlt || title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"

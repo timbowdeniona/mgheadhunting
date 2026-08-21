@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useContentfulLiveUpdates } from '@contentful/live-preview/react';
 import { InsightArticleFields, SiteSettingsFields } from '../../../lib/contentful/types';
+import { getArticleCoverAlt, getArticleCoverUrl } from '../../../lib/contentful/api';
 import { RichTextRenderer } from '../../../components/ui/RichTextRenderer';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
@@ -42,12 +43,9 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
     }
   }, [article?.slug, article?.title, article?.category]);
 
-  const coverUrl =
-    article.coverImage?.fields?.file?.url ||
-    article.featuredImage?.fields?.file?.url ||
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop';
-
+  const coverUrl = getArticleCoverUrl(article);
   const normalizedCover = coverUrl.startsWith('//') ? `https:${coverUrl}` : coverUrl;
+  const coverAlt = getArticleCoverAlt(article);
   const authorName = article.author?.fields?.name || 'Mark Goldsmith';
   const authorRole = article.author?.fields?.roleTitle || 'Managing Director & Lead Search Partner';
   const authorTenure = article.author?.fields?.practiceTenure || '20+ Years';
@@ -121,16 +119,16 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
         <div className="relative w-full h-72 sm:h-96 lg:h-[420px] mb-10 overflow-hidden bg-steel-100 border border-steel-300 shadow-sm">
           <Image
             src={normalizedCover}
-            alt={article.title}
+            alt={coverAlt}
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 896px"
             className="object-cover object-center"
           />
           <div className="absolute inset-0 bg-navy-950/15 pointer-events-none" />
-          {article.coverImage?.fields?.description && (
+          {((article.coverImage as any)?.fields?.caption || (article.coverImage as any)?.fields?.description) && (
             <div className="absolute bottom-0 inset-x-0 bg-navy-950/80 backdrop-blur-sm text-steel-300 text-[11px] font-sans px-4 py-2 text-right">
-              {article.coverImage.fields.description}
+              {(article.coverImage as any)?.fields?.caption || (article.coverImage as any)?.fields?.description}
             </div>
           )}
         </div>
@@ -228,10 +226,8 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {relatedArticles.map((rel) => {
-                const relCover =
-                  rel.coverImage?.fields?.file?.url ||
-                  rel.featuredImage?.fields?.file?.url ||
-                  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop';
+                const relCover = getArticleCoverUrl(rel);
+                const relAlt = getArticleCoverAlt(rel);
                 return (
                   <InsightCard
                     key={rel.slug}
@@ -241,6 +237,7 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
                     title={rel.title}
                     excerpt={rel.excerpt}
                     coverImage={relCover}
+                    coverImageAlt={relAlt}
                     href={`/insights/${rel.slug}`}
                     variant="compact"
                     onClick={() => trackInsightView(rel.slug, rel.title, rel.category)}
