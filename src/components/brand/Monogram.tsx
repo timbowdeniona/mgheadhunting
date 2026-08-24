@@ -1,15 +1,20 @@
 import React from 'react';
+import { normalizeImageUrl } from '../../lib/contentful/imageLoader';
 
 export interface MonogramProps {
   variant?: 'light' | 'dark' | 'outline' | 'solid-teal';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  customLogoUrl?: string;
+  customLogoAlt?: string;
 }
 
 export const Monogram: React.FC<MonogramProps> = ({
   variant = 'dark',
   size = 'md',
   className = '',
+  customLogoUrl,
+  customLogoAlt = 'MG Headhunting Monogram',
 }) => {
   const sizeMap = {
     sm: 'w-7 h-7 text-xs',
@@ -17,6 +22,20 @@ export const Monogram: React.FC<MonogramProps> = ({
     lg: 'w-12 h-12 text-lg',
     xl: 'w-16 h-16 text-2xl',
   };
+
+  if (customLogoUrl) {
+    const normalized = normalizeImageUrl(customLogoUrl);
+    return (
+      <div className={`relative inline-flex items-center justify-center shrink-0 select-none ${sizeMap[size]} ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={normalized}
+          alt={customLogoAlt}
+          className="w-full h-full object-contain"
+        />
+      </div>
+    );
+  }
 
   const variantMap = {
     dark: 'bg-navy-900 text-white border border-steel-400/30',

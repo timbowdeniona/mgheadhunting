@@ -111,6 +111,12 @@ export interface SiteSettingsFields {
   footerSpecialisms: string[];
   footerSubSectors: string[];
   copyrightText: string;
+  mainLogo?: ContentfulAsset | { fields: MediaAssetFields; sys: { id: string } };
+  mainLogoAlt?: string;
+  mainLogoDark?: ContentfulAsset | { fields: MediaAssetFields; sys: { id: string } };
+  mainLogoDarkAlt?: string;
+  miniLogo?: ContentfulAsset | { fields: MediaAssetFields; sys: { id: string } };
+  miniLogoAlt?: string;
 }
 
 export interface HeroSectionData {
@@ -204,6 +210,10 @@ export interface ContactFooterSectionData {
   footerSpecialisms: string[];
   footerSubSectors: string[];
   linkedinUrl: string;
+  logoDarkUrl?: string;
+  logoDarkAlt?: string;
+  logoUrl?: string;
+  logoAlt?: string;
 }
 
 export interface HomepageEntryFields {

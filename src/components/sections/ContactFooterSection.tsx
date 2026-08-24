@@ -94,7 +94,13 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
           
           {/* Col 1: Identity */}
           <div className="space-y-4">
-            <Wordmark variant="light" size="sm" showSubtitle />
+            <Wordmark
+              variant="light"
+              size="sm"
+              showSubtitle
+              customLogoUrl={footer.logoDarkUrl || footer.logoUrl}
+              customLogoAlt={footer.logoDarkAlt || footer.logoAlt}
+            />
             <p className="text-xs text-steel-400 leading-relaxed">
               {footer.siteDescription}
             </p>

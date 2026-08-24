@@ -52,3 +52,11 @@ export const LightOnDark: Story = {
     backgrounds: { default: 'navy-dark' },
   },
 };
+
+export const CustomImageLogo: Story = {
+  args: {
+    size: 'md',
+    customLogoUrl: '/mgh-favicon.svg',
+    customLogoAlt: 'Custom CMS Uploaded Logo',
+  },
+};

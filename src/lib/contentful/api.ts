@@ -55,6 +55,34 @@ export function getArticleCoverUrl(
   return cover?.fields?.file?.url || cover?.fields?.image?.fields?.file?.url || fallback;
 }
 
+// Helper utilities for Media Assets & Logos
+export function getMediaAssetUrl(assetField: any, fallback = ''): string {
+  if (!assetField) return fallback;
+  const f = assetField.fields || assetField;
+  // If it's a mediaAsset wrapper linking to an image asset
+  if (f.image?.fields?.file?.url) {
+    return f.image.fields.file.url;
+  }
+  // If it's a direct Contentful asset
+  if (f.file?.url) {
+    return f.file.url;
+  }
+  // If string url
+  if (typeof assetField === 'string') {
+    return assetField;
+  }
+  return fallback;
+}
+
+export function getMediaAssetAlt(assetField: any, fallback = 'Brand Logo'): string {
+  if (!assetField) return fallback;
+  const f = assetField.fields || assetField;
+  if (f.altText) return f.altText;
+  if (f.description) return f.description;
+  if (f.title) return f.title;
+  return fallback;
+}
+
 // API Fetchers
 
 export async function fetchSiteSettings(preview = false): Promise<SiteSettingsFields> {
@@ -62,13 +90,17 @@ export async function fetchSiteSettings(preview = false): Promise<SiteSettingsFi
     const client = getContentfulClient(preview);
     const response = await client.getEntries<any>({
       content_type: 'siteSettings',
+      include: 2,
       limit: 1,
     });
     if (response.items && response.items.length > 0) {
-      const fields = response.items[0].fields;
+      const fields = response.items[0].fields as any;
       return {
         ...fallbackSiteSettings,
         ...(fields as unknown as Partial<SiteSettingsFields>),
+        mainLogoAlt: getMediaAssetAlt(fields.mainLogo, 'MG Headhunting Logo'),
+        mainLogoDarkAlt: getMediaAssetAlt(fields.mainLogoDark, 'MG Headhunting Logo'),
+        miniLogoAlt: getMediaAssetAlt(fields.miniLogo, 'MG Headhunting Monogram'),
       };
     }
   } catch (err) {
@@ -285,6 +317,10 @@ export async function fetchHomepageData(preview = false): Promise<HomepageConten
       complianceNotice: siteSettings.icoRegistrationNumber || fallbackContactFooterData.complianceNotice,
       copyright: siteSettings.copyrightText || fallbackContactFooterData.copyright,
       linkedinUrl: siteSettings.linkedinUrl || fallbackContactFooterData.linkedinUrl,
+      logoDarkUrl: getMediaAssetUrl(siteSettings.mainLogoDark || siteSettings.mainLogo),
+      logoDarkAlt: siteSettings.mainLogoDarkAlt || siteSettings.mainLogoAlt,
+      logoUrl: getMediaAssetUrl(siteSettings.mainLogo),
+      logoAlt: siteSettings.mainLogoAlt,
     },
   };
 }

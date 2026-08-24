@@ -333,6 +333,30 @@ async function runSetup() {
   await ensureContentType('siteSettings', 'Site Settings & Config', 'siteName', [
     { id: 'siteName', name: 'Site Name', type: 'Symbol', required: true },
     { id: 'tagline', name: 'Tagline', type: 'Symbol', required: false },
+    {
+      id: 'mainLogo',
+      name: 'Main Logo (Light Backgrounds / Header)',
+      type: 'Link',
+      linkType: 'Entry',
+      validations: [{ linkContentType: ['mediaAsset'] }],
+      required: false,
+    },
+    {
+      id: 'mainLogoDark',
+      name: 'Main Logo (Dark Backgrounds / Footer)',
+      type: 'Link',
+      linkType: 'Entry',
+      validations: [{ linkContentType: ['mediaAsset'] }],
+      required: false,
+    },
+    {
+      id: 'miniLogo',
+      name: 'Mini / Monogram Logo (Mobile & Compact Nav)',
+      type: 'Link',
+      linkType: 'Entry',
+      validations: [{ linkContentType: ['mediaAsset'] }],
+      required: false,
+    },
     { id: 'primaryEmail', name: 'Primary Desk Email', type: 'Symbol', required: true },
     { id: 'phone', name: 'Telephone', type: 'Symbol', required: false },
     { id: 'headquarters', name: 'Headquarters Location', type: 'Symbol', required: false },
@@ -1826,11 +1850,7 @@ async function configureEditorInterfaces() {
       const groupControls = groups.map((g) => ({
         groupId: g.groupId,
         widgetNamespace: 'builtin',
-        widgetId: 'fieldset',
-        settings: {
-          helpText: g.helpText || '',
-          collapsedByDefault: g.collapsedByDefault ?? false,
-        },
+        widgetId: 'topLevelTab',
       }));
 
       // Configure custom widget controls (e.g. entryCardEditor for visual thumbnails)
@@ -1868,17 +1888,13 @@ async function configureEditorInterfaces() {
     }
   }
 
-  // --- homepage (45+ fields) ---
+  // --- homepage (45+ fields grouped into 4 clean topLevelTabs) ---
   await setFieldGroups('homepage', [
     {
-      groupId: 'homepage-meta',
-      name: 'Page Meta & SEO',
-      fieldIds: ['internalTitle', 'metaTitle', 'metaDescription'],
-    },
-    {
-      groupId: 'homepage-hero',
-      name: 'Hero Section',
+      groupId: 'homepage_hero',
+      name: 'Hero & Metadata',
       fieldIds: [
+        'internalTitle', 'metaTitle', 'metaDescription',
         'heroBadgeOverline', 'heroBadgeCategory', 'heroHeadline', 'heroHighlightedPhrase',
         'heroSubtitle', 'heroKeyValues', 'heroCtaPrimaryText', 'heroCtaSecondaryText',
         'heroComplianceNotice', 'heroPartnerName', 'heroPartnerTitle', 'heroPartnerBio',
@@ -1886,28 +1902,20 @@ async function configureEditorInterfaces() {
       ],
     },
     {
-      groupId: 'homepage-sector-matrix',
-      name: 'Sector Matrix Section',
-      fieldIds: ['sectorMatrixSectionLabel', 'sectorMatrixTitle', 'sectorMatrixDescription', 'sectorMatrixSubDisciplines'],
-    },
-    {
-      groupId: 'homepage-difference',
-      name: 'Difference Section',
+      groupId: 'homepage_practice',
+      name: 'Specialisms & Process',
       fieldIds: [
+        'sectorMatrixSectionLabel', 'sectorMatrixTitle', 'sectorMatrixDescription', 'sectorMatrixSubDisciplines',
         'differenceSectionLabel', 'differenceTitle', 'differenceDescription',
         'differenceAssuranceTitle', 'differenceAssuranceDescription',
         'differenceCandidateQualityTitle', 'differenceCandidateQualityText',
         'differenceReplacementGuaranteeTitle', 'differenceReplacementGuaranteeText',
+        'processSectionLabel', 'processTitle', 'processDescription',
       ],
     },
     {
-      groupId: 'homepage-process',
-      name: 'Process Section',
-      fieldIds: ['processSectionLabel', 'processTitle', 'processDescription'],
-    },
-    {
-      groupId: 'homepage-insights',
-      name: 'Insights Section',
+      groupId: 'homepage_insights',
+      name: 'Market Intelligence',
       fieldIds: [
         'insightsSectionLabel', 'insightsTitle', 'insightsDescription',
         'insightsReportBannerCategory', 'insightsReportBannerTitle',
@@ -1915,8 +1923,8 @@ async function configureEditorInterfaces() {
       ],
     },
     {
-      groupId: 'homepage-blocks',
-      name: 'Referenced Blocks',
+      groupId: 'homepage_blocks',
+      name: 'Partner & Footer Blocks',
       fieldIds: ['aboutPartnerBlock', 'contactFooterBlock'],
     },
   ], {
@@ -1929,22 +1937,22 @@ async function configureEditorInterfaces() {
     'insightArticle',
     [
       {
-        groupId: 'article-content',
+        groupId: 'article_content',
         name: 'Article Content',
         fieldIds: ['title', 'slug', 'category', 'publishedDate', 'readTime', 'excerpt', 'body'],
       },
       {
-        groupId: 'article-taxonomy',
+        groupId: 'article_taxonomy',
         name: 'Taxonomy & Discovery',
         fieldIds: ['keyTakeaways', 'isFeatured', 'author'],
       },
       {
-        groupId: 'article-media',
+        groupId: 'article_media',
         name: 'Media',
         fieldIds: ['coverImage'],
       },
       {
-        groupId: 'article-seo',
+        groupId: 'article_seo',
         name: 'SEO',
         fieldIds: ['metaTitle', 'metaDescription'],
         collapsedByDefault: true,
@@ -1959,22 +1967,22 @@ async function configureEditorInterfaces() {
   // --- blockCtaBanner ---
   await setFieldGroups('blockCtaBanner', [
     {
-      groupId: 'cta-content',
+      groupId: 'cta_content',
       name: 'Content',
       fieldIds: ['internalName', 'variant', 'overline', 'title', 'description'],
     },
     {
-      groupId: 'cta-primary',
+      groupId: 'cta_primary',
       name: 'Primary CTA',
       fieldIds: ['primaryCtaText', 'primaryCtaAction', 'primaryCtaHref'],
     },
     {
-      groupId: 'cta-secondary',
+      groupId: 'cta_secondary',
       name: 'Secondary CTA',
       fieldIds: ['secondaryCtaText', 'secondaryCtaHref'],
     },
     {
-      groupId: 'cta-assurance',
+      groupId: 'cta_assurance',
       name: 'Assurance',
       fieldIds: ['guaranteeNotice'],
       collapsedByDefault: true,
@@ -1984,22 +1992,22 @@ async function configureEditorInterfaces() {
   // --- blockTeamProfile ---
   await setFieldGroups('blockTeamProfile', [
     {
-      groupId: 'team-section',
+      groupId: 'team_section',
       name: 'Section Config',
       fieldIds: ['internalName', 'sectionLabel', 'badge', 'badgeSecondary', 'headline'],
     },
     {
-      groupId: 'team-partner',
+      groupId: 'team_partner',
       name: 'Partner Details',
       fieldIds: ['partnerName', 'partnerRole', 'partnerPracticeTenure', 'partnerSpecialization', 'partnerPlacementLevel'],
     },
     {
-      groupId: 'team-contact',
+      groupId: 'team_contact',
       name: 'Contact & Links',
       fieldIds: ['partnerEmail', 'partnerLinkedinUrl'],
     },
     {
-      groupId: 'team-bio',
+      groupId: 'team_bio',
       name: 'Biography',
       fieldIds: ['paragraphs', 'credentialsChecklist'],
     },
@@ -2008,17 +2016,17 @@ async function configureEditorInterfaces() {
   // --- blockEditorialRichText ---
   await setFieldGroups('blockEditorialRichText', [
     {
-      groupId: 'editorial-header',
+      groupId: 'editorial_header',
       name: 'Section Header',
       fieldIds: ['internalName', 'sectionLabel', 'title', 'subtitle', 'layout'],
     },
     {
-      groupId: 'editorial-content',
+      groupId: 'editorial_content',
       name: 'Content',
       fieldIds: ['leadParagraph', 'keyTakeaways'],
     },
     {
-      groupId: 'editorial-quote',
+      groupId: 'editorial_quote',
       name: 'Pull Quote',
       fieldIds: ['quoteText', 'quoteAuthor', 'quoteRole'],
       collapsedByDefault: true,
@@ -2028,27 +2036,27 @@ async function configureEditorInterfaces() {
   // --- siteSettings ---
   await setFieldGroups('siteSettings', [
     {
-      groupId: 'settings-brand',
-      name: 'Brand',
-      fieldIds: ['siteName', 'tagline'],
+      groupId: 'settings_brand',
+      name: 'Brand & Visual Identity',
+      fieldIds: ['siteName', 'tagline', 'mainLogo', 'mainLogoDark', 'miniLogo'],
     },
     {
-      groupId: 'settings-contact',
+      groupId: 'settings_contact',
       name: 'Contact Details',
       fieldIds: ['primaryEmail', 'phone', 'headquarters', 'linkedinUrl'],
     },
     {
-      groupId: 'settings-navigation',
+      groupId: 'settings_navigation',
       name: 'Navigation',
       fieldIds: ['navLinks'],
     },
     {
-      groupId: 'settings-footer',
+      groupId: 'settings_footer',
       name: 'Footer Content',
       fieldIds: ['footerSpecialisms', 'footerSubSectors', 'copyrightText', 'icoRegistrationNumber'],
     },
     {
-      groupId: 'settings-seo',
+      groupId: 'settings_seo',
       name: 'SEO Defaults',
       fieldIds: ['metaTitleDefault', 'metaDescriptionDefault'],
       collapsedByDefault: true,
@@ -2060,18 +2068,18 @@ async function configureEditorInterfaces() {
     'modularPage',
     [
       {
-        groupId: 'page-config',
+        groupId: 'page_config',
         name: 'Page Config',
         fieldIds: ['title', 'slug', 'showHeader', 'showFooter'],
       },
       {
-        groupId: 'page-seo',
+        groupId: 'page_seo',
         name: 'SEO',
         fieldIds: ['metaTitle', 'metaDescription'],
         collapsedByDefault: true,
       },
       {
-        groupId: 'page-builder',
+        groupId: 'page_builder',
         name: 'Page Builder',
         fieldIds: ['sections'],
       },

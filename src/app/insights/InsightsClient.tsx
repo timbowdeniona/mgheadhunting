@@ -15,7 +15,7 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { InsightArticleFields, SiteSettingsFields } from '../../lib/contentful/types';
-import { getArticleCoverAlt, getArticleCoverUrl } from '../../lib/contentful/api';
+import { getArticleCoverAlt, getArticleCoverUrl, getMediaAssetUrl } from '../../lib/contentful/api';
 import { contentfulImageLoader } from '../../lib/contentful/imageLoader';
 import { InsightCard } from '../../components/ui/InsightCard';
 import { Button } from '../../components/ui/Button';
@@ -108,10 +108,19 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="hidden sm:block">
-                <Wordmark size="sm" showSubtitle={false} />
+                <Wordmark
+                  size="sm"
+                  showSubtitle={false}
+                  customLogoUrl={getMediaAssetUrl(siteSettings?.mainLogo)}
+                  customLogoAlt={siteSettings?.mainLogoAlt}
+                />
               </div>
               <div className="sm:hidden flex items-center gap-2">
-                <Monogram size="sm" />
+                <Monogram
+                  size="sm"
+                  customLogoUrl={getMediaAssetUrl(siteSettings?.miniLogo)}
+                  customLogoAlt={siteSettings?.miniLogoAlt}
+                />
                 <span className="font-display font-bold text-xs uppercase tracking-wider text-navy-900">
                   MGH
                 </span>

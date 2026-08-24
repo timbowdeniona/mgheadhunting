@@ -34,6 +34,29 @@ export const BrandGuidelines: React.FC = () => {
           </p>
         </div>
 
+        {/* Contentful CMS Editorial Callout */}
+        <div className="p-6 bg-teal-50 border-l-4 border-teal-600 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-teal-900 uppercase tracking-wider">
+              <Sparkles className="w-4 h-4 text-teal-600" />
+              <span>How to Edit / Replace Logos in Contentful CMS</span>
+            </div>
+            <p className="text-xs sm:text-sm text-steel-700 leading-relaxed max-w-2xl">
+              Brand logos can be customized directly in the CMS without code changes. In Contentful, navigate to <strong>Content → Site Settings &amp; Config → Brand Identity &amp; Logos</strong>. Upload or link your <code>mediaAsset</code> files for <em>Main Logo (Light)</em>, <em>Main Logo (Dark)</em>, and <em>Mini / Monogram Logo</em>.
+            </p>
+          </div>
+          <a
+            href="https://app.contentful.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0"
+          >
+            <Button variant="primary" size="sm">
+              Open Contentful CMS
+            </Button>
+          </a>
+        </div>
+
         {/* 1. Primary Wordmark Anatomy */}
         <section className="bg-white border border-steel-300 p-6 sm:p-8 space-y-8">
           <div className="border-b border-steel-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">

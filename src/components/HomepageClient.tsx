@@ -16,6 +16,7 @@ import {
   HomepageContentfulData,
   InsightArticleFields,
 } from '../lib/contentful/types';
+import { getMediaAssetUrl } from '../lib/contentful/api';
 
 export interface HomepageClientProps {
   data: HomepageContentfulData;
@@ -56,6 +57,10 @@ export function HomepageClient({ data: initialData }: HomepageClientProps) {
         directEmail={data.siteSettings.primaryEmail}
         siteName={data.siteSettings.siteName}
         tagline={data.siteSettings.tagline}
+        mainLogoUrl={getMediaAssetUrl(data.siteSettings.mainLogo)}
+        mainLogoAlt={data.siteSettings.mainLogoAlt}
+        miniLogoUrl={getMediaAssetUrl(data.siteSettings.miniLogo)}
+        miniLogoAlt={data.siteSettings.miniLogoAlt}
         onInitiateSearch={() => handleOpenSearchModal()}
       />
 

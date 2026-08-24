@@ -1,10 +1,14 @@
 import React from 'react';
+import Image from 'next/image';
+import { contentfulImageLoader, normalizeImageUrl } from '../../lib/contentful/imageLoader';
 
 export interface WordmarkProps {
   variant?: 'light' | 'dark';
   size?: 'sm' | 'md' | 'lg';
   showSubtitle?: boolean;
   className?: string;
+  customLogoUrl?: string;
+  customLogoAlt?: string;
 }
 
 export const Wordmark: React.FC<WordmarkProps> = ({
@@ -12,8 +16,32 @@ export const Wordmark: React.FC<WordmarkProps> = ({
   size = 'md',
   showSubtitle = true,
   className = '',
+  customLogoUrl,
+  customLogoAlt = 'MG Headhunting Logo',
 }) => {
   const isLight = variant === 'light';
+
+  // If custom logo image is provided from CMS, render it
+  if (customLogoUrl) {
+    const heightMap = {
+      sm: 'h-7 sm:h-8 max-w-[200px]',
+      md: 'h-9 sm:h-10 max-w-[260px]',
+      lg: 'h-12 sm:h-14 max-w-[340px]',
+    };
+
+    const normalized = normalizeImageUrl(customLogoUrl);
+
+    return (
+      <div className={`inline-flex items-center select-none ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={normalized}
+          alt={customLogoAlt}
+          className={`${heightMap[size]} w-auto object-contain`}
+        />
+      </div>
+    );
+  }
 
   const sizeClasses = {
     sm: {

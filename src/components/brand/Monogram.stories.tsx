@@ -50,3 +50,11 @@ export const Outline: Story = {
     size: 'xl',
   },
 };
+
+export const CustomImageMonogram: Story = {
+  args: {
+    size: 'lg',
+    customLogoUrl: '/mgh-favicon.svg',
+    customLogoAlt: 'Custom CMS Uploaded Monogram',
+  },
+};

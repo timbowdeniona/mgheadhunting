@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useContentfulLiveUpdates } from '@contentful/live-preview/react';
 import { ModularPageData, InsightArticleFields } from '../../lib/contentful/types';
+import { getMediaAssetUrl } from '../../lib/contentful/api';
 import { HeaderNav } from '../sections/HeaderNav';
 import { ContactFooterSection } from '../sections/ContactFooterSection';
 import { PageSectionRenderer } from './PageSectionRenderer';
@@ -45,6 +46,10 @@ export const ModularPageClient: React.FC<ModularPageClientProps> = ({ data: init
           directEmail={data.siteSettings.primaryEmail}
           siteName={data.siteSettings.siteName}
           tagline={data.siteSettings.tagline}
+          mainLogoUrl={getMediaAssetUrl(data.siteSettings.mainLogo)}
+          mainLogoAlt={data.siteSettings.mainLogoAlt}
+          miniLogoUrl={getMediaAssetUrl(data.siteSettings.miniLogo)}
+          miniLogoAlt={data.siteSettings.miniLogoAlt}
           onInitiateSearch={() => handleOpenSearchModal()}
         />
       )}
@@ -89,6 +94,10 @@ export const ModularPageClient: React.FC<ModularPageClientProps> = ({ data: init
             footerSpecialisms: data.siteSettings.footerSpecialisms,
             footerSubSectors: data.siteSettings.footerSubSectors,
             linkedinUrl: data.siteSettings.linkedinUrl || 'https://www.linkedin.com',
+            logoDarkUrl: getMediaAssetUrl(data.siteSettings.mainLogoDark || data.siteSettings.mainLogo),
+            logoDarkAlt: data.siteSettings.mainLogoDarkAlt || data.siteSettings.mainLogoAlt,
+            logoUrl: getMediaAssetUrl(data.siteSettings.mainLogo),
+            logoAlt: data.siteSettings.mainLogoAlt,
           }}
           onInitiateSearch={() => handleOpenSearchModal()}
         />

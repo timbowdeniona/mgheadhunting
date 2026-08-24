@@ -13,6 +13,10 @@ export interface HeaderNavProps {
   directEmail?: string;
   siteName?: string;
   tagline?: string;
+  mainLogoUrl?: string;
+  mainLogoAlt?: string;
+  miniLogoUrl?: string;
+  miniLogoAlt?: string;
   onInitiateSearch: () => void;
 }
 
@@ -29,6 +33,10 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   directEmail = 'mgoldsmith@mgheadhunting.co.uk',
   siteName = 'MG Headhunting',
   tagline = 'Building Products',
+  mainLogoUrl,
+  mainLogoAlt,
+  miniLogoUrl,
+  miniLogoAlt,
   onInitiateSearch,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -68,12 +76,21 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
           <Link href="/" className="flex items-center gap-3 group focus:outline-none shrink-0">
             {/* Desktop Wordmark */}
             <div className="hidden sm:block">
-              <Wordmark size={isScrolled ? 'sm' : 'md'} showSubtitle={!isScrolled} />
+              <Wordmark
+                size={isScrolled ? 'sm' : 'md'}
+                showSubtitle={!isScrolled}
+                customLogoUrl={mainLogoUrl}
+                customLogoAlt={mainLogoAlt}
+              />
             </div>
             
             {/* Mobile / Small Screen Monogram */}
             <div className="sm:hidden flex items-center gap-2.5">
-              <Monogram size="md" />
+              <Monogram
+                size="md"
+                customLogoUrl={miniLogoUrl}
+                customLogoAlt={miniLogoAlt}
+              />
               <div className="flex flex-col">
                 <span className="font-display font-bold text-xs uppercase tracking-wider text-navy-900 leading-tight">
                   {siteName}
