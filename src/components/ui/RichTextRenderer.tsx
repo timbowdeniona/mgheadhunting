@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import { Document, BLOCKS, INLINES, MARKS } from '@contentful/rich-text-types';
+import { contentfulImageLoader, normalizeImageUrl } from '../../lib/contentful/imageLoader';
 
 interface RichTextRendererProps {
   document?: Document;
@@ -61,15 +62,17 @@ const renderOptions: Options = {
     [BLOCKS.EMBEDDED_ASSET]: (node) => {
       const asset = node.data?.target?.fields;
       if (!asset?.file?.url) return null;
-      const imageUrl = asset.file.url.startsWith('//') ? `https:${asset.file.url}` : asset.file.url;
+      const imageUrl = normalizeImageUrl(asset.file.url);
       const title = asset.title || 'Briefing Asset';
       return (
         <div className="my-8 overflow-hidden border border-steel-300 bg-steel-100">
           <div className="relative w-full h-64 sm:h-80 md:h-96">
             <Image
+              loader={contentfulImageLoader}
               src={imageUrl}
               alt={title}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 800px"
               className="object-cover"
             />
           </div>

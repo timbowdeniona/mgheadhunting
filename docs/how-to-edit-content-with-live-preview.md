@@ -14,7 +14,8 @@ Welcome to the **MG Headhunting (MGH)** Content Management Guide. This document 
 4. [Creating New Modular Pages (Drag-and-Drop Page Builder)](#4-creating-new-modular-pages-drag-and-drop-page-builder)
 5. [Publishing Workflow & Draft vs. Published Status](#5-publishing-workflow--draft-vs-published-status)
 6. [Best Practices & Tips for High-Impact Content](#6-best-practices--tips-for-high-impact-content)
-7. [Troubleshooting & FAQs](#7-troubleshooting--faqs)
+7. [Media & Image Optimisation Guidelines (Contentful Images CDN)](#7-media--image-optimisation-guidelines-contentful-images-cdn)
+8. [Troubleshooting & FAQs](#8-troubleshooting--faqs)
 
 ---
 
@@ -169,7 +170,27 @@ graph LR
 
 ---
 
-## 7. Troubleshooting & FAQs
+## 7. Media & Image Optimisation Guidelines (Contentful Images CDN)
+
+The MG Headhunting frontend is integrated with Contentful's global Images API to deliver ultra-fast, responsive, next-generation WebP images across mobile and desktop devices. Follow these rules when uploading media:
+
+### 1. File Size Limits & Upload Guidelines
+* **Absolute Hard Limit (100MB)**: Contentful's Images API will **bypass transformations** for any raw asset larger than 100MB. Uploads over 100MB cannot be dynamically resized or compressed by the CDN.
+* **Recommended Sweet Spot (5MB–15MB)**: Upload high-resolution source images (e.g., 2400px–3840px wide JPEGs or PNGs) between 5MB and 15MB. The website will automatically scale, compress (`q=80`), and convert them to lightweight WebP formats on the fly (typically 40KB–180KB for visitors).
+
+### 2. Automatic Optimisations Applied
+* **Next-Gen WebP Delivery (`fm=webp`)**: All images served on the website are automatically converted to WebP format for optimal compression.
+* **Quality Sweet Spot (`q=80`)**: Contentful delivers crisp visual fidelity while stripping out heavy metadata and compression artifacts.
+* **Responsive `srcset`**: Mobile visitors automatically download mobile-sized images (e.g. 400px–640px) while 4K displays receive high-density versions.
+* **Social Cards & OpenGraph (1200×630)**: Social share previews (LinkedIn, Twitter/X, WhatsApp) are automatically cropped and formatted to the recommended 1200×630 dimensions.
+
+### 3. Media Asset Wrapper & Alt Text
+* When adding images to Articles or Page Blocks, use the **Media Asset (`mediaAsset`)** wrapper.
+* Always supply a descriptive **Alt Text / Title** describing the architectural or subject context for accessibility and Google Image SEO.
+
+---
+
+## 8. Troubleshooting & FAQs
 
 ### Q: Why isn't my Live Preview updating as I type?
 1. Check that the preview environment is set to `MGH Netlify Live Preview` (or `Localhost Live Preview` if working locally).
@@ -185,3 +206,4 @@ Yes! Send them the secure preview link:
 https://mgheadhunting.netlify.app/api/draft?secret=mgh_preview_secret_2026&slug=YOUR_PAGE_SLUG
 ```
 When they click the link, their browser will open the page in Draft Mode with unpublished changes visible.
+

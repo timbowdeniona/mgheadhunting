@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import { fetchInsightBySlug, fetchInsightArticles, fetchSiteSettings, getArticleCoverAlt, getArticleCoverUrl } from '../../../lib/contentful/api';
+import { getContentfulImageUrl } from '../../../lib/contentful/imageLoader';
+import { InsightArticleFields } from '../../../lib/contentful/types';
 import { InsightDetailClient } from './InsightDetailClient';
 import { ArticleSchema } from '../../../components/seo/JsonLd';
 
@@ -11,15 +13,25 @@ interface InsightPageProps {
 
 export async function generateMetadata({ params }: InsightPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = await fetchInsightBySlug(slug);
-  if (!article) {
+  const rawArticle = await fetchInsightBySlug(slug);
+  if (!rawArticle) {
     return {
       title: 'Executive Briefing Not Found | MG Headhunting',
     };
   }
 
+  const article: InsightArticleFields = rawArticle?.fields
+    ? { ...rawArticle.fields, sys: rawArticle.sys }
+    : rawArticle;
+
   const coverUrl = getArticleCoverUrl(article);
-  const normalizedCover = coverUrl.startsWith('//') ? `https:${coverUrl}` : coverUrl;
+  const normalizedCover = getContentfulImageUrl(coverUrl, {
+    width: 1200,
+    height: 630,
+    fit: 'fill',
+    quality: 85,
+    format: 'jpg',
+  });
   const coverAlt = getArticleCoverAlt(article);
 
   return {
@@ -45,7 +57,7 @@ export async function generateMetadata({ params }: InsightPageProps): Promise<Me
 export async function generateStaticParams() {
   const articles = await fetchInsightArticles();
   return articles.map((article) => ({
-    slug: article.slug,
+    slug: article.fields?.slug || article.slug,
   }));
 }
 
@@ -53,25 +65,29 @@ export default async function InsightDetailPage({ params }: InsightPageProps) {
   const { slug } = await params;
   const { isEnabled } = await draftMode();
 
-  const [article, allArticles, siteSettings] = await Promise.all([
+  const [rawArticle, allArticles, siteSettings] = await Promise.all([
     fetchInsightBySlug(slug, isEnabled),
     fetchInsightArticles(isEnabled),
     fetchSiteSettings(isEnabled),
   ]);
 
-  if (!article) {
+  if (!rawArticle) {
     notFound();
   }
 
+  const article: InsightArticleFields = rawArticle?.fields
+    ? { ...rawArticle.fields, sys: rawArticle.sys }
+    : rawArticle;
+
   const relatedArticles = allArticles
-    .filter((a) => a.slug !== slug)
+    .filter((a) => (a.fields?.slug || a.slug) !== slug)
     .slice(0, 2);
 
   return (
     <>
       <ArticleSchema article={article} />
       <InsightDetailClient
-        initialArticle={article}
+        initialArticle={rawArticle}
         relatedArticles={relatedArticles}
         siteSettings={siteSettings}
       />

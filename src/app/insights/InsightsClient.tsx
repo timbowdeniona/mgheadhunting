@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { InsightArticleFields, SiteSettingsFields } from '../../lib/contentful/types';
 import { getArticleCoverAlt, getArticleCoverUrl } from '../../lib/contentful/api';
+import { contentfulImageLoader } from '../../lib/contentful/imageLoader';
 import { InsightCard } from '../../components/ui/InsightCard';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -25,8 +26,8 @@ import { Monogram } from '../../components/brand/Monogram';
 import { trackInsightView, trackCtaClick, trackDirectContact, trackEvent } from '../../lib/analytics';
 
 interface InsightsClientProps {
-  articles: InsightArticleFields[];
-  siteSettings: SiteSettingsFields;
+  articles: any[];
+  siteSettings: any;
 }
 
 const CATEGORIES = [
@@ -38,8 +39,20 @@ const CATEGORIES = [
 ];
 
 export function InsightsClient({ articles: initialArticles, siteSettings: initialSiteSettings }: InsightsClientProps) {
-  const articles = useContentfulLiveUpdates(initialArticles);
-  const siteSettings = useContentfulLiveUpdates(initialSiteSettings);
+  const rawArticles = useContentfulLiveUpdates(initialArticles);
+  const rawSiteSettings = useContentfulLiveUpdates(initialSiteSettings);
+
+  const articles: InsightArticleFields[] = useMemo(() => {
+    if (!Array.isArray(rawArticles)) return [];
+    return rawArticles.map((item: any) =>
+      item?.fields ? { ...item.fields, sys: item.sys } : item
+    );
+  }, [rawArticles]);
+
+  const siteSettings: SiteSettingsFields = useMemo(() => {
+    return rawSiteSettings?.fields ? { ...rawSiteSettings.fields, sys: rawSiteSettings.sys } : rawSiteSettings;
+  }, [rawSiteSettings]);
+
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -170,6 +183,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
               {/* Cover Image */}
               <div className="relative lg:col-span-7 h-64 sm:h-80 lg:h-auto min-h-[300px] overflow-hidden bg-steel-100">
                 <Image
+                  loader={contentfulImageLoader}
                   src={normalizedFeaturedCover}
                   alt={featuredCoverAlt || featuredArticle.title}
                   fill

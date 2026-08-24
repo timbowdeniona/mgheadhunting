@@ -5,10 +5,12 @@ import { FaqAccordionBlockData } from '../../lib/contentful/types';
 import { Badge } from '../ui/Badge';
 import { SectionDivider } from '../ui/SectionDivider';
 import { ChevronDown, Plus, Minus } from 'lucide-react';
+import { FaqSchema } from '../seo/JsonLd';
 
 export interface FaqAccordionBlockProps {
   data: FaqAccordionBlockData;
 }
+
 
 export const FaqAccordionBlock: React.FC<FaqAccordionBlockProps> = ({ data }) => {
   const [openIndices, setOpenIndices] = useState<number[]>([0]);
@@ -21,6 +23,7 @@ export const FaqAccordionBlock: React.FC<FaqAccordionBlockProps> = ({ data }) =>
 
   return (
     <section className="py-20 bg-canvas-light border-b border-steel-300">
+      <FaqSchema items={data.items} />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

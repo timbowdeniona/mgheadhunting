@@ -3,9 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useContentfulLiveUpdates } from '@contentful/live-preview/react';
+import { useContentfulLiveUpdates, useContentfulInspectorMode } from '@contentful/live-preview/react';
 import { InsightArticleFields, SiteSettingsFields } from '../../../lib/contentful/types';
 import { getArticleCoverAlt, getArticleCoverUrl } from '../../../lib/contentful/api';
+import { contentfulImageLoader } from '../../../lib/contentful/imageLoader';
 import { RichTextRenderer } from '../../../components/ui/RichTextRenderer';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
@@ -24,8 +25,8 @@ import {
 } from 'lucide-react';
 
 export interface InsightDetailClientProps {
-  initialArticle: InsightArticleFields;
-  relatedArticles: InsightArticleFields[];
+  initialArticle: any;
+  relatedArticles: any[];
   siteSettings: SiteSettingsFields;
 }
 
@@ -35,7 +36,13 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
   siteSettings,
 }) => {
   // Subscribe to live side-by-side editing events
-  const article = useContentfulLiveUpdates(initialArticle);
+  const liveEntry = useContentfulLiveUpdates(initialArticle);
+  const article: InsightArticleFields = (liveEntry?.fields
+    ? { ...liveEntry.fields, sys: liveEntry.sys }
+    : liveEntry) || initialArticle;
+
+  const entryId = liveEntry?.sys?.id || initialArticle?.sys?.id;
+  const inspectorProps = useContentfulInspectorMode({ entryId });
 
   React.useEffect(() => {
     if (article?.slug) {
@@ -89,13 +96,16 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
       <main className="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         {/* Category & Badge */}
         <div className="mb-4">
-          <Badge variant="teal" size="md" dot>
+          <Badge variant="teal" size="md" dot {...(inspectorProps ? inspectorProps({ fieldId: 'category' }) : {})}>
             {article.category}
           </Badge>
         </div>
 
         {/* Article Headline */}
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-navy-900 tracking-tight leading-[1.15] mb-6">
+        <h1
+          className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-navy-900 tracking-tight leading-[1.15] mb-6"
+          {...(inspectorProps ? inspectorProps({ fieldId: 'title' }) : {})}
+        >
           {article.title}
         </h1>
 
@@ -103,11 +113,15 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
         <div className="flex flex-wrap items-center gap-6 text-xs font-sans text-steel-600 border-y border-steel-300 py-4 mb-8">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-teal-600" />
-            <span>Published: {article.publishedDate}</span>
+            <span {...(inspectorProps ? inspectorProps({ fieldId: 'publishedDate' }) : {})}>
+              Published: {article.publishedDate}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-teal-600" />
-            <span>Read Time: {article.readTime}</span>
+            <span {...(inspectorProps ? inspectorProps({ fieldId: 'readTime' }) : {})}>
+              Read Time: {article.readTime}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <User className="w-4 h-4 text-teal-600" />
@@ -116,8 +130,12 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
         </div>
 
         {/* Hero Cover Image Display */}
-        <div className="relative w-full h-72 sm:h-96 lg:h-[420px] mb-10 overflow-hidden bg-steel-100 border border-steel-300 shadow-sm">
+        <div
+          className="relative w-full h-72 sm:h-96 lg:h-[420px] mb-10 overflow-hidden bg-steel-100 border border-steel-300 shadow-sm"
+          {...(inspectorProps ? inspectorProps({ fieldId: 'coverImage' }) : {})}
+        >
           <Image
+            loader={contentfulImageLoader}
             src={normalizedCover}
             alt={coverAlt}
             fill
@@ -134,7 +152,10 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
         </div>
 
         {/* Executive Summary Box */}
-        <div className="p-6 sm:p-8 bg-steel-100 border-l-4 border-teal-600 mb-10 shadow-sm">
+        <div
+          className="p-6 sm:p-8 bg-steel-100 border-l-4 border-teal-600 mb-10 shadow-sm"
+          {...(inspectorProps ? inspectorProps({ fieldId: 'excerpt' }) : {})}
+        >
           <div className="font-sans text-xs uppercase tracking-wider text-teal-900 font-bold mb-2">
             Executive Summary &amp; Market Context
           </div>
@@ -145,7 +166,10 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
 
         {/* Key Strategic Takeaways */}
         {article.keyTakeaways && article.keyTakeaways.length > 0 && (
-          <div className="mb-10 p-6 bg-white border border-steel-300 shadow-sm">
+          <div
+            className="mb-10 p-6 bg-white border border-steel-300 shadow-sm"
+            {...(inspectorProps ? inspectorProps({ fieldId: 'keyTakeaways' }) : {})}
+          >
             <div className="font-sans text-xs uppercase tracking-wider text-navy-900 font-bold mb-4 pb-2 border-b border-steel-200 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-teal-600" />
               <span>Key Strategic Takeaways for Boards &amp; Investors</span>
@@ -162,7 +186,10 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
         )}
 
         {/* Rich Text Body Content */}
-        <article className="bg-white p-6 sm:p-10 border border-steel-300 mb-12 shadow-sm">
+        <article
+          className="bg-white p-6 sm:p-10 border border-steel-300 mb-12 shadow-sm"
+          {...(inspectorProps ? inspectorProps({ fieldId: 'body' }) : {})}
+        >
           {article.body ? (
             <RichTextRenderer document={article.body} />
           ) : (

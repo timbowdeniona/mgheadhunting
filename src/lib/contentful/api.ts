@@ -35,19 +35,23 @@ import {
 } from './fallbacks';
 
 // Helper utilities for Insight Articles
-export function getArticleCoverAlt(article: InsightArticleFields): string {
-  if (article.coverImageAlt) return article.coverImageAlt;
-  const cover = article.coverImage as any;
+export function getArticleCoverAlt(article: InsightArticleFields | any): string {
+  const fields = article?.fields || article;
+  if (!fields) return 'Insight cover';
+  if (fields.coverImageAlt) return fields.coverImageAlt;
+  const cover = fields.coverImage as any;
   if (cover?.fields?.altText) return cover.fields.altText;
   if (cover?.fields?.description) return cover.fields.description;
-  return article.title;
+  return fields.title || 'Insight cover';
 }
 
 export function getArticleCoverUrl(
-  article: InsightArticleFields,
+  article: InsightArticleFields | any,
   fallback = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop'
 ): string {
-  const cover = article.coverImage as any;
+  const fields = article?.fields || article;
+  if (!fields) return fallback;
+  const cover = fields.coverImage as any;
   return cover?.fields?.file?.url || cover?.fields?.image?.fields?.file?.url || fallback;
 }
 
@@ -121,7 +125,7 @@ export async function fetchProcessSteps(preview = false): Promise<ProcessStepFie
   return fallbackProcessSteps;
 }
 
-export async function fetchInsightArticles(preview = false): Promise<InsightArticleFields[]> {
+export async function fetchInsightArticles(preview = false): Promise<any[]> {
   try {
     const client = getContentfulClient(preview);
     const response = await client.getEntries<any>({
@@ -129,15 +133,19 @@ export async function fetchInsightArticles(preview = false): Promise<InsightArti
       include: 2,
     });
     if (response.items && response.items.length > 0) {
-      return response.items.map((item) => item.fields as unknown as InsightArticleFields);
+      return response.items;
     }
   } catch (err) {
     console.warn('[Contentful API] Using fallback insight articles:', err);
   }
-  return fallbackInsightArticles;
+  return fallbackInsightArticles.map((fallback) => ({
+    sys: (fallback as any).sys || { id: (fallback as any).sys?.id || `fallback-${fallback.slug}`, type: 'Entry' },
+    fields: fallback,
+    ...fallback,
+  }));
 }
 
-export async function fetchInsightBySlug(slug: string, preview = false): Promise<InsightArticleFields | null> {
+export async function fetchInsightBySlug(slug: string, preview = false): Promise<any | null> {
   try {
     const client = getContentfulClient(preview);
     const response = await client.getEntries<any>({
@@ -147,12 +155,20 @@ export async function fetchInsightBySlug(slug: string, preview = false): Promise
       limit: 1,
     });
     if (response.items && response.items.length > 0) {
-      return response.items[0].fields as unknown as InsightArticleFields;
+      return response.items[0];
     }
   } catch (err) {
     console.warn(`[Contentful API] fetchInsightBySlug(${slug}) error:`, err);
   }
-  return fallbackInsightArticles.find((a) => a.slug === slug) || null;
+  const fallback = fallbackInsightArticles.find((a) => a.slug === slug);
+  if (fallback) {
+    return {
+      sys: (fallback as any).sys || { id: (fallback as any).sys?.id || `fallback-${fallback.slug}`, type: 'Entry' },
+      fields: fallback,
+      ...fallback,
+    };
+  }
+  return null;
 }
 
 export async function fetchHomepageData(preview = false): Promise<HomepageContentfulData> {
@@ -467,6 +483,17 @@ export function normalizeSectionBlock(rawBlock: any): PageSectionBlock | null {
         badgeCategory: f.badge,
         headline: f.title || '',
         subtitle: f.description,
+      };
+    }
+
+    case 'blockExecutiveSummary': {
+      return {
+        type: 'executiveSummary',
+        overline: f.overline,
+        title: f.title,
+        directAnswer: f.directAnswer || f.summary || '',
+        keyPoints: f.keyPoints,
+        citationSource: f.citationSource,
       };
     }
 

@@ -23,6 +23,7 @@ import { InsightsSection } from '../sections/InsightsSection';
 import { AboutPartnerSection } from '../sections/AboutPartnerSection';
 
 import { PageHeaderBlock } from './PageHeaderBlock';
+import { ExecutiveSummaryBlock } from './ExecutiveSummaryBlock';
 import { EditorialRichTextBlock } from './EditorialRichTextBlock';
 import { MetricsStatsBlock } from './MetricsStatsBlock';
 import { FaqAccordionBlock } from './FaqAccordionBlock';
@@ -43,6 +44,9 @@ export const PageSectionRenderer: React.FC<PageSectionRendererProps> = ({
   switch (section.type) {
     case 'pageHeader':
       return <PageHeaderBlock data={section} />;
+
+    case 'executiveSummary':
+      return <ExecutiveSummaryBlock data={section} />;
 
     case 'hero': {
       const heroData: HeroSectionData = {

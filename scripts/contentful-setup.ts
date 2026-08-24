@@ -1797,11 +1797,6 @@ async function configureEditorInterfaces() {
   console.log(`[MGH CMS Setup] Configuring Editor Interface Field Groups`);
   console.log(`===========================================================\n`);
 
-  // Entity-based client for editor interface API
-  const entityClient = createClient({ accessToken: MANAGEMENT_TOKEN });
-  const space = await entityClient.getSpace(SPACE_ID);
-  const environment = await space.getEnvironment(ENVIRONMENT_ID);
-
   async function setFieldGroups(
     contentTypeId: string,
     groups: Array<{
@@ -1810,21 +1805,25 @@ async function configureEditorInterfaces() {
       fieldIds: string[];
       helpText?: string;
       collapsedByDefault?: boolean;
-    }>
+    }>,
+    customControls?: Record<string, { widgetId: string; settings?: Record<string, any> }>
   ) {
     try {
-      const contentType = await environment.getContentType(contentTypeId);
-      const editorInterface = await contentType.getEditorInterface();
+      const editorInterface = await client.editorInterface.get({
+        spaceId: SPACE_ID,
+        environmentId: ENVIRONMENT_ID,
+        contentTypeId,
+      });
 
       // Build editorLayout: each group contains items referencing field IDs
-      editorInterface.editorLayout = groups.map((g) => ({
+      const editorLayout = groups.map((g) => ({
         groupId: g.groupId,
         name: g.name,
         items: g.fieldIds.map((fieldId) => ({ fieldId })),
       }));
 
       // Build groupControls: settings for each group
-      editorInterface.groupControls = groups.map((g) => ({
+      const groupControls = groups.map((g) => ({
         groupId: g.groupId,
         widgetNamespace: 'builtin',
         widgetId: 'fieldset',
@@ -1834,8 +1833,36 @@ async function configureEditorInterfaces() {
         },
       }));
 
-      await editorInterface.update();
-      console.log(`  ✓ Field groups configured for: ${contentTypeId}`);
+      // Configure custom widget controls (e.g. entryCardEditor for visual thumbnails)
+      let controls = editorInterface.controls || [];
+      if (customControls && controls) {
+        controls = controls.map((control: any) => {
+          if (customControls[control.fieldId]) {
+            const cfg = customControls[control.fieldId];
+            return {
+              ...control,
+              widgetId: cfg.widgetId,
+              settings: cfg.settings ? { ...control.settings, ...cfg.settings } : control.settings,
+            };
+          }
+          return control;
+        });
+      }
+
+      await client.editorInterface.update(
+        {
+          spaceId: SPACE_ID,
+          environmentId: ENVIRONMENT_ID,
+          contentTypeId,
+        },
+        {
+          ...editorInterface,
+          controls,
+          editorLayout,
+          groupControls,
+        }
+      );
+      console.log(`  ✓ Field groups and controls configured for: ${contentTypeId}`);
     } catch (err: any) {
       console.log(`  ! Could not configure field groups for ${contentTypeId}: ${err.message}`);
     }
@@ -1892,32 +1919,42 @@ async function configureEditorInterfaces() {
       name: 'Referenced Blocks',
       fieldIds: ['aboutPartnerBlock', 'contactFooterBlock'],
     },
-  ]);
+  ], {
+    aboutPartnerBlock: { widgetId: 'entryCardEditor' },
+    contactFooterBlock: { widgetId: 'entryCardEditor' },
+  });
 
   // --- insightArticle ---
-  await setFieldGroups('insightArticle', [
+  await setFieldGroups(
+    'insightArticle',
+    [
+      {
+        groupId: 'article-content',
+        name: 'Article Content',
+        fieldIds: ['title', 'slug', 'category', 'publishedDate', 'readTime', 'excerpt', 'body'],
+      },
+      {
+        groupId: 'article-taxonomy',
+        name: 'Taxonomy & Discovery',
+        fieldIds: ['keyTakeaways', 'isFeatured', 'author'],
+      },
+      {
+        groupId: 'article-media',
+        name: 'Media',
+        fieldIds: ['coverImage'],
+      },
+      {
+        groupId: 'article-seo',
+        name: 'SEO',
+        fieldIds: ['metaTitle', 'metaDescription'],
+        collapsedByDefault: true,
+      },
+    ],
     {
-      groupId: 'article-content',
-      name: 'Article Content',
-      fieldIds: ['title', 'slug', 'category', 'publishedDate', 'readTime', 'excerpt', 'body'],
-    },
-    {
-      groupId: 'article-taxonomy',
-      name: 'Taxonomy & Discovery',
-      fieldIds: ['keyTakeaways', 'isFeatured', 'author'],
-    },
-    {
-      groupId: 'article-media',
-      name: 'Media',
-      fieldIds: ['coverImage'],
-    },
-    {
-      groupId: 'article-seo',
-      name: 'SEO',
-      fieldIds: ['metaTitle', 'metaDescription'],
-      collapsedByDefault: true,
-    },
-  ]);
+      coverImage: { widgetId: 'entryCardEditor' },
+      author: { widgetId: 'entryCardEditor' },
+    }
+  );
 
   // --- blockCtaBanner ---
   await setFieldGroups('blockCtaBanner', [
@@ -2019,24 +2056,30 @@ async function configureEditorInterfaces() {
   ]);
 
   // --- modularPage ---
-  await setFieldGroups('modularPage', [
+  await setFieldGroups(
+    'modularPage',
+    [
+      {
+        groupId: 'page-config',
+        name: 'Page Config',
+        fieldIds: ['title', 'slug', 'showHeader', 'showFooter'],
+      },
+      {
+        groupId: 'page-seo',
+        name: 'SEO',
+        fieldIds: ['metaTitle', 'metaDescription'],
+        collapsedByDefault: true,
+      },
+      {
+        groupId: 'page-builder',
+        name: 'Page Builder',
+        fieldIds: ['sections'],
+      },
+    ],
     {
-      groupId: 'page-config',
-      name: 'Page Config',
-      fieldIds: ['title', 'slug', 'showHeader', 'showFooter'],
-    },
-    {
-      groupId: 'page-seo',
-      name: 'SEO',
-      fieldIds: ['metaTitle', 'metaDescription'],
-      collapsedByDefault: true,
-    },
-    {
-      groupId: 'page-builder',
-      name: 'Page Builder',
-      fieldIds: ['sections'],
-    },
-  ]);
+      sections: { widgetId: 'entryCardsEditor' },
+    }
+  );
 
   console.log(`\n  ✓ Editor Interface field groups configured for all content types.`);
 }

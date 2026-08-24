@@ -439,9 +439,19 @@ export interface ContactDeskBlockData {
   ndaNotice?: string;
 }
 
+export interface ExecutiveSummaryBlockData {
+  type: 'executiveSummary';
+  overline?: string;
+  title?: string;
+  directAnswer: string;
+  keyPoints?: string[];
+  citationSource?: string;
+}
+
 export type PageSectionBlock =
   | HeroBlockData
   | PageHeaderBlockData
+  | ExecutiveSummaryBlockData
   | EditorialRichTextBlockData
   | SectorGridBlockData
   | DifferencePillarsBlockData

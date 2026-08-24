@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock } from 'lucide-react';
+import { contentfulImageLoader, normalizeImageUrl } from '../../lib/contentful/imageLoader';
 
 export interface InsightCardProps {
   category: string;
@@ -46,7 +47,8 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       {coverImage && (
         <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-steel-100 border-b border-steel-200">
           <Image
-            src={coverImage.startsWith('//') ? `https:${coverImage}` : coverImage}
+            loader={contentfulImageLoader}
+            src={normalizeImageUrl(coverImage)}
             alt={coverImageAlt || title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
