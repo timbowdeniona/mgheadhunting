@@ -1,5 +1,7 @@
 import { createClient } from 'contentful-management';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as path from 'path';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config();
@@ -167,8 +169,39 @@ async function runSetup() {
   }
 
   // Helper to safely create/update & publish an Asset
-  async function ensureAsset(id: string, title: string, description: string, uploadUrl: string) {
+  async function ensureAsset(
+    id: string,
+    title: string,
+    description: string,
+    source: string,
+    contentType = 'image/jpeg',
+    fileName = `${id}.jpg`
+  ) {
     let asset;
+    let fileObj: any = {
+      contentType,
+      fileName,
+    };
+
+    if (source.startsWith('http://') || source.startsWith('https://')) {
+      fileObj.upload = source;
+    } else if (fs.existsSync(source)) {
+      const fileBuffer = fs.readFileSync(source);
+      const upload = await client.upload.create(
+        { spaceId: SPACE_ID, environmentId: ENVIRONMENT_ID },
+        { file: fileBuffer }
+      );
+      fileObj.uploadFrom = {
+        sys: {
+          type: 'Link',
+          linkType: 'Upload',
+          id: upload.sys.id,
+        },
+      };
+    } else {
+      fileObj.upload = source;
+    }
+
     try {
       const existing = await client.asset.get({ assetId: id });
       console.log(`  - Updating existing asset: ${id} ("${title}")`);
@@ -179,11 +212,7 @@ async function runSetup() {
             title: { 'en-US': title },
             description: { 'en-US': description },
             file: {
-              'en-US': {
-                contentType: 'image/jpeg',
-                fileName: `${id}.jpg`,
-                upload: uploadUrl,
-              },
+              'en-US': fileObj,
             },
           },
           sys: existing.sys,
@@ -198,11 +227,7 @@ async function runSetup() {
             title: { 'en-US': title },
             description: { 'en-US': description },
             file: {
-              'en-US': {
-                contentType: 'image/jpeg',
-                fileName: `${id}.jpg`,
-                upload: uploadUrl,
-              },
+              'en-US': fileObj,
             },
           },
         }
@@ -692,6 +717,37 @@ async function runSetup() {
   );
 
   console.log(`\n===========================================================`);
+  console.log(`[MGH CMS Setup] Provisioning Brand Logo Vector Assets`);
+  console.log(`===========================================================\n`);
+
+  const logoWordmarkLightAsset = await ensureAsset(
+    'asset-logo-wordmark-light',
+    'MG Headhunting - Wordmark Logo (Light Backgrounds)',
+    'Primary MGH Wordmark vector logo for light canvas headers and white backgrounds',
+    path.resolve(process.cwd(), 'public/mgh-wordmark-light.svg'),
+    'image/svg+xml',
+    'mgh-wordmark-light.svg'
+  );
+
+  const logoWordmarkDarkAsset = await ensureAsset(
+    'asset-logo-wordmark-dark',
+    'MG Headhunting - Wordmark Logo (Dark Backgrounds / Footer)',
+    'Primary MGH Wordmark vector logo for dark navy and slate footer backgrounds',
+    path.resolve(process.cwd(), 'public/mgh-wordmark-dark.svg'),
+    'image/svg+xml',
+    'mgh-wordmark-dark.svg'
+  );
+
+  const logoMonogramAsset = await ensureAsset(
+    'asset-logo-monogram',
+    'MG Headhunting - Mini Monogram / Favicon',
+    'Geometric MGH Monogram square badge for mobile headers and compact navigation',
+    path.resolve(process.cwd(), 'public/mgh-monogram.svg'),
+    'image/svg+xml',
+    'mgh-monogram.svg'
+  );
+
+  console.log(`\n===========================================================`);
   console.log(`[MGH CMS Setup] Seeding Initial Content & Rich Text Bodies`);
   console.log(`===========================================================\n`);
 
@@ -784,6 +840,27 @@ async function runSetup() {
     image: { sys: { type: 'Link', linkType: 'Asset', id: asset4.sys.id } },
     altText: 'Engineered sustainable mass timber and low-carbon structural building components',
     caption: 'Sustainable mass timber & structural engineering',
+  });
+
+  const mediaLogoWordmarkLight = await seedEntry('mediaAsset', 'media-logo-wordmark-light', {
+    internalName: 'Logo: Main Wordmark (Light Background)',
+    image: { sys: { type: 'Link', linkType: 'Asset', id: logoWordmarkLightAsset.sys.id } },
+    altText: 'MG Headhunting - Retained Executive Search for Building Products',
+    caption: 'Main Wordmark Logo (Light / White Backgrounds)',
+  });
+
+  const mediaLogoWordmarkDark = await seedEntry('mediaAsset', 'media-logo-wordmark-dark', {
+    internalName: 'Logo: Main Wordmark (Dark Background)',
+    image: { sys: { type: 'Link', linkType: 'Asset', id: logoWordmarkDarkAsset.sys.id } },
+    altText: 'MG Headhunting - Retained Executive Search for Building Products',
+    caption: 'Main Wordmark Logo (Dark / Boardroom Slate Backgrounds)',
+  });
+
+  const mediaLogoMonogram = await seedEntry('mediaAsset', 'media-logo-monogram', {
+    internalName: 'Logo: Mini Monogram / Icon',
+    image: { sys: { type: 'Link', linkType: 'Asset', id: logoMonogramAsset.sys.id } },
+    altText: 'MG Headhunting MGH Monogram Icon',
+    caption: 'Mini Monogram Badge (Mobile & Compact Navigation)',
   });
 
 
@@ -1244,6 +1321,15 @@ async function runSetup() {
   await seedEntry('siteSettings', 'global-site-settings', {
     siteName: 'MG Headhunting',
     tagline: 'Building Products',
+    mainLogo: {
+      sys: { type: 'Link', linkType: 'Entry', id: mediaLogoWordmarkLight.sys.id },
+    },
+    mainLogoDark: {
+      sys: { type: 'Link', linkType: 'Entry', id: mediaLogoWordmarkDark.sys.id },
+    },
+    miniLogo: {
+      sys: { type: 'Link', linkType: 'Entry', id: mediaLogoMonogram.sys.id },
+    },
     primaryEmail: 'mgoldsmith@mgheadhunting.co.uk',
     phone: '+44 (0) 20 7946 0198',
     headquarters: 'London & Home Counties, United Kingdom',

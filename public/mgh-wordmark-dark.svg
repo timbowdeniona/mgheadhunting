@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 70" width="420" height="70">
+  <style>
+    .title-dark { font-family: 'Cinzel', 'Times New Roman', serif; font-size: 25px; font-weight: 700; fill: #FFFFFF; letter-spacing: 4.5px; }
+    .title-dark-bold { font-weight: 700; }
+    .subtitle-dark { font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 10.5px; font-weight: 600; fill: #CBD5E1; letter-spacing: 2.8px; }
+  </style>
+  <!-- Main Wordmark for Dark Backgrounds -->
+  <text x="0" y="30" class="title-dark">MG <tspan class="title-dark-bold">HEADHUNTING</tspan></text>
+  <!-- Signature Teal Rule Divider -->
+  <rect x="0" y="40" width="420" height="2.5" fill="#138D90" />
+  <!-- Subtitle: Executive Search & Sector -->
+  <text x="0" y="58" class="subtitle-dark">EXECUTIVE SEARCH</text>
+  <rect x="180" y="52" width="4" height="4" fill="#138D90" />
+  <text x="420" y="58" class="subtitle-dark" text-anchor="end">BUILDING PRODUCTS</text>
+</svg>
