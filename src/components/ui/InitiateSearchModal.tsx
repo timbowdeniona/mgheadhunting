@@ -16,6 +16,9 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
   defaultSector,
 }) => {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     roleTitle: '',
@@ -36,10 +39,34 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    trackLeadSubmission('mandate', formData.sectorSpecialism);
-    setSubmitted(true);
+    if (honeypot) return; // bot trap
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const encode = (data: Record<string, string>) =>
+      Object.entries(data)
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join('&');
+
+    try {
+      await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: encode({
+          'form-name': 'initiate-search-mandate',
+          ...formData,
+        }),
+      });
+      trackLeadSubmission('mandate', formData.sectorSpecialism);
+      setSubmitted(true);
+    } catch {
+      setSubmitError('Something went wrong. Please email mgoldsmith@mgheadhunting.co.uk directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -103,6 +130,12 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Required by Netlify Forms */}
+            <input type="hidden" name="form-name" value="initiate-search-mandate" />
+            {/* Honeypot — hidden from real users, traps bots */}
+            <div hidden aria-hidden="true">
+              <input name="bot-field" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
@@ -228,16 +261,21 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
             </div>
 
             {/* Action Buttons */}
+            {submitError && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-sm px-3 py-2">
+                {submitError}
+              </p>
+            )}
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-steel-200">
               <div className="text-[11px] font-sans text-steel-500">
                 Direct: <span className="text-navy-900 font-semibold">mgoldsmith@mgheadhunting.co.uk</span>
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Button type="button" variant="outline" size="md" onClick={onClose}>
+                <Button type="button" variant="outline" size="md" onClick={onClose} disabled={isSubmitting}>
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="md">
-                  Submit Search Mandate
+                <Button type="submit" variant="primary" size="md" disabled={isSubmitting}>
+                  {isSubmitting ? 'Sending…' : 'Submit Search Mandate'}
                 </Button>
               </div>
             </div>
