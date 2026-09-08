@@ -674,9 +674,23 @@ async function runSetup() {
     { id: 'insightsReportBannerDescription', name: 'Insights Report Banner Description', type: 'Text', required: false },
     { id: 'insightsReportBannerCtaText', name: 'Insights Report Banner CTA Text', type: 'Symbol', required: false },
     
+    // Process Steps — editable reference list (max 5) linked from homepage entry
+    {
+      id: 'processSteps',
+      name: 'Process Steps (max 5)',
+      type: 'Array',
+      items: {
+        type: 'Link',
+        linkType: 'Entry',
+        validations: [{ linkContentType: ['processStep'] }],
+      },
+      required: false,
+      validations: [{ size: { max: 5 } }],
+    },
+
     // About Partner Section
     { id: 'aboutPartnerBlock', name: 'About Partner Block', type: 'Link', linkType: 'Entry', validations: [{ linkContentType: ['blockTeamProfile'] }], required: false },
-    
+
     // Contact Footer Section
     { id: 'contactFooterBlock', name: 'Contact Footer Block', type: 'Link', linkType: 'Entry', validations: [{ linkContentType: ['blockContactDesk', 'blockCtaBanner'] }], required: false },
   ]);
@@ -1879,6 +1893,15 @@ async function runSetup() {
     processTitle: 'The 5-Stage Search Blueprint',
     processDescription: 'A disciplined, milestone-driven framework designed to identify, attract, and secure top-tier executive leadership without disruption.',
 
+    // Process Steps — linked references (max 5, editable from homepage entry)
+    processSteps: [
+      entryLink('step-01-calibration'),
+      entryLink('step-02-mapping'),
+      entryLink('step-03-assessment'),
+      entryLink('step-04-presentation'),
+      entryLink('step-05-integration'),
+    ],
+
     // Insights Section
     insightsSectionLabel: 'Market Intelligence',
     insightsTitle: 'Executive Briefings & Market Insights',
@@ -1997,6 +2020,7 @@ async function configureEditorInterfaces() {
         'differenceCandidateQualityTitle', 'differenceCandidateQualityText',
         'differenceReplacementGuaranteeTitle', 'differenceReplacementGuaranteeText',
         'processSectionLabel', 'processTitle', 'processDescription',
+        'processSteps',
       ],
     },
     {
@@ -2014,6 +2038,7 @@ async function configureEditorInterfaces() {
       fieldIds: ['aboutPartnerBlock', 'contactFooterBlock'],
     },
   ], {
+    processSteps: { widgetId: 'entryLinksEditor' },
     aboutPartnerBlock: { widgetId: 'entryCardEditor' },
     contactFooterBlock: { widgetId: 'entryCardEditor' },
   });

@@ -273,7 +273,30 @@ export async function fetchHomepageData(preview = false): Promise<HomepageConten
       sectionLabel: cmsData.processSectionLabel || 'Search Methodology',
       title: cmsData.processTitle || 'The 5-Stage Search Blueprint',
       description: cmsData.processDescription || 'A disciplined, milestone-driven framework designed to identify, attract, and secure top-tier executive leadership without disruption.',
-      steps,
+      steps: (() => {
+        // Prefer the homepage-linked processSteps references (max 5, editable inline)
+        if (Array.isArray(cmsData.processSteps) && cmsData.processSteps.length > 0) {
+          const inline = cmsData.processSteps
+            .slice(0, 5)
+            .map((entry: any) => {
+              const f = entry?.fields || entry;
+              if (!f?.title) return null;
+              return {
+                stepNumber: f.stepNumber || '',
+                phaseName: f.phaseName || '',
+                title: f.title || '',
+                timeline: f.timeline || '',
+                description: f.description || '',
+                deliverable: f.deliverable || '',
+                order: f.order,
+              } as ProcessStepFields;
+            })
+            .filter((s): s is ProcessStepFields => s !== null);
+          if (inline.length > 0) return inline;
+        }
+        // Fallback: globally fetched processStep entries
+        return steps;
+      })(),
     },
     insights: {
       sectionLabel: cmsData.insightsSectionLabel || 'Market Intelligence',

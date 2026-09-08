@@ -256,6 +256,8 @@ export interface HomepageEntryFields {
   processSectionLabel?: string;
   processTitle?: string;
   processDescription?: string;
+  /** Up to 5 linked processStep entries — editable inline from the homepage entry */
+  processSteps?: any[];
 
   // Insights Section
   insightsSectionLabel?: string;
