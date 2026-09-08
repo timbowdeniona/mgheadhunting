@@ -31,5 +31,6 @@ export async function GET(request: NextRequest) {
     targetPath = `/${slug.startsWith('/') ? slug.slice(1) : slug}`;
   }
 
-  redirect(targetPath);
+  const separator = targetPath.includes('?') ? '&' : '?';
+  redirect(`${targetPath}${separator}preview=true`);
 }

@@ -4,12 +4,20 @@ import { draftMode } from 'next/headers';
 import { fetchModularPageBySlug, fetchAllModularPageSlugs } from '../../lib/contentful/api';
 import { ModularPageClient } from '../../components/page-builder/ModularPageClient';
 
-export const revalidate = 60;
+// Staging (mgheadhunting.netlify.app) is 100% dynamic for real-time Contentful preview.
+// Live production (www.mgheadhunting.co.uk) switches to static ISR when SITE_ENV=production.
+const isLiveProduction =
+  process.env.SITE_ENV === 'production' ||
+  process.env.NEXT_PUBLIC_SITE_ENV === 'production';
+
+export const dynamic = 'auto';
+export const revalidate = 0;
 
 interface PageProps {
   params: Promise<{
     slug: string;
   }>;
+  searchParams?: Promise<{ preview?: string }>;
 }
 
 export async function generateStaticParams() {
@@ -41,10 +49,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function ModularPage({ params }: PageProps) {
+export default async function ModularPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const { isEnabled } = await draftMode();
-  const pageData = await fetchModularPageBySlug(slug, isEnabled);
+  const query = searchParams ? await searchParams : undefined;
+  const hasPreviewParam = query?.preview === 'true';
+
+  const isPreview = !isLiveProduction || isEnabled || hasPreviewParam;
+  const pageData = await fetchModularPageBySlug(slug, isPreview);
 
   if (!pageData) {
     notFound();
