@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { SectionDivider } from '../ui/SectionDivider';
 import { InsightCard } from '../ui/InsightCard';
-import { Button } from '../ui/Button';
-import { BookOpen, Download, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { InsightArticleFields, InsightsSectionData } from '../../lib/contentful/types';
 import { getArticleCoverAlt, getArticleCoverUrl } from '../../lib/contentful/api';
 import { fallbackInsightArticles } from '../../lib/contentful/fallbacks';
@@ -11,7 +12,7 @@ import { trackInsightView, trackEvent } from '../../lib/analytics';
 
 export interface InsightsSectionProps {
   data?: InsightsSectionData;
-  articles?: InsightArticleFields[];
+  articles?: (InsightArticleFields | any)[];
   onReadArticle?: (article: InsightArticleFields) => void;
   onRequestReport?: () => void;
 }
@@ -20,28 +21,55 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
   data,
   articles,
   onReadArticle,
-  onRequestReport,
 }) => {
-  const [selectedTag, setSelectedTag] = useState<string>('ALL');
+  const [selectedTag, setSelectedTag] = useState<'ALL' | 'CASE STUDIES' | 'INSIGHTS'>('ALL');
 
-  const articleList = articles || data?.articles || fallbackInsightArticles;
+  const rawArticles = articles || data?.articles || fallbackInsightArticles;
+
+  // Normalize articles so that both flat fallback objects and raw Contentful Entry items
+  // ({ sys: ..., fields: { ... } }) are seamlessly supported with complete type safety.
+  const normalizedArticles: (InsightArticleFields & { sys?: any })[] = useMemo(() => {
+    if (!Array.isArray(rawArticles)) return [];
+    return rawArticles.map((item: any) => {
+      if (item?.fields) {
+        return {
+          ...item.fields,
+          sys: item.sys,
+        };
+      }
+      return item;
+    });
+  }, [rawArticles]);
+
   const sectionLabel = data?.sectionLabel || 'Market Intelligence';
-  const sectionTitle = data?.title || 'Executive Briefings & Market Insights';
+  const sectionTitle = data?.title || 'Case Studies & Market Insights';
   const sectionDesc =
     data?.description ||
-    'Proprietary intelligence on executive talent flows, board compensation dynamics, and regulatory shifts across the Building Products landscape.';
-  const reportCategory = data?.reportBannerCategory || 'Special Research Publication';
-  const reportTitle =
-    data?.reportBannerTitle || '2026/2027 Building Products Executive Salary & Retention Benchmark';
-  const reportDesc =
-    data?.reportBannerDescription ||
-    'Comprehensive compensation analysis covering 400+ board appointments across UK & European manufacturing, merchants, and fabricators.';
-  const reportCta = data?.reportBannerCtaText || 'Request Confidential Report';
+    'Proprietary intelligence on executive talent flows, board compensation dynamics, and placement case studies across the Building Products landscape.';
 
-  const filteredArticles =
-    selectedTag === 'ALL'
-      ? articleList
-      : articleList.filter((a) => a.category.toUpperCase().includes(selectedTag));
+  const filteredArticles = useMemo(() => {
+    if (selectedTag === 'ALL') {
+      return normalizedArticles;
+    }
+    return normalizedArticles.filter((a) => {
+      const cat = (a.category || '').toUpperCase();
+      const title = (a.title || '').toUpperCase();
+      const slug = (a.slug || '').toUpperCase();
+      const isCaseStudy =
+        cat.includes('CASE') ||
+        cat.includes('STUDY') ||
+        title.includes('CASE STUDY') ||
+        slug.includes('CASE-STUDY');
+
+      if (selectedTag === 'CASE STUDIES') {
+        return isCaseStudy;
+      }
+      if (selectedTag === 'INSIGHTS') {
+        return !isCaseStudy;
+      }
+      return true;
+    });
+  }, [selectedTag, normalizedArticles]);
 
   return (
     <section id="insights" className="py-20 lg:py-28 bg-canvas-light border-b border-steel-300 relative">
@@ -62,7 +90,7 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex flex-wrap items-center gap-1.5 p-1 bg-steel-100 border border-steel-300">
-              {['ALL', 'COMPENSATION', 'REGULATORY', 'M&A', 'SUSTAINABILITY'].map((tag) => (
+              {(['ALL', 'CASE STUDIES', 'INSIGHTS'] as const).map((tag) => (
                 <button
                   key={tag}
                   onClick={() => {
@@ -75,7 +103,7 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
                       : 'text-steel-700 hover:text-navy-900 hover:bg-steel-200/60'
                   }`}
                 >
-                  {tag}
+                  {tag === 'ALL' ? 'All' : tag === 'CASE STUDIES' ? 'Case Studies' : 'Insights'}
                 </button>
               ))}
             </div>
@@ -93,73 +121,41 @@ export const InsightsSection: React.FC<InsightsSectionProps> = ({
 
         {/* Insights Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredArticles.map((article) => {
+          {filteredArticles.map((article, index) => {
             const coverUrl = getArticleCoverUrl(article);
             const coverAlt = getArticleCoverAlt(article);
+            const articleKey =
+              article.sys?.id ||
+              article.slug ||
+              (article.title ? `${article.title}-${index}` : `insight-${index}`);
 
             return (
               <InsightCard
-                key={article.slug || article.title}
-                category={article.category}
-                readTime={article.readTime}
-                date={article.publishedDate}
-                title={article.title}
-                excerpt={article.excerpt}
+                key={articleKey}
+                category={article.category || 'MARKET INTELLIGENCE'}
+                readTime={article.readTime || '5 min read'}
+                date={article.publishedDate || 'Recent'}
+                title={article.title || 'Executive Briefing'}
+                excerpt={article.excerpt || ''}
                 keyTakeaways={article.keyTakeaways}
                 coverImage={coverUrl}
                 coverImageAlt={coverAlt}
-                href={`/insights/${article.slug}`}
+                href={article.slug ? `/insights/${article.slug}` : '/insights'}
                 author={
                   article.author
                     ? {
-                        name: article.author.fields?.name || 'Mark Goldsmith',
-                        title: article.author.fields?.roleTitle || 'Managing Director, MGH',
+                        name: (article.author as any).fields?.name || (article.author as any).name || 'Mark Goldsmith',
+                        title: (article.author as any).fields?.roleTitle || (article.author as any).title || 'Managing Director, MGH',
                       }
                     : undefined
                 }
                 onClick={() => {
-                  trackInsightView(article.slug, article.title, article.category);
+                  trackInsightView(article.slug || '', article.title || '', article.category || '');
                   if (onReadArticle) onReadArticle(article);
                 }}
               />
             );
           })}
-        </div>
-
-        {/* Annual Executive Salary Report Download Bar */}
-        <div className="mt-12 p-6 sm:p-8 bg-navy-900 text-white border border-navy-700 flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
-          <div className="absolute top-0 left-0 w-16 h-[2px] bg-teal-400" />
-          
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-teal-400" />
-              <span className="font-sans font-medium tracking-wide text-teal-300">
-                {reportCategory}
-              </span>
-            </div>
-            <h3 className="font-display text-xl font-bold">
-              {reportTitle}
-            </h3>
-            <p className="text-xs text-steel-300 max-w-xl">
-              {reportDesc}
-            </p>
-          </div>
-
-          <Button
-            variant="primary"
-            size="md"
-            icon={<Download className="w-4 h-4" />}
-            onClick={() => {
-              trackEvent('file_download', 'Research Report', reportTitle);
-              if (onRequestReport) {
-                onRequestReport();
-              } else {
-                alert('Download requested: 2026/2027 Building Products Executive Salary Benchmark Report has been queued for delivery.');
-              }
-            }}
-          >
-            {reportCta}
-          </Button>
         </div>
 
       </div>

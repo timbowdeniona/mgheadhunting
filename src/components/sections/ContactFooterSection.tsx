@@ -1,8 +1,11 @@
+'use client';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Wordmark } from '../brand/Wordmark';
 import { Button } from '../ui/Button';
-import { Mail, Shield, Lock, Check, Clock } from 'lucide-react';
+import { Mail, Shield, Lock, Check, Clock, Phone } from 'lucide-react';
 import { ContactFooterSectionData } from '../../lib/contentful/types';
 import { fallbackContactFooterData } from '../../lib/contentful/fallbacks';
 import { trackDirectContact, trackCtaClick } from '../../lib/analytics';
@@ -18,6 +21,7 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
 }) => {
   const footer = data || fallbackContactFooterData;
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const bannerCta = footer.bannerCtaText || 'Start the Conversation';
 
   const handleCopyEmail = () => {
     trackDirectContact('email', footer.directDeskEmail, 'footer_copy_email');
@@ -31,36 +35,82 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
       {/* Main Executive Contact Hub */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 relative z-10">
         
-        {/* Top Engagement Bar */}
-        <div className="bg-navy-900 border border-navy-700 p-8 sm:p-12 mb-16 relative">
+        {/* Top Engagement Bar with Personal Seated Portrait */}
+        <div className="bg-navy-900 border border-navy-700 p-6 sm:p-10 lg:p-12 mb-16 relative">
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-teal-500" />
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-8 space-y-3">
+            
+            {/* Seated Portrait Card */}
+            <div className="lg:col-span-4">
+              <div className="relative aspect-[16/11] sm:aspect-[3/2] lg:aspect-[4/3] w-full overflow-hidden bg-navy-950 border border-navy-700 shadow-md group">
+                <Image
+                  src="/mark-goldsmith-seated.jpg"
+                  alt="Mark Goldsmith - Lead Search Partner"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover object-center group-hover:scale-102 transition-transform duration-500 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-3 left-4 right-4 text-white">
+                  <span className="text-[10px] font-sans text-teal-300 font-semibold uppercase tracking-wider block">
+                    Practice Leader &amp; Founder
+                  </span>
+                  <span className="font-display text-base font-bold text-white">
+                    Mark Goldsmith
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Engagement Text */}
+            <div className="lg:col-span-5 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="font-sans text-xs tracking-wide text-teal-400 font-semibold">
+                <span className="font-sans text-xs tracking-wide text-teal-400 font-semibold uppercase">
                   {footer.bannerOverline}
                 </span>
               </div>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
                 {footer.bannerTitle}
               </h2>
-              <p className="text-sm text-steel-300 max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-steel-300 leading-relaxed font-sans">
                 {footer.bannerSubtitle}
               </p>
+
+              {/* Direct Reach Strip */}
+              <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-sans text-steel-300">
+                <a
+                  href="tel:07570740490"
+                  onClick={() => trackDirectContact('phone', '07570 740490', 'footer_banner')}
+                  className="inline-flex items-center gap-1.5 text-white hover:text-teal-300 font-medium transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5 text-teal-400" />
+                  <span>07570 740490</span>
+                </a>
+                <span>•</span>
+                <a
+                  href={`mailto:${footer.directDeskEmail}`}
+                  onClick={() => trackDirectContact('email', footer.directDeskEmail, 'footer_banner')}
+                  className="inline-flex items-center gap-1.5 text-white hover:text-teal-300 font-medium transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5 text-teal-400" />
+                  <span>{footer.directDeskEmail}</span>
+                </a>
+              </div>
             </div>
 
-            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
+            {/* Actions */}
+            <div className="lg:col-span-3 flex flex-col gap-3 justify-center">
               <Button
                 variant="primary"
                 size="lg"
                 onClick={() => {
-                  trackCtaClick(footer.bannerCtaText, 'footer_banner');
+                  trackCtaClick(bannerCta, 'footer_banner');
                   onInitiateSearch();
                 }}
                 fullWidth
               >
-                {footer.bannerCtaText}
+                {bannerCta}
               </Button>
               
               <button
@@ -167,6 +217,12 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
                 <span className="text-white font-bold">Mark Goldsmith</span>
               </div>
               <div>
+                <span className="text-steel-400 block text-[11px]">Direct Mobile</span>
+                <a href="tel:07570740490" className="text-teal-300 hover:underline">
+                  07570 740490
+                </a>
+              </div>
+              <div>
                 <span className="text-steel-400 block text-[11px]">Direct Mandate Email</span>
                 <a href={`mailto:${footer.directDeskEmail}`} className="text-teal-300 hover:underline">
                   {footer.directDeskEmail}
@@ -199,7 +255,9 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
             <Link href="/design-system" className="hover:text-teal-400 transition-colors">
               Design System
             </Link>
-            <a href="#about" className="hover:text-teal-400 transition-colors">Privacy &amp; Data Policy</a>
+            <Link href="/privacy" className="hover:text-teal-400 transition-colors">
+              Privacy &amp; Data Policy
+            </Link>
           </div>
         </div>
 

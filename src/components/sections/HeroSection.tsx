@@ -1,11 +1,12 @@
 import React from 'react';
-import { ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, ShieldCheck, CheckCircle2, Phone } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { StatCard } from '../ui/StatCard';
 import { HeroSectionData } from '../../lib/contentful/types';
 import { fallbackHeroData } from '../../lib/contentful/fallbacks';
-import { trackCtaClick } from '../../lib/analytics';
+import { trackCtaClick, trackDirectContact } from '../../lib/analytics';
 
 export interface HeroSectionProps {
   data?: HeroSectionData;
@@ -69,12 +70,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 variant="primary"
                 size="lg"
                 onClick={() => {
-                  trackCtaClick(hero.ctaPrimaryText, 'hero_primary');
+                  trackCtaClick(hero.ctaPrimaryText || 'Start the Conversation', 'hero_primary');
                   onInitiateSearch();
                 }}
                 icon={<ArrowRight className="w-4 h-4" />}
               >
-                {hero.ctaPrimaryText}
+                {hero.ctaPrimaryText || 'Start the Conversation'}
               </Button>
 
               <Button
@@ -98,42 +99,83 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Architectural Photography Frame & Live Search Metrics */}
+          {/* Right Column: Personalised Executive Portrait Card & Live Search Metrics */}
           <div className="lg:col-span-5 relative">
             
-            {/* Outer Frame */}
-            <div className="relative bg-white border border-steel-300 p-3 sm:p-4 shadow-sm">
+            {/* Outer Card */}
+            <div className="relative bg-white border border-steel-300 p-3 sm:p-4 shadow-md">
               
-              {/* Architectural Image Placeholder Frame */}
-              <div className="relative bg-navy-900 text-white overflow-hidden aspect-[4/3] flex flex-col justify-center p-8 border border-navy-800">
+              {/* Suited Portrait Frame */}
+              <div className="relative bg-navy-950 text-white overflow-hidden aspect-[16/11] flex flex-col justify-end border border-navy-800 group">
+                <Image
+                  src="/mark-goldsmith-suited.jpg"
+                  alt="Mark Goldsmith - Lead Search Partner"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover object-top group-hover:scale-102 transition-transform duration-500 ease-out"
+                />
                 
-                {/* Center Visual Content */}
-                <div className="relative z-10 text-center">
-                  <div className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-                    {hero.partnerName}
-                  </div>
-                  <div className="text-sm font-sans tracking-wide text-teal-300 mb-4 font-medium">
-                    {hero.partnerTitle}
-                  </div>
-                  <p className="text-sm text-steel-300 leading-relaxed font-sans max-w-sm mx-auto">
-                    {hero.partnerBio}
-                  </p>
-                </div>
+                {/* Subtle vignette gradient for text clarity */}
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-950/30 to-transparent pointer-events-none" />
 
+                {/* Bottom Overlay Info */}
+                <div className="relative z-10 p-4 sm:p-5">
+                  <div className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white mb-0.5">
+                    {hero.partnerName || 'Mark Goldsmith'}
+                  </div>
+                  <div className="text-xs font-sans tracking-wide text-teal-300 font-medium">
+                    {hero.partnerTitle || 'Managing Director & Lead Search Partner'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bio snippet */}
+              <p className="text-xs text-steel-700 leading-relaxed font-sans pt-3 px-1">
+                {hero.partnerBio}
+              </p>
+
+              {/* Contact Strip: Mobile + LinkedIn */}
+              <div className="mt-3 pt-3 border-t border-steel-200 flex items-center justify-between gap-3 text-xs font-sans">
+                <a
+                  href="tel:07570740490"
+                  onClick={() => trackDirectContact('phone', '07570 740490', 'hero_partner_card')}
+                  className="inline-flex items-center gap-2 text-navy-900 hover:text-teal-700 font-semibold transition-colors group"
+                  title="Direct Mobile"
+                >
+                  <span className="w-6 h-6 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                    <Phone className="w-3 h-3" />
+                  </span>
+                  <span>07570 740490</span>
+                </a>
+
+                <a
+                  href="https://www.linkedin.com/in/markgoldsmith2/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackDirectContact('linkedin', 'https://www.linkedin.com/in/markgoldsmith2/', 'hero_partner_card')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-steel-100 hover:bg-teal-600 text-steel-700 hover:text-white border border-steel-300 hover:border-teal-600 transition-colors text-xs font-medium"
+                  aria-label="Mark Goldsmith LinkedIn Profile"
+                >
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                  <span>LinkedIn</span>
+                </a>
               </div>
 
               {/* Live Metric Overlay Bar */}
-              <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-steel-200">
-                <div className="bg-canvas-light p-3 border border-steel-200">
-                  <div className="text-xl font-display font-bold text-navy-900">
+              <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-steel-200">
+                <div className="bg-canvas-light p-2.5 sm:p-3 border border-steel-200">
+                  <div className="text-lg sm:text-xl font-display font-bold text-navy-900">
                     {hero.metricPlacements}
                   </div>
                   <div className="text-[11px] font-sans text-steel-600">
                     Executive Placements
                   </div>
                 </div>
-                <div className="bg-canvas-light p-3 border border-steel-200">
-                  <div className="text-xl font-display font-bold text-teal-700">
+                <div className="bg-canvas-light p-2.5 sm:p-3 border border-steel-200">
+                  <div className="text-lg sm:text-xl font-display font-bold text-teal-700">
                     {hero.metricTenure}
                   </div>
                   <div className="text-[11px] font-sans text-steel-600">

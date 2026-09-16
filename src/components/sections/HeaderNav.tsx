@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -25,7 +27,7 @@ const defaultNavLinks: NavigationItem[] = [
   { label: 'The Difference', href: '#difference' },
   { label: 'Search Process', href: '#process' },
   { label: 'Market Intelligence', href: '/insights' },
-  { label: 'About', href: '#about' },
+  { label: 'About', href: '/about' },
 ];
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({
@@ -149,13 +151,13 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               variant="primary"
               size="md"
               onClick={() => {
-                trackCtaClick('Initiate Search', 'header_desktop');
+                trackCtaClick('Start the Conversation', 'header_desktop');
                 onInitiateSearch();
               }}
               icon={<ArrowRight className="w-3.5 h-3.5" />}
               className="hidden sm:inline-flex"
             >
-              Initiate Search
+              Start the Conversation
             </Button>
 
             {/* Mobile Menu Button - Visible on mobile/tablet (<lg) */}
@@ -214,13 +216,13 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               size="md"
               fullWidth
               onClick={() => {
-                trackCtaClick('Initiate Search Mandate', 'header_mobile');
+                trackCtaClick('Start the Conversation', 'header_mobile');
                 setMobileMenuOpen(false);
                 onInitiateSearch();
               }}
               icon={<ArrowRight className="w-3.5 h-3.5" />}
             >
-              Initiate Search Mandate
+              Start the Conversation
             </Button>
           </div>
         </div>

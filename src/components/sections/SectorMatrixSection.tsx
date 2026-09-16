@@ -1,8 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
 import { SectionDivider } from '../ui/SectionDivider';
 import { MatrixCard } from '../ui/MatrixCard';
 import { SectorSpecialismFields, SectorMatrixSectionData } from '../../lib/contentful/types';
-import { fallbackSpecialisms, fallbackSubDisciplines } from '../../lib/contentful/fallbacks';
+import { fallbackSpecialisms } from '../../lib/contentful/fallbacks';
 import { trackSectorInteraction, trackEvent } from '../../lib/analytics';
 
 export interface SectorMatrixSectionProps {
@@ -22,7 +24,6 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
   const sectionLabel = data?.sectionLabel || 'Sector Specialism Matrix';
   const sectionTitle = data?.title || 'Core Practice Matrix';
   const sectionDesc = data?.description || 'Specialized search focused exclusively on executive roles across manufacturing, distribution, and contracting in the Building Products & Construction materials ecosystem.';
-  const subDisciplines = data?.subDisciplines || fallbackSubDisciplines;
 
   const filteredSpecialisms = specialismList.filter((item) => {
     if (activeFilter === 'ALL') return true;
@@ -70,9 +71,9 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
 
         {/* Matrix Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSpecialisms.map((spec) => (
+          {filteredSpecialisms.map((spec, idx) => (
             <MatrixCard
-              key={spec.code || spec.title}
+              key={spec.code || spec.title || `spec-${idx}`}
               title={spec.title}
               subtitle={spec.subtitle}
               description={spec.description}
@@ -84,35 +85,6 @@ export const SectorMatrixSection: React.FC<SectorMatrixSectionProps> = ({
               }}
             />
           ))}
-        </div>
-
-        {/* Sub-Sector Blueprints Strip */}
-        <div className="mt-12 p-6 sm:p-8 bg-canvas-light border border-steel-300 relative">
-          <div className="absolute top-0 left-0 w-8 h-[2px] bg-teal-600" />
-          
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="font-sans text-xs uppercase tracking-widest text-teal-700 font-bold">
-                  Sector Sub-Disciplines Covered
-                </span>
-              </div>
-              <h4 className="font-display text-lg font-bold text-navy-900">
-                End-to-End Built Environment Supply Chain
-              </h4>
-            </div>
-
-            <div className="flex flex-wrap gap-2 text-xs font-sans">
-              {subDisciplines.map((sub, idx) => (
-                <span
-                  key={idx}
-                  className="bg-white border border-steel-300 text-navy-900 px-3 py-1.5 hover:border-teal-600 transition-colors"
-                >
-                  {sub}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
 
       </div>

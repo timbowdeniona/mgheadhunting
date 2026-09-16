@@ -15,6 +15,7 @@ dist
 dist-ssr
 .next
 out
+storybook-static
 *.tsbuildinfo
 
 # Environment & Local Secrets

@@ -24,9 +24,9 @@ export const Wordmark: React.FC<WordmarkProps> = ({
   // If custom logo image is provided from CMS, render it
   if (customLogoUrl) {
     const heightMap = {
-      sm: 'h-7 sm:h-8 max-w-[200px]',
-      md: 'h-9 sm:h-10 max-w-[260px]',
-      lg: 'h-12 sm:h-14 max-w-[340px]',
+      sm: 'h-8 sm:h-9 max-w-[240px]',
+      md: 'h-11 sm:h-12 max-w-[320px]',
+      lg: 'h-14 sm:h-16 max-w-[420px]',
     };
 
     const normalized = normalizeImageUrl(customLogoUrl);
@@ -48,19 +48,19 @@ export const Wordmark: React.FC<WordmarkProps> = ({
       mg: 'text-base tracking-[0.16em]',
       headhunting: 'text-[9px] tracking-[0.24em]',
       gap: 'gap-0.5',
-      rule: 'h-[1.5px] my-1',
+      rule: 'h-[1.5px] my-1 max-w-[190px]',
     },
     md: {
-      mg: 'text-lg sm:text-xl tracking-[0.18em]',
-      headhunting: 'text-[10px] sm:text-[11px] tracking-[0.28em]',
+      mg: 'text-xl sm:text-2xl tracking-[0.18em]',
+      headhunting: 'text-[11px] sm:text-[12px] tracking-[0.28em]',
       gap: 'gap-1',
-      rule: 'h-[2px] my-1.5',
+      rule: 'h-[2px] my-1.5 max-w-[250px]',
     },
     lg: {
       mg: 'text-2xl sm:text-3xl tracking-[0.2em]',
       headhunting: 'text-xs sm:text-sm tracking-[0.32em]',
       gap: 'gap-1.5',
-      rule: 'h-[2.5px] my-2',
+      rule: 'h-[2.5px] my-2 max-w-[320px]',
     },
   };
 

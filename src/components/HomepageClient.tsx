@@ -8,7 +8,6 @@ import { SectorMatrixSection } from './sections/SectorMatrixSection';
 import { DifferenceSection } from './sections/DifferenceSection';
 import { SearchProcessSection } from './sections/SearchProcessSection';
 import { InsightsSection } from './sections/InsightsSection';
-import { AboutPartnerSection } from './sections/AboutPartnerSection';
 import { ContactFooterSection } from './sections/ContactFooterSection';
 import { InitiateSearchModal } from './ui/InitiateSearchModal';
 import { ArticleModal } from './ui/ArticleModal';
@@ -94,11 +93,6 @@ export function HomepageClient({ data: initialData }: HomepageClientProps) {
           articles={data.insights.articles}
           onReadArticle={(article) => setSelectedArticle(article)}
           onRequestReport={() => handleOpenSearchModal('Executive Remuneration Benchmark')}
-        />
-
-        <AboutPartnerSection
-          data={data.aboutPartner}
-          onInitiateSearch={() => handleOpenSearchModal()}
         />
       </main>
 

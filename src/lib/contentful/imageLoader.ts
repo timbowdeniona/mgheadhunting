@@ -30,31 +30,40 @@ export function normalizeImageUrl(url: string): string {
 
 /**
  * Custom Next.js Image loader that delegates responsive resizing, format conversion (WebP),
- * and quality compression (q=80 sweet spot) directly to Contentful's global Images API CDN.
+ * and quality compression directly to Contentful's global Images API CDN, while implementing
+ * the required width parameter contract across all image sources.
  */
 export function contentfulImageLoader({ src, width, quality }: ImageLoaderProps): string {
   if (!src) return '';
 
   const normalized = normalizeImageUrl(src);
 
-  if (!isContentfulAssetUrl(normalized)) {
-    return normalized;
-  }
-
   try {
-    const url = new URL(normalized);
+    const isAbsolute = normalized.startsWith('http://') || normalized.startsWith('https://');
+    const url = isAbsolute ? new URL(normalized) : new URL(normalized, 'https://mgheadhunting.com');
+
+    // Next.js custom loaders must implement the width parameter across all URLs
     url.searchParams.set('w', width.toString());
-    url.searchParams.set('q', (quality || 80).toString());
-    
-    // Only set format if not already explicitly specified in the src
-    if (!url.searchParams.has('fm')) {
-      url.searchParams.set('fm', 'webp');
+    if (quality) {
+      url.searchParams.set('q', quality.toString());
+    }
+
+    // Apply Contentful specific optimizations (WebP format conversion) only to Contentful assets
+    if (isContentfulAssetUrl(normalized)) {
+      if (!url.searchParams.has('fm')) {
+        url.searchParams.set('fm', 'webp');
+      }
+    }
+
+    if (!isAbsolute) {
+      return `${url.pathname}${url.search}`;
     }
 
     return url.toString();
   } catch {
-    // If URL parsing fails, return normalized original
-    return normalized;
+    // If URL parsing fails, ensure width is implemented by appending or updating parameter
+    const separator = normalized.includes('?') ? '&' : '?';
+    return `${normalized}${separator}w=${width}`;
   }
 }
 
