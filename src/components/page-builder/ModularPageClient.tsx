@@ -81,7 +81,7 @@ export const ModularPageClient: React.FC<ModularPageClientProps> = ({ data: init
             bannerOverline: 'RETAINED SEARCH ADVISORY',
             bannerTitle: 'Commission a Board or Executive Search Mandate',
             bannerSubtitle: 'Discuss your talent requirements in strict confidence with Managing Partner Mark Goldsmith.',
-            bannerCtaText: 'Initiate Search Mandate',
+            bannerCtaText: 'Start the Conversation',
             ndaTitle: 'Strict Non-Disclosure Notice',
             ndaStatement: 'All initial discussions and client briefings are conducted under absolute confidentiality and strict non-disclosure.',
             siteDescription: data.siteSettings.tagline || 'Boutique retained executive search delivering Board, Managing Director, and C-Suite appointments across the UK and European Building Products and Built Environment sectors.',

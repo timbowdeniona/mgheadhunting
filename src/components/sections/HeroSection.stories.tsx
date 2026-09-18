@@ -31,7 +31,7 @@ export const Default: Story = {
         '12-Month Placement Guarantee',
         'Strict Non-Disclosure',
       ],
-      ctaPrimaryText: 'Initiate Search Mandate',
+      ctaPrimaryText: 'Start the Conversation',
       ctaSecondaryText: 'Explore Sector Specialisms',
       complianceNotice: 'Registered with the Information Commissioner’s Office (ICO). Strictly confidential under AESC Professional Practice.',
       partnerName: 'Mark Goldsmith',

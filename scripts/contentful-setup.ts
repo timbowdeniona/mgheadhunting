@@ -9,6 +9,9 @@ dotenv.config();
 const SPACE_ID = process.env.VITE_CONTENTFUL_SPACE_ID || process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID || 'hssdcxeme8fc';
 const MANAGEMENT_TOKEN = process.env.CONTENTFUL_MANAGEMENT_TOKEN || process.env.CONTENTFUL_CMA_TOKEN || '';
 const ENVIRONMENT_ID = process.env.CONTENTFUL_ENVIRONMENT || process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT || 'master';
+const ONLY_LOGOS = process.argv.includes('--logos-only') || process.argv.includes('--only-logos');
+const SCHEMA_ONLY = process.argv.includes('--schema-only') || process.argv.includes('--only-schema');
+const FORCE_OVERWRITE = process.argv.includes('--force-seed') || process.argv.includes('--overwrite-content');
 
 if (!MANAGEMENT_TOKEN) {
   console.error('Error: CONTENTFUL_MANAGEMENT_TOKEN or CONTENTFUL_CMA_TOKEN environment variable is required.');
@@ -112,41 +115,9 @@ async function runSetup() {
           }
         );
       } catch (updateErr: any) {
-        console.log(`  ! Incompatible field change detected for "${id}". Recreating content type cleanly...`);
-        // If field types changed incompatibly (e.g. Object -> Array), unpublish and delete old entries
-        try {
-          const entries = await client.entry.getMany({
-            query: { content_type: id, limit: 100 },
-          });
-          for (const item of entries.items) {
-            try {
-              await client.entry.unpublish({ entryId: item.sys.id });
-            } catch (_) {}
-            try {
-              await client.entry.delete({ entryId: item.sys.id });
-            } catch (_) {}
-          }
-        } catch (_) {}
-
-        // Unpublish content type
-        try {
-          await client.contentType.unpublish({ contentTypeId: id });
-        } catch (_) {}
-        // Delete content type
-        try {
-          await client.contentType.delete({ contentTypeId: id });
-        } catch (_) {}
-
-        // Create new content type with updated fields
-        contentType = await client.contentType.createWithId(
-          { contentTypeId: id },
-          {
-            name,
-            description: name,
-            displayField,
-            fields,
-          }
-        );
+        console.warn(`  ! Notice: Could not update content type "${id}": ${updateErr.message}`);
+        console.warn(`  ! Preserving existing content type and entries to prevent data loss.`);
+        contentType = existing;
       }
     } catch (e: any) {
       console.log(`  + Creating new content type: ${id} ("${name}")`);
@@ -204,6 +175,10 @@ async function runSetup() {
 
     try {
       const existing = await client.asset.get({ assetId: id });
+      if (!FORCE_OVERWRITE) {
+        console.log(`  ~ Preserving existing asset: ${id} ("${existing.fields?.title?.['en-US'] || title}")`);
+        return existing;
+      }
       console.log(`  - Updating existing asset: ${id} ("${title}")`);
       asset = await client.asset.update(
         { assetId: id },
@@ -236,23 +211,205 @@ async function runSetup() {
 
     try {
       await client.asset.processForAllLocales({}, asset);
-      let processed = false;
       let attempts = 0;
-      while (!processed && attempts < 15) {
+      while (attempts < 20) {
         await new Promise((r) => setTimeout(r, 1000));
         const current = await client.asset.get({ assetId: id });
         if (current.fields.file?.['en-US']?.url) {
           asset = current;
-          processed = true;
+          break;
         }
         attempts++;
       }
-      asset = await client.asset.publish({ assetId: id }, asset);
-      console.log(`  ✓ Published asset: ${id}`);
+
+      let published = false;
+      let pubAttempts = 0;
+      while (!published && pubAttempts < 5) {
+        try {
+          const fresh = await client.asset.get({ assetId: id });
+          asset = await client.asset.publish({ assetId: id }, fresh);
+          published = true;
+          console.log(`  ✓ Published asset: ${id}`);
+        } catch (pubErr: any) {
+          pubAttempts++;
+          if (pubAttempts >= 5) {
+            console.log(`  ! Notice processing asset ${id}: ${pubErr.message}`);
+            break;
+          }
+          await new Promise((r) => setTimeout(r, 1500));
+        }
+      }
     } catch (err: any) {
       console.log(`  ! Notice processing asset ${id}: ${err.message}`);
     }
     return asset;
+  }
+
+  // Helper to create or update entry
+  async function seedEntry(contentTypeId: string, entryId: string, fields: Record<string, any>) {
+    const formattedFields: Record<string, { 'en-US': any }> = {};
+    for (const [key, value] of Object.entries(fields)) {
+      formattedFields[key] = { 'en-US': value };
+    }
+
+    let entry;
+    try {
+      const existing = await client.entry.get({ entryId });
+      if (!FORCE_OVERWRITE) {
+        console.log(`  ~ Preserving existing entry [${contentTypeId}]: ${entryId} (client content protected, skipping overwrite)`);
+        return existing;
+      }
+      console.log(`  - Updating entry [${contentTypeId}]: ${entryId}`);
+      entry = await client.entry.update(
+        { entryId },
+        {
+          fields: formattedFields,
+          sys: existing.sys,
+        }
+      );
+    } catch (e) {
+      console.log(`  + Creating entry [${contentTypeId}]: ${entryId}`);
+      entry = await client.entry.createWithId(
+        { contentTypeId, entryId },
+        {
+          fields: formattedFields,
+        }
+      );
+    }
+
+    try {
+      let published = false;
+      let pubAttempts = 0;
+      while (!published && pubAttempts < 5) {
+        try {
+          const fresh = await client.entry.get({ entryId });
+          entry = await client.entry.publish({ entryId }, fresh);
+          published = true;
+          console.log(`  ✓ Published entry: ${entryId}`);
+        } catch (pubErr: any) {
+          pubAttempts++;
+          if (pubAttempts >= 5) {
+            console.log(`  ! Notice on publishing ${entryId}: ${pubErr.message}`);
+            break;
+          }
+          await new Promise((r) => setTimeout(r, 1500));
+        }
+      }
+    } catch (publishErr: any) {
+      console.log(`  ! Notice on publishing ${entryId}: ${publishErr.message}`);
+    }
+    return entry;
+  }
+
+  // Provision official brand logos (Light PNG, Dark PNG, Monogram Badge)
+  async function deployBrandLogos() {
+    console.log(`\n===========================================================`);
+    console.log(`[MGH CMS Setup] Provisioning Official Brand Logo Assets`);
+    console.log(`===========================================================\n`);
+
+    const lightLogoPath = fs.existsSync(path.resolve(process.cwd(), 'public/mgh-logo-light.png'))
+      ? path.resolve(process.cwd(), 'public/mgh-logo-light.png')
+      : path.resolve(process.cwd(), 'assets/MGH Full Logo.png');
+
+    const darkLogoPath = fs.existsSync(path.resolve(process.cwd(), 'public/mgh-logo-dark.png'))
+      ? path.resolve(process.cwd(), 'public/mgh-logo-dark.png')
+      : path.resolve(process.cwd(), 'assets/mgh-logo-dark.png');
+
+    const monogramPath = fs.existsSync(path.resolve(process.cwd(), 'public/mgh-monogram.png'))
+      ? path.resolve(process.cwd(), 'public/mgh-monogram.png')
+      : path.resolve(process.cwd(), 'assets/mgh-monogram.png');
+
+    const logoWordmarkLightAsset = await ensureAsset(
+      'asset-logo-wordmark-light',
+      'MG Headhunting - Wordmark Logo (Light Backgrounds)',
+      'Primary MGH Wordmark logo for light canvas headers and white backgrounds',
+      lightLogoPath,
+      'image/png',
+      'mgh-logo-light.png'
+    );
+
+    const logoWordmarkDarkAsset = await ensureAsset(
+      'asset-logo-wordmark-dark',
+      'MG Headhunting - Wordmark Logo (Dark Backgrounds / Footer)',
+      'Primary MGH Wordmark logo for dark navy and slate footer backgrounds',
+      darkLogoPath,
+      'image/png',
+      'mgh-logo-dark.png'
+    );
+
+    const logoMonogramAsset = await ensureAsset(
+      'asset-logo-monogram',
+      'MG Headhunting - Mini Monogram / Favicon',
+      'Geometric MGH Monogram square badge for mobile headers and compact navigation',
+      monogramPath,
+      'image/png',
+      'mgh-monogram.png'
+    );
+
+    console.log(`\n  --- Seeding Media Asset Wrappers for Logos ---`);
+
+    const mediaLogoWordmarkLight = await seedEntry('mediaAsset', 'media-logo-wordmark-light', {
+      internalName: 'Logo: Main Wordmark (Light Background)',
+      image: { sys: { type: 'Link', linkType: 'Asset', id: logoWordmarkLightAsset.sys.id } },
+      altText: 'MG Headhunting - Retained Executive Search for Building Products',
+      caption: 'Main Wordmark Logo (Light / White Backgrounds)',
+    });
+
+    const mediaLogoWordmarkDark = await seedEntry('mediaAsset', 'media-logo-wordmark-dark', {
+      internalName: 'Logo: Main Wordmark (Dark Background)',
+      image: { sys: { type: 'Link', linkType: 'Asset', id: logoWordmarkDarkAsset.sys.id } },
+      altText: 'MG Headhunting - Retained Executive Search for Building Products (Dark)',
+      caption: 'Main Wordmark Logo (Dark / Boardroom Slate Backgrounds)',
+    });
+
+    const mediaLogoMonogram = await seedEntry('mediaAsset', 'media-logo-monogram', {
+      internalName: 'Logo: Mini Monogram / Icon',
+      image: { sys: { type: 'Link', linkType: 'Asset', id: logoMonogramAsset.sys.id } },
+      altText: 'MG Headhunting MGH Monogram Icon',
+      caption: 'Mini Monogram Badge (Mobile & Compact Navigation)',
+    });
+
+    return {
+      logoWordmarkLightAsset,
+      logoWordmarkDarkAsset,
+      logoMonogramAsset,
+      mediaLogoWordmarkLight,
+      mediaLogoWordmarkDark,
+      mediaLogoMonogram,
+    };
+  }
+
+  // If running in logos-only mode, deploy logos and update site settings immediately
+  if (ONLY_LOGOS) {
+    console.log(`[MGH CMS Setup] Running in --logos-only mode.`);
+    const logos = await deployBrandLogos();
+
+    console.log(`\n  --- Linking Logos to global-site-settings ---`);
+    try {
+      const existingSettings = await client.entry.get({ entryId: 'global-site-settings' });
+      existingSettings.fields.mainLogo = {
+        'en-US': { sys: { type: 'Link', linkType: 'Entry', id: logos.mediaLogoWordmarkLight.sys.id } },
+      };
+      existingSettings.fields.mainLogoDark = {
+        'en-US': { sys: { type: 'Link', linkType: 'Entry', id: logos.mediaLogoWordmarkDark.sys.id } },
+      };
+      existingSettings.fields.miniLogo = {
+        'en-US': { sys: { type: 'Link', linkType: 'Entry', id: logos.mediaLogoMonogram.sys.id } },
+      };
+      const updated = await client.entry.update(
+        { entryId: 'global-site-settings' },
+        existingSettings
+      );
+      await client.entry.publish({ entryId: 'global-site-settings' }, updated);
+      console.log(`  ✓ Updated and published global-site-settings with deployed brand logos.`);
+    } catch (err: any) {
+      console.log(`  ! Notice updating global-site-settings: ${err.message}`);
+    }
+
+    console.log(`\n===========================================================`);
+    console.log(`[MGH CMS Setup] ✓ All Brand Logos Successfully Deployed to Contentful!`);
+    console.log(`===========================================================\n`);
+    return;
   }
 
   // 1. Author Content Type
@@ -695,7 +852,15 @@ async function runSetup() {
     { id: 'contactFooterBlock', name: 'Contact Footer Block', type: 'Link', linkType: 'Entry', validations: [{ linkContentType: ['blockContactDesk', 'blockCtaBanner'] }], required: false },
   ]);
 
-
+  if (SCHEMA_ONLY) {
+    console.log(`\n===========================================================`);
+    console.log(`[MGH CMS Setup] Running in --schema-only mode.`);
+    console.log(`✓ All Content Types ensured. Skipping all assets and entry seeding.`);
+    console.log(`===========================================================\n`);
+    await configureEditorInterfaces();
+    console.log(`\n✓ [MGH CMS Setup] Schema and Editor Interfaces successfully configured.`);
+    return;
+  }
 
   console.log(`\n===========================================================`);
   console.log(`[MGH CMS Setup] Provisioning Cover Image Assets`);
@@ -730,77 +895,14 @@ async function runSetup() {
     'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1600&auto=format&fit=crop'
   );
 
-  console.log(`\n===========================================================`);
-  console.log(`[MGH CMS Setup] Provisioning Brand Logo Vector Assets`);
-  console.log(`===========================================================\n`);
-
-  const logoWordmarkLightAsset = await ensureAsset(
-    'asset-logo-wordmark-light',
-    'MG Headhunting - Wordmark Logo (Light Backgrounds)',
-    'Primary MGH Wordmark vector logo for light canvas headers and white backgrounds',
-    path.resolve(process.cwd(), 'public/mgh-wordmark-light.svg'),
-    'image/svg+xml',
-    'mgh-wordmark-light.svg'
-  );
-
-  const logoWordmarkDarkAsset = await ensureAsset(
-    'asset-logo-wordmark-dark',
-    'MG Headhunting - Wordmark Logo (Dark Backgrounds / Footer)',
-    'Primary MGH Wordmark vector logo for dark navy and slate footer backgrounds',
-    path.resolve(process.cwd(), 'public/mgh-wordmark-dark.svg'),
-    'image/svg+xml',
-    'mgh-wordmark-dark.svg'
-  );
-
-  const logoMonogramAsset = await ensureAsset(
-    'asset-logo-monogram',
-    'MG Headhunting - Mini Monogram / Favicon',
-    'Geometric MGH Monogram square badge for mobile headers and compact navigation',
-    path.resolve(process.cwd(), 'public/mgh-monogram.svg'),
-    'image/svg+xml',
-    'mgh-monogram.svg'
-  );
+  const logos = await deployBrandLogos();
+  const logoWordmarkLightAsset = logos.logoWordmarkLightAsset;
+  const logoWordmarkDarkAsset = logos.logoWordmarkDarkAsset;
+  const logoMonogramAsset = logos.logoMonogramAsset;
 
   console.log(`\n===========================================================`);
   console.log(`[MGH CMS Setup] Seeding Initial Content & Rich Text Bodies`);
   console.log(`===========================================================\n`);
-
-  // Helper to create or update entry
-  async function seedEntry(contentTypeId: string, entryId: string, fields: Record<string, any>) {
-    const formattedFields: Record<string, { 'en-US': any }> = {};
-    for (const [key, value] of Object.entries(fields)) {
-      formattedFields[key] = { 'en-US': value };
-    }
-
-    let entry;
-    try {
-      const existing = await client.entry.get({ entryId });
-      console.log(`  - Updating entry [${contentTypeId}]: ${entryId}`);
-      entry = await client.entry.update(
-        { entryId },
-        {
-          fields: formattedFields,
-          sys: existing.sys,
-        }
-      );
-    } catch (e) {
-      console.log(`  + Creating entry [${contentTypeId}]: ${entryId}`);
-      entry = await client.entry.createWithId(
-        { contentTypeId, entryId },
-        {
-          fields: formattedFields,
-        }
-      );
-    }
-
-    try {
-      entry = await client.entry.publish({ entryId }, entry);
-      console.log(`  ✓ Published entry: ${entryId}`);
-    } catch (publishErr: any) {
-      console.log(`  ! Notice on publishing ${entryId}: ${publishErr.message}`);
-    }
-    return entry;
-  }
 
   // Seed Author: Mark Goldsmith
   const markAuthor = await seedEntry('author', 'author-mark-goldsmith', {
@@ -808,7 +910,7 @@ async function runSetup() {
     roleTitle: 'Managing Director & Lead Search Partner',
     organization: 'MG Headhunting',
     email: 'mgoldsmith@mgheadhunting.co.uk',
-    linkedinUrl: 'https://www.linkedin.com',
+    linkedinUrl: 'https://www.linkedin.com/in/markgoldsmith2/',
     bioShort: 'Head of Executive Search specializing in Board, MD, and C-Suite placements across the UK & European Building Products and Construction materials industry.',
     practiceTenure: '20+ Years',
     placementLevel: 'Board / MD / C-Suite',
@@ -856,26 +958,9 @@ async function runSetup() {
     caption: 'Sustainable mass timber & structural engineering',
   });
 
-  const mediaLogoWordmarkLight = await seedEntry('mediaAsset', 'media-logo-wordmark-light', {
-    internalName: 'Logo: Main Wordmark (Light Background)',
-    image: { sys: { type: 'Link', linkType: 'Asset', id: logoWordmarkLightAsset.sys.id } },
-    altText: 'MG Headhunting - Retained Executive Search for Building Products',
-    caption: 'Main Wordmark Logo (Light / White Backgrounds)',
-  });
-
-  const mediaLogoWordmarkDark = await seedEntry('mediaAsset', 'media-logo-wordmark-dark', {
-    internalName: 'Logo: Main Wordmark (Dark Background)',
-    image: { sys: { type: 'Link', linkType: 'Asset', id: logoWordmarkDarkAsset.sys.id } },
-    altText: 'MG Headhunting - Retained Executive Search for Building Products',
-    caption: 'Main Wordmark Logo (Dark / Boardroom Slate Backgrounds)',
-  });
-
-  const mediaLogoMonogram = await seedEntry('mediaAsset', 'media-logo-monogram', {
-    internalName: 'Logo: Mini Monogram / Icon',
-    image: { sys: { type: 'Link', linkType: 'Asset', id: logoMonogramAsset.sys.id } },
-    altText: 'MG Headhunting MGH Monogram Icon',
-    caption: 'Mini Monogram Badge (Mobile & Compact Navigation)',
-  });
+  const mediaLogoWordmarkLight = logos.mediaLogoWordmarkLight;
+  const mediaLogoWordmarkDark = logos.mediaLogoWordmarkDark;
+  const mediaLogoMonogram = logos.mediaLogoMonogram;
 
 
   // Seed Sector Specialisms
@@ -1345,15 +1430,16 @@ async function runSetup() {
       sys: { type: 'Link', linkType: 'Entry', id: mediaLogoMonogram.sys.id },
     },
     primaryEmail: 'mgoldsmith@mgheadhunting.co.uk',
-    phone: '+44 (0) 20 7946 0198',
+    phone: '07570 740490',
     headquarters: 'London & Home Counties, United Kingdom',
-    linkedinUrl: 'https://www.linkedin.com',
+    linkedinUrl: 'https://www.linkedin.com/in/markgoldsmith2/',
     navLinks: [
       { label: 'Specialisms', href: '/#specialisms' },
       { label: 'The MGH Difference', href: '/#difference' },
       { label: 'Search Process', href: '/#process' },
       { label: 'Market Intelligence', href: '/insights' },
-      { label: 'About Mark Goldsmith', href: '/#about' },
+      { label: 'FAQ', href: '/faq' },
+      { label: 'About Mark Goldsmith', href: '/about' },
       { label: 'Contact', href: '/#contact' },
     ],
     footerSpecialisms: [
@@ -1417,7 +1503,7 @@ async function runSetup() {
     partnerSpecialization: 'Building Products, Materials & Offsite Systems',
     partnerPlacementLevel: 'Board, CEO, Managing Director & Operations Heads',
     partnerEmail: 'mgoldsmith@mgheadhunting.co.uk',
-    partnerLinkedinUrl: 'https://www.linkedin.com',
+    partnerLinkedinUrl: 'https://www.linkedin.com/in/markgoldsmith2/',
     paragraphs: [
       'MG Headhunting was founded on a singular principle: executive search in the Building Products sector requires deep domain mastery, rigorous competency assessment, and personal accountability from start to finish.',
       'Unlike volume recruitment agencies that delegate critical assignments to junior resourcers, Managing Partner Mark Goldsmith personally leads every search—from initial board scoping through direct confidential headhunting to final placement.',
@@ -1751,7 +1837,7 @@ async function runSetup() {
     overline: 'STRATEGIC APPOINTMENTS',
     title: 'Experience Precision Retained Search',
     description: 'Commission a mandate backed by full 12-month warranties and direct partner accountability.',
-    primaryCtaText: 'Initiate Search Mandate',
+    primaryCtaText: 'Start the Conversation',
     primaryCtaAction: 'searchModal',
   });
 
@@ -1788,7 +1874,7 @@ async function runSetup() {
     title: 'Schedule a Confidential Strategic Consultation',
     description: 'Reach out directly to Managing Partner Mark Goldsmith to discuss executive recruitment, succession planning, or compensation benchmarking.',
     email: 'mgoldsmith@mgheadhunting.co.uk',
-    phone: '+44 (0) 20 7946 0198',
+    phone: '07570 740490',
     headquarters: 'London & Home Counties, United Kingdom',
     ndaNotice: 'All conversations and documents exchanged are subject to strict non-disclosure obligations and professional confidentiality standards.',
   });
@@ -1835,6 +1921,150 @@ async function runSetup() {
     ],
   });
 
+  // --- 6. FAQ PAGE BLOCKS ---
+  await seedEntry('blockPageHeader', 'block-faq-header', {
+    internalName: 'FAQ - Hero Header',
+    badge: 'PRACTICE PROTOCOL',
+    overline: 'TRANSPARENT EXECUTIVE ADVISORY',
+    title: 'Direct, Candid Answers on',
+    highlightedPhrase: 'Retained Headhunting & Mandates',
+    subtitle: 'Honest, partner-level perspectives on retained fees, confidential searches, industry track records, candidate replacement warranties, and the search process.',
+    coordinate: 'MGH // FAQ-PROTOCOL',
+    breadcrumbs: ['FAQ:/faq'],
+  });
+
+  await seedEntry('blockMetricItem', 'metric-faq-experience', {
+    label: 'Practice Tenure',
+    value: '22+ Yrs',
+    description: 'Exclusively leading headhunting assignments across building products and construction.',
+    tag: 'TENURE',
+  });
+  await seedEntry('blockMetricItem', 'metric-faq-placements', {
+    label: 'Leadership Placements',
+    value: '300+',
+    description: 'Executive, Managing Director, and specialist leadership roles successfully appointed.',
+    tag: 'TRACK RECORD',
+  });
+  await seedEntry('blockMetricItem', 'metric-faq-capacity', {
+    label: 'Live Mandate Cap',
+    value: 'Max 3',
+    description: 'Strict low-volume focus ensuring maximum partner attention and uncompromised search execution.',
+    tag: 'FOCUS',
+  });
+  await seedEntry('blockMetricItem', 'metric-faq-warranty', {
+    label: 'Replacement Warranty',
+    value: '6 Months',
+    description: 'Comprehensive fee-free replacement commitment backing every retained placement.',
+    tag: 'SECURITY',
+  });
+
+  await seedEntry('blockMetricsStats', 'block-faq-metrics', {
+    internalName: 'FAQ - Verified Practice Benchmarks',
+    sectionLabel: 'VERIFIED BENCHMARKS',
+    title: 'High-Touch Headhunting by the Numbers',
+    subtitle: 'Purposefully structured for low volume, uncompromised partner accountability, and exceptional outcome certainty.',
+    stats: [
+      entryLink('metric-faq-experience'),
+      entryLink('metric-faq-placements'),
+      entryLink('metric-faq-capacity'),
+      entryLink('metric-faq-warranty'),
+    ],
+  });
+
+  await seedEntry('blockFaqItem', 'faq-fee-structure', {
+    question: 'What’s your fee structure?',
+    category: 'FEES & COMMERCIALS',
+    answer: 'I operate a retained model. However, where I differ from many headhunters is how my fees are structured. Typically, firms dictate a fee split into three portions – a retainer, ‘working’ or shortlist fee, and the placement fee. I don’t feel this puts enough of the onus on the headhunter to achieve the desired client outcome. Shortlists are often manufactured to suit the recruiters’ commercials.\n\nI must work under a retained model. The amount of upfront work demands this. However, my fees are back weighted towards the result. This makes it far fairer on both sides and develops a more thorough and progressive relationship.\n\nFurthermore, my fees reflect how difficult your vacancy is likely to fill. This can only be defined upon understanding your situation in full.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-mandate-accountability', {
+    question: 'What happens if you don’t succeed?',
+    category: 'ACCOUNTABILITY & COMMITMENT',
+    answer: 'Because you’ve retained me, it becomes my challenge (problem) to solve. Occasionally assignments prove exceptionally hard to fill. It is absolutely my requirement to work with the client to share key intelligence, consult with you about the barriers and alternative avenues to take, and to get you the person who makes the difference to your company.\n\nAn example of this was a Head of Technical role I completed within fenestration. The client required someone who’d led a technical department within a uPVC extrusion setting and lived within commuting distance of their main plant. There were 27 individuals nationally. This had to be communicated with the MD. We had to work together to overcome relocation challenges and prioritise the key attributes to the person. It was filled, but the shortlist contained only three potential candidates.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-confidential-headhunt', {
+    question: 'How do you handle a confidential headhunt?',
+    category: 'CONFIDENTIALITY & NDAS',
+    answer: 'Roughly half of my searches are of this nature – either the client doesn’t want the market to know their plans, or the board aims to replace a poorly performing employee (be this at board level or underneath).\n\nAfter taking the brief, we agree how I am to sell the opportunity; what I can and cannot say, and at what point client details are to be released. I also manage the NDA process. Importantly, I advise as to how we can extract the most value from selling the role and company. This is the hard part – not steering the audience to who my client is, whilst providing enough of a hook to gain interest.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-process-differentiation', {
+    question: 'How does your process differ from any other recruiter?',
+    category: 'THE MGH DIFFERENCE',
+    answer: 'Three key answers:\n\n• AI Judgement vs Overreliance: I am witnessing the increased use of headhunters using AI. To a degree, I use it, too. However, I fear that many are fast becoming over reliant on its answers. When exhausting research work, AI does not take over from 20 plus years of experience and judgement. It misses key targets and can be wide of the mark. My mixture of manually building target lists, with the aid of AI ensures no stone is unturned. You are getting the best, most exhaustive solution.\n\n• Low Volume Work: I’ve purposefully set up the business for low volume work: I know that many headhunters / recruiters manage between four and 10 live assignments per consultant at any given time. I’ve always struggled to understand, in fact I know, that it’s impossible to give an assignment the attention and effort that a client deserves. As a rule, I attempt to keep live assignments to three – two at search stage, with one to two at interview / offer stage.\n\n• 100% Direct Partner Involvement: I remain heavily involved in every assignment. Unlike the majority of other headhunters, I do not pass assignments over to someone with limited knowledge of the industry. I manage your assignment throughout the process, ensuring that no competitor is missed, or the opportunity is poorly represented.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-sector-track-record', {
+    question: 'What’s your track record of recruiting similar roles within our industry?',
+    category: 'INDUSTRY TRACK RECORD',
+    answer: '22 years of leading headhunting assignments exclusively in building products and construction means that I have recruited in excess of 300 leadership and specialist positions. Each client and assignment brings its own nuances. This rich experience helps guide prospective clients ahead of going live with a new search (see Case Studies for further clarification).\n\nIt’s highly likely that I have recruited similar roles in parallel settings before; from a newly created COO role for an invested in construction consultancy, to a Sales Manager employed to open the new perimeter protection equipment market for an established manufacturer.\n\nYou’re the expert in your field. It’s likely that you have a strong product or service offering. You just need someone to help guide you through how’s best to secure the optimum candidate. Much of my experience has been gained headhunting within the United Kingdom. However, I have managed assignments across Europe and into Northern America.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-search-timeline', {
+    question: 'What’s the timeline to your process?',
+    category: 'SEARCH TIMELINES',
+    answer: 'Typically, from taking the brief to presenting the shortlist ready for you to interview, assignments run for four weeks. There’s no exact science to this and, being open, each assignment is different.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-communication-progress', {
+    question: 'And how do we know how the headhunt is progressing?',
+    category: 'COMMUNICATION & GOVERNANCE',
+    answer: 'This is a key question to answer. Consulting with you throughout the process is essential. As referenced, each assignment brings its own surprises and, sometimes, challenges. I’ve learnt to not assume and never predetermine. Some sound straightforward at briefing stage and turn out to be very challenging, while others the opposite.\n\nOne non-negotiable is ongoing communication throughout the process. I prefer to hold a five-to-30-minute Teams call from week one onwards. Not only to present key data, but to share nuances to the search – what’s working well and what isn’t. During calls, different avenues often present themselves and I love to share these.\n\nHeadhunting isn’t a magic pill and anyone who tells you it is, is either naive or lying to you. Communication is key to you gaining maximum return for your investment.',
+  });
+
+  await seedEntry('blockFaqItem', 'faq-replacement-warranty', {
+    question: 'And what happens if that person leaves?',
+    category: 'PLACEMENT WARRANTY',
+    answer: 'This rarely happens – in fact, over the past 10 years this has only happened to me twice. The process is so thorough that you’re not making a knee-jerk reaction.\n\nHowever, should it, I don’t believe doing the atypical recruitment response helps anyone. Most offer money back on a sliding scale, up to six months of service. You’ve still paid a chunk money to have a seat empty! I much prefer to offer a free replacement up to a six-month period.',
+  });
+
+  await seedEntry('blockFaqAccordion', 'block-faq-accordion', {
+    internalName: 'FAQ - Practice Questions Accordion',
+    sectionLabel: 'PRACTICE ADVISORY',
+    title: 'Frequently Asked Questions About Retained Headhunting',
+    description: 'Clear answers from Managing Partner Mark Goldsmith addressing fee structures, confidentiality, timelines, and candidate warranties.',
+    items: [
+      entryLink('faq-fee-structure'),
+      entryLink('faq-mandate-accountability'),
+      entryLink('faq-confidential-headhunt'),
+      entryLink('faq-process-differentiation'),
+      entryLink('faq-sector-track-record'),
+      entryLink('faq-search-timeline'),
+      entryLink('faq-communication-progress'),
+      entryLink('faq-replacement-warranty'),
+    ],
+  });
+
+  await seedEntry('blockCtaBanner', 'block-faq-cta', {
+    internalName: 'FAQ - Confidential Call CTA',
+    variant: 'navy',
+    overline: 'NO CLICHÉS • DIRECT PARTNER DIALOGUE',
+    title: 'Let’s Have an Honest, Confidential Conversation',
+    description: 'I could tell you to "unlock your hiring potential" but that\'s not really my style. If you\'ve got a role you’re considering going live with, or that you\'re struggling to fill, let’s have a confidential call.',
+    primaryCtaText: 'Call Mark Direct: 07570 740490',
+    primaryCtaAction: 'link',
+    primaryCtaHref: 'tel:07570740490',
+    secondaryCtaText: 'Start the Conversation',
+    secondaryCtaHref: '/contact',
+    guaranteeNotice: 'Direct Partner Desk • 07570 740490 • Strict Discretion & Non-Disclosure Assured',
+  });
+
+  await seedEntry('modularPage', 'page-faq', {
+    title: 'Frequently Asked Questions',
+    slug: 'faq',
+    metaTitle: 'Frequently Asked Questions | MG Headhunting Retained Search',
+    metaDescription: 'Direct, honest answers from Mark Goldsmith on retained search fees, confidentiality, timelines, and candidate warranties in the Building Products sector.',
+    showHeader: true,
+    showFooter: true,
+    sections: [
+      entryLink('block-faq-header'),
+      entryLink('block-faq-metrics'),
+      entryLink('block-faq-accordion'),
+      entryLink('block-faq-cta'),
+    ],
+  });
+
   await seedEntry('homepage', 'homepage-default', {
     internalTitle: 'MGH Global Homepage (Seeded)',
     aboutPartnerBlock: entryLink('block-about-team'),
@@ -1851,7 +2081,7 @@ async function runSetup() {
       '100% Partner Execution',
       'Deep Sector Discretion',
     ],
-    heroCtaPrimaryText: 'Initiate Confidential Search',
+    heroCtaPrimaryText: 'Start the Conversation',
     heroCtaSecondaryText: 'View Sector Specialisms',
     heroComplianceNotice: 'Operating under UK Executive Search Code of Conduct & Strict Data Protection protocols.',
     heroPartnerName: 'Mark Goldsmith',

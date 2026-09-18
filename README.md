@@ -1,6 +1,6 @@
 # MG Headhunting (MGH) — Executive Search Platform & Design System
 
-A comprehensive, production-ready **Next.js (App Router)** and **Contentful Headless CMS** platform for **MG Headhunting (MGH)** — a boutique executive search firm specializing in retained C-suite, Board, and Director-level placements across the **Building Products & Construction** sectors.
+A comprehensive, production-ready **Next.js (App Router)** and **Contentful Headless CMS** platform for **MG Headhunting (MGH)** — a boutique executive search firm specializing in retained C-suite, Board, and Director-level placements across the **Building Products & Construction** sectors in the UK.
 
 ---
 

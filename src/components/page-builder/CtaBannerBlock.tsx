@@ -93,7 +93,7 @@ export const CtaBannerBlock: React.FC<CtaBannerBlockProps> = ({
               onClick={onInitiateSearch}
               icon={<ArrowRight className="w-4 h-4" />}
             >
-              {data.primaryCtaText || 'Initiate Search Mandate'}
+              {data.primaryCtaText || 'Start the Conversation'}
             </Button>
           )}
 

@@ -7,7 +7,7 @@
   <!-- Main Wordmark for Dark Backgrounds -->
   <text x="0" y="30" class="title-dark">MG <tspan class="title-dark-bold">HEADHUNTING</tspan></text>
   <!-- Signature Teal Rule Divider -->
-  <rect x="0" y="40" width="420" height="2.5" fill="#138D90" />
+  <rect x="0" y="40" width="340" height="2.5" fill="#138D90" />
   <!-- Subtitle: Executive Search & Sector -->
   <text x="0" y="58" class="subtitle-dark">EXECUTIVE SEARCH</text>
   <rect x="180" y="52" width="4" height="4" fill="#138D90" />

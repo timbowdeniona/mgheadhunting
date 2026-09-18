@@ -26,11 +26,12 @@ console.log('Result 2:', transformedQ90);
 assert(transformedQ90.includes('q=90'), 'Respects quality override q=90');
 assert(transformedQ90.includes('w=1200'), 'Sets width param w=1200');
 
-// 3. Non-Contentful URL pass-through (e.g. Unsplash)
-const unsplashUrl = 'https://images.unsplash.com/photo-12345?w=800';
+// 3. Non-Contentful URL handling (e.g. Unsplash) - implements width to satisfy Next.js loader contract
+const unsplashUrl = 'https://images.unsplash.com/photo-12345?w=1600';
 const nonCtfTransformed = contentfulImageLoader({ src: unsplashUrl, width: 800, quality: 80 });
 console.log('Result 3:', nonCtfTransformed);
-assert(nonCtfTransformed === unsplashUrl, 'Passes through non-Contentful URLs unchanged');
+assert(nonCtfTransformed.includes('w=800'), 'Implements width parameter for non-Contentful URLs');
+assert(!nonCtfTransformed.includes('fm=webp'), 'Does not force Contentful fm=webp parameter on non-Contentful URLs');
 
 // 4. getContentfulImageUrl helper test (OpenGraph 1200x630)
 const ogImageUrl = getContentfulImageUrl(rawCtfUrl, {

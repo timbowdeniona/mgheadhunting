@@ -7,10 +7,12 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "oxlint",
+    "lint": "oxlint src scripts",
     "storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p 6006",
     "build-storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook build --quiet -o storybook-static",
     "contentful:setup": "tsx scripts/contentful-setup.ts",
+    "contentful:setup:schema": "tsx scripts/contentful-setup.ts --schema-only",
+    "contentful:setup:logos": "tsx scripts/contentful-setup.ts --logos-only",
     "contentful:test": "tsx scripts/test-delivery.ts"
   },
   "dependencies": {

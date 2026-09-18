@@ -59,7 +59,7 @@ export const DifferenceSection: React.FC<DifferenceSectionProps> = ({
             onClick={onInitiateSearch}
             icon={<ArrowRight className="w-3.5 h-3.5" />}
           >
-            Commission Mandate
+            Start the Conversation
           </Button>
         </div>
 
@@ -81,11 +81,19 @@ export const DifferenceSection: React.FC<DifferenceSectionProps> = ({
           })}
         </div>
 
-        {/* Comparison Table / Summary Bar */}
-        <div className="mt-12 bg-navy-900 text-white p-6 sm:p-8 border border-navy-700 relative">
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-teal-500" />
+        {/* Comparison Table / Summary Bar with Subtle Faded Architectural Background */}
+        <div className="mt-12 bg-navy-900 text-white p-6 sm:p-8 border border-navy-700 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-teal-500 z-10" />
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          {/* Faded Architectural Construction Texture Backdrop */}
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none bg-cover bg-center mix-blend-luminosity"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?q=80&w=1200&auto=format&fit=crop')`,
+            }}
+          />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center relative z-10">
             <div className="space-y-1">
               <div className="font-sans text-xs text-teal-400 font-medium tracking-wide">
                 The retained assurance
