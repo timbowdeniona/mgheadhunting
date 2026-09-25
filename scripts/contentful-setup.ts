@@ -1439,7 +1439,6 @@ async function runSetup() {
       { label: 'Search Process', href: '/#process' },
       { label: 'Market Intelligence', href: '/insights' },
       { label: 'FAQ', href: '/faq' },
-      { label: 'About Mark Goldsmith', href: '/about' },
       { label: 'Contact', href: '/#contact' },
     ],
     footerSpecialisms: [

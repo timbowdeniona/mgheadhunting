@@ -21,21 +21,12 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
   const [honeypot, setHoneypot] = useState('');
   const [formData, setFormData] = useState({
     name: '',
-    roleTitle: '',
     company: '',
     email: '',
     phone: '',
-    targetLevel: 'Managing Director / CEO',
-    sectorSpecialism: defaultSector || 'Heavy Building Materials',
-    timeframe: 'Immediate (< 30 days)',
+    functionRequired: 'C-Suite / MD',
     notes: '',
   });
-
-  useEffect(() => {
-    if (defaultSector) {
-      setFormData((prev) => ({ ...prev, sectorSpecialism: defaultSector }));
-    }
-  }, [defaultSector]);
 
   if (!isOpen) return null;
 
@@ -57,10 +48,16 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: encode({
           'form-name': 'initiate-search-mandate',
-          ...formData,
+          targetLevel: formData.functionRequired, // compatibility with legacy Netlify form handler
+          functionRequired: formData.functionRequired,
+          name: formData.name,
+          company: formData.company,
+          email: formData.email,
+          phone: formData.phone,
+          notes: formData.notes,
         }),
       });
-      trackLeadSubmission('mandate', formData.sectorSpecialism);
+      trackLeadSubmission('mandate', formData.functionRequired);
       setSubmitted(true);
     } catch {
       setSubmitError('Something went wrong. Please email mgoldsmith@mgheadhunting.co.uk directly.');
@@ -90,7 +87,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
               <Badge variant="navy" size="sm">Confidential intake</Badge>
             </div>
             <h2 className="font-display text-2xl font-bold text-navy-900 tracking-tight">
-              Initiate Retained Search
+              Initiate Confidential Conversation
             </h2>
             <p className="text-xs sm:text-sm text-steel-600 mt-1">
               Direct engagement with Mark Goldsmith for board and director-level appointments in building products.
@@ -118,8 +115,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
               Thank you, <strong>{formData.name || 'Executive'}</strong>. Mark Goldsmith will personally review your search mandate and reach out within 24 hours under strict Non-Disclosure Protocol.
             </p>
             <div className="p-4 bg-steel-50 border border-steel-200 text-xs font-mono text-steel-600 max-w-md mx-auto text-left space-y-1">
-              <div><strong>Target Appointment:</strong> {formData.targetLevel}</div>
-              <div><strong>Sector Focus:</strong> {formData.sectorSpecialism}</div>
+              <div><strong>Function Required:</strong> {formData.functionRequired}</div>
               <div><strong>Confirmation Dispatch:</strong> {formData.email || 'mgoldsmith@mgheadhunting.co.uk'}</div>
             </div>
             <div className="pt-4">
@@ -195,48 +191,22 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
-                  Target Level / Role
-                </label>
-                <select
-                  value={formData.targetLevel}
-                  onChange={(e) => setFormData({ ...formData, targetLevel: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
-                >
-                  <option value="Managing Director / CEO">Managing Director / CEO</option>
-                  <option value="Chief Operating Officer (COO)">Chief Operating Officer (COO)</option>
-                  <option value="Chief Commercial Officer / Sales Director">Chief Commercial Officer / Sales Director</option>
-                  <option value="Chief Financial Officer (CFO)">Chief Financial Officer (CFO)</option>
-                  <option value="Technical / R&D Director">Technical / R&D Director</option>
-                  <option value="Non-Executive Director / Chair">Non-Executive Director / Chair</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
-                  Sector Specialism Focus
-                </label>
-                <select
-                  value={formData.sectorSpecialism}
-                  onChange={(e) => setFormData({ ...formData, sectorSpecialism: e.target.value })}
-                  className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
-                >
-                  <option value="Heavy Building Materials">Heavy Building Materials (Concrete, Cement, Aggregates)</option>
-                  <option value="Building Envelope & Façades">Building Envelope, Glazing & Façades</option>
-                  <option value="HVAC & Building Services">HVAC, Mechanical & Building Services</option>
-                  <option value="Timber & Modular / MMC">Timber & Modern Methods of Construction (MMC)</option>
-                  <option value="Merchant & Distribution Networks">Merchant & Distribution Networks</option>
-                  <option value="Interior Finishing & Fit-out Systems">Interior Finishing & Fit-out Systems</option>
-                  <option value="Managing Directors & CEOs">Managing Directors & CEOs</option>
-                  <option value="Commercial & Sales Directors">Commercial & Sales Directors</option>
-                  <option value="Operations & Supply Chain">Operations & Supply Chain</option>
-                  <option value="Technical, R&D & Compliance">Technical, R&D & Compliance</option>
-                  <option value="Finance & Corporate Development">Finance & Corporate Development</option>
-                  <option value="Sustainability & ESG Leadership">Sustainability & ESG Leadership</option>
-                </select>
-              </div>
+            <div>
+              <label className="block font-sans text-sm font-medium text-navy-800 mb-1">
+                Function Required
+              </label>
+              <select
+                value={formData.functionRequired}
+                onChange={(e) => setFormData({ ...formData, functionRequired: e.target.value })}
+                className="w-full px-3 py-2 text-sm bg-steel-50 border border-steel-300 focus:border-teal-600 focus:bg-white outline-none rounded-sm transition-colors"
+              >
+                <option value="C-Suite / MD">C-Suite / MD</option>
+                <option value="Sales / Commercial">Sales / Commercial</option>
+                <option value="Finance">Finance</option>
+                <option value="Operations / Technical">Operations / Technical</option>
+                <option value="HR">HR</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
 
             <div>
@@ -275,7 +245,7 @@ export const InitiateSearchModal: React.FC<InitiateSearchModalProps> = ({
                   Cancel
                 </Button>
                 <Button type="submit" variant="primary" size="md" disabled={isSubmitting}>
-                  {isSubmitting ? 'Sending…' : 'Submit Search Mandate'}
+                  {isSubmitting ? 'Sending…' : 'Initiate Confidential Conversation'}
                 </Button>
               </div>
             </div>

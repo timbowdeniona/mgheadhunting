@@ -27,7 +27,6 @@ const defaultNavLinks: NavigationItem[] = [
   { label: 'The Difference', href: '#difference' },
   { label: 'Search Process', href: '#process' },
   { label: 'Market Intelligence', href: '/insights' },
-  { label: 'About', href: '/about' },
 ];
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({
@@ -53,7 +52,14 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const links = navLinks && navLinks.length > 0 ? navLinks : defaultNavLinks;
+  const rawLinks = navLinks && navLinks.length > 0 ? navLinks : defaultNavLinks;
+  // Filter out 'About Mark Goldsmith' / 'About' links per client request
+  const links = rawLinks.filter(
+    (link) =>
+      !link.label.toLowerCase().includes('about') &&
+      link.href !== '/about' &&
+      link.href !== '#about'
+  );
 
   // Resolve href for anchor links when not on root page
   const resolveHref = (href: string) => {

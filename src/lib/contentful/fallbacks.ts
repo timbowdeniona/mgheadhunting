@@ -27,7 +27,6 @@ export const fallbackSiteSettings: SiteSettingsFields = {
     { label: 'Search Process', href: '#process' },
     { label: 'Market Intelligence', href: '/insights' },
     { label: 'FAQ', href: '/faq' },
-    { label: 'About', href: '/about' },
   ],
   footerSpecialisms: [
     'Managing Directors & CEOs',
@@ -439,7 +438,7 @@ export const fallbackContactFooterData: ContactFooterSectionData = {
   bannerTitle: 'Discuss an Executive Appointment with Mark Goldsmith',
   bannerSubtitle: 'Whether commissioning a confidential Managing Director search, restructuring commercial leadership, or seeking board advisory on compensation, connect directly with our practice leader.',
   bannerCtaText: 'Start the Conversation',
-  ndaTitle: 'Modular Placement Disclosure Protocol',
+  ndaTitle: 'Assignment Disclosure Protocol',
   ndaStatement: 'In strict adherence to executive restrictive covenants and client non-disclosure agreements, specific placement case studies and client references are shared selectively with verified clients during the calibration phase under bilateral NDA.',
   siteDescription: 'Boutique retained executive search specializing in C-suite, Board, and Director appointments across the UK and European Building Products and Construction sectors.',
   directDeskEmail: 'mgoldsmith@mgheadhunting.co.uk',

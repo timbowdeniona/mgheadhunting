@@ -95,9 +95,17 @@ export async function fetchSiteSettings(preview = false): Promise<SiteSettingsFi
     });
     if (response.items && response.items.length > 0) {
       const fields = response.items[0].fields as any;
+      const rawNavLinks = Array.isArray(fields.navLinks) ? fields.navLinks : fallbackSiteSettings.navLinks;
+      const filteredNavLinks = rawNavLinks.filter(
+        (link: any) =>
+          !link?.label?.toLowerCase().includes('about') &&
+          link?.href !== '/about' &&
+          link?.href !== '#about'
+      );
       return {
         ...fallbackSiteSettings,
         ...(fields as unknown as Partial<SiteSettingsFields>),
+        navLinks: filteredNavLinks,
         mainLogoAlt: getMediaAssetAlt(fields.mainLogo, 'MG Headhunting Logo'),
         mainLogoDarkAlt: getMediaAssetAlt(fields.mainLogoDark, 'MG Headhunting Logo'),
         miniLogoAlt: getMediaAssetAlt(fields.miniLogo, 'MG Headhunting Monogram'),
@@ -328,7 +336,10 @@ export async function fetchHomepageData(preview = false): Promise<HomepageConten
       bannerTitle: contactFooterBlockFields.title || fallbackContactFooterData.bannerTitle,
       bannerSubtitle: contactFooterBlockFields.description || fallbackContactFooterData.bannerSubtitle,
       bannerCtaText: contactFooterBlockFields.primaryCtaText || fallbackContactFooterData.bannerCtaText,
-      ndaTitle: contactFooterBlockFields.ndaTitle || fallbackContactFooterData.ndaTitle,
+      ndaTitle:
+        contactFooterBlockFields.ndaTitle === 'Modular Placement Disclosure Protocol'
+          ? 'Assignment Disclosure Protocol'
+          : contactFooterBlockFields.ndaTitle || fallbackContactFooterData.ndaTitle,
       ndaStatement: contactFooterBlockFields.ndaNotice || fallbackContactFooterData.ndaStatement,
       siteDescription: contactFooterBlockFields.siteDescription || fallbackContactFooterData.siteDescription,
       directDeskEmail: contactFooterBlockFields.email || siteSettings.primaryEmail,

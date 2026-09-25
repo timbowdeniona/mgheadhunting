@@ -13,6 +13,7 @@
     "contentful:setup": "tsx scripts/contentful-setup.ts",
     "contentful:setup:schema": "tsx scripts/contentful-setup.ts --schema-only",
     "contentful:setup:logos": "tsx scripts/contentful-setup.ts --logos-only",
+    "contentful:patch": "tsx scripts/patch-client-feedback.ts",
     "contentful:test": "tsx scripts/test-delivery.ts"
   },
   "dependencies": {
