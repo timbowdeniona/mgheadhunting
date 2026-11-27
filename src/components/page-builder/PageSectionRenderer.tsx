@@ -185,8 +185,8 @@ export const PageSectionRenderer: React.FC<PageSectionRendererProps> = ({
         partnerPracticeTenure: section.partnerPracticeTenure || '20+ Years in Executive Search',
         partnerSpecialization: section.partnerSpecialization || 'Building Products & Construction Materials',
         partnerPlacementLevel: section.partnerPlacementLevel || 'Board, CEO, MD & C-Suite',
-        partnerEmail: section.partnerEmail || 'mark.goldsmith@mgheadhunting.com',
-        partnerLinkedinUrl: section.partnerLinkedinUrl || 'https://www.linkedin.com',
+        partnerEmail: section.partnerEmail || 'mgoldsmith@mgheadhunting.co.uk',
+        partnerLinkedinUrl: section.partnerLinkedinUrl || 'https://www.linkedin.com/in/markgoldsmith2/',
         paragraphs: section.paragraphs || [
           'With over two decades of dedicated executive search experience, Mark Goldsmith has established a preeminent track record of placing Board and Executive leaders across the UK and European Building Products market.',
           'Unlike volume recruitment agencies, Mark personally leads every mandate from initial market mapping through psychometric assessment to final contract negotiations.',

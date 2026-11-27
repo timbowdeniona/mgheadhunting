@@ -484,7 +484,7 @@ export const fallbackModularPages: Record<string, Omit<ModularPageData, 'siteSet
         partnerSpecialization: 'Building Products, Materials & Offsite Systems',
         partnerPlacementLevel: 'Board, CEO, Managing Director & Operations Heads',
         partnerEmail: 'mgoldsmith@mgheadhunting.co.uk',
-        partnerLinkedinUrl: 'https://www.linkedin.com',
+        partnerLinkedinUrl: 'https://www.linkedin.com/in/markgoldsmith2/',
         paragraphs: [
           'MG Headhunting was founded on a singular principle: executive search in the Building Products sector requires deep domain mastery, rigorous competency assessment, and personal accountability from start to finish.',
           'Unlike volume recruitment agencies that delegate critical assignments to junior resourcers, Managing Partner Mark Goldsmith personally leads every search—from initial board scoping through direct confidential headhunting to final placement.',
@@ -733,7 +733,7 @@ export const fallbackModularPages: Record<string, Omit<ModularPageData, 'siteSet
         title: 'Schedule a Confidential Strategic Consultation',
         description: 'Reach out directly to Managing Partner Mark Goldsmith to discuss executive recruitment, succession planning, or compensation benchmarking.',
         email: 'mgoldsmith@mgheadhunting.co.uk',
-        phone: '+44 (0) 20 7946 0198',
+        phone: '07570 740490',
         headquarters: 'London & Home Counties, United Kingdom',
         ndaNotice: 'All conversations and documents exchanged are subject to strict non-disclosure obligations and professional confidentiality standards.',
       },

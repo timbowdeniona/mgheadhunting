@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { draftMode } from 'next/headers';
 import Script from 'next/script';
 import './globals.css';
@@ -6,12 +7,14 @@ import { ContentfulLivePreviewProvider } from '../components/contentful/Contentf
 import { DraftModeBar } from '../components/ui/DraftModeBar';
 import { CookieConsent } from '../components/ui/CookieConsent';
 import { OrganizationSchema } from '../components/seo/JsonLd';
+import { AnalyticsRouteTracker } from '../components/seo/AnalyticsRouteTracker';
+import { SITE_URL, DEFAULT_OG_IMAGE } from '../lib/seo';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://mgheadhunting.com'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'MG Headhunting (MGH) | Retained Executive Search for Building Products & Construction',
-    template: '%s | MG Headhunting (MGH)',
+    template: '%s | MG Headhunting',
   },
   description:
     'Boutique retained executive search delivering Board, Managing Director, and C-Suite appointments across the UK and European Building Products and Built Environment sectors. Partner-led, rigorously assessed, and strictly confidential.',
@@ -20,6 +23,7 @@ export const metadata: Metadata = {
     'Headhunting',
     'Building Products',
     'Construction Materials',
+    'Fenestration Headhunter',
     'Board Appointments',
     'Managing Director',
     'C-Suite',
@@ -27,9 +31,12 @@ export const metadata: Metadata = {
     'Mark Goldsmith',
     'MG Headhunting',
   ],
-  authors: [{ name: 'Mark Goldsmith' }],
+  authors: [{ name: 'Mark Goldsmith', url: `${SITE_URL}/about` }],
   creator: 'MG Headhunting',
   publisher: 'MG Headhunting',
+  alternates: {
+    canonical: SITE_URL,
+  },
   robots: {
     index: true,
     follow: true,
@@ -43,27 +50,32 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'MG Headhunting (MGH) | Retained Executive Search',
+    title: 'MG Headhunting (MGH) | Retained Executive Search for Building Products',
     description:
-      'Precision-engineered executive search for manufacturers, distributors, and PE investors across the Building Products sector.',
-    url: '/',
-    siteName: 'MG Headhunting (MGH)',
+      'Precision-engineered executive search for manufacturers, distributors, and PE investors across the UK & European Building Products sector.',
+    url: SITE_URL,
+    siteName: 'MG Headhunting',
     type: 'website',
     locale: 'en_GB',
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: 'MG Headhunting — Retained Executive Search for Building Products & Construction',
+      },
+    ],
   },
   icons: {
-    icon: [
-      { url: '/mgh-favicon.svg', type: 'image/svg+xml' }
-    ],
-    apple: [
-      { url: '/mgh-favicon.svg', type: 'image/svg+xml' }
-    ],
+    icon: [{ url: '/mgh-favicon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/mgh-logo-light.png', type: 'image/png' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MG Headhunting (MGH) | Retained Executive Search',
-    description: 'Precision-engineered executive search for manufacturers, distributors, and PE investors across the Building Products sector.',
-    creator: '@mgheadhunting',
+    title: 'MG Headhunting (MGH) | Retained Executive Search for Building Products',
+    description:
+      'Precision-engineered executive search for manufacturers, distributors, and PE investors across the UK & European Building Products sector.',
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 
@@ -77,7 +89,7 @@ export default async function RootLayout({
   const { isEnabled } = await draftMode();
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en-GB" className="scroll-smooth">
       <head>
         {GA_ID && (
           <>
@@ -89,13 +101,18 @@ export default async function RootLayout({
                 __html: `
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
+                  var savedConsent = null;
+                  try { savedConsent = window.localStorage.getItem('mgh_cookie_consent'); } catch (e) {}
+                  var initialConsent = savedConsent === 'granted' ? 'granted' : 'denied';
                   gtag('consent', 'default', {
-                    'analytics_storage': 'denied',
+                    'analytics_storage': initialConsent,
                     'ad_storage': 'denied',
-                    'ad_user_data': 'denied',
+                    'ad_user_data': initialConsent,
                     'ad_personalization': 'denied',
                     'wait_for_update': 500
                   });
+                  gtag('set', 'ads_data_redaction', true);
+                  gtag('set', 'url_passthrough', true);
                 `,
               }}
             />
@@ -111,11 +128,21 @@ export default async function RootLayout({
                 __html: `
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${GA_ID}', {
-                    page_path: window.location.pathname,
-                    send_page_view: true
-                  });
+                  var host = (window.location.hostname || '').toLowerCase();
+                  var path = window.location.pathname || '';
+                  var isNonProdOrInternal =
+                    host === 'localhost' ||
+                    host === '127.0.0.1' ||
+                    host.endsWith('.netlify.app') ||
+                    path.indexOf('/design-system') === 0 ||
+                    path.indexOf('/storybook') === 0;
+                  if (!isNonProdOrInternal) {
+                    gtag('js', new Date());
+                    gtag('config', '${GA_ID}', {
+                      page_path: path + (window.location.search || ''),
+                      send_page_view: true
+                    });
+                  }
                 `,
               }}
             />
@@ -124,6 +151,9 @@ export default async function RootLayout({
       </head>
       <body className="min-h-screen bg-canvas-light text-navy-900 font-sans selection:bg-teal-600 selection:text-white antialiased">
         <OrganizationSchema />
+        <Suspense fallback={null}>
+          <AnalyticsRouteTracker />
+        </Suspense>
         <ContentfulLivePreviewProvider locale="en-US" enableLiveUpdates={true} enableInspectorMode={true}>
           {children}
           <DraftModeBar isEnabled={isEnabled} />
@@ -133,4 +163,3 @@ export default async function RootLayout({
     </html>
   );
 }
-

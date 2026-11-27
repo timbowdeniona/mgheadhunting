@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Clock,
   User,
-  Download,
   BookOpen,
   ArrowLeft,
   Briefcase,
@@ -30,13 +29,7 @@ interface InsightsClientProps {
   siteSettings: any;
 }
 
-const CATEGORIES = [
-  'ALL',
-  'EXECUTIVE COMPENSATION',
-  'REGULATORY & COMPLIANCE',
-  'M&A & EXPANSION',
-  'SUSTAINABILITY & TECH',
-];
+const CATEGORIES = ['ALL', 'CASE STUDIES', 'INSIGHTS'] as const;
 
 export function InsightsClient({ articles: initialArticles, siteSettings: initialSiteSettings }: InsightsClientProps) {
   const rawArticles = useContentfulLiveUpdates(initialArticles);
@@ -67,16 +60,28 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
   // Filtered Articles
   const filteredArticles = useMemo(() => {
     return articles.filter((article) => {
+      if (!article?.slug || article.slug === 'undefined') return false;
+
+      const catUpper = (article.category || '').toUpperCase();
+      const titleUpper = (article.title || '').toUpperCase();
+      const slugUpper = (article.slug || '').toUpperCase();
+      const isCaseStudy =
+        catUpper.includes('CASE') ||
+        catUpper.includes('STUDY') ||
+        titleUpper.includes('CASE STUDY') ||
+        slugUpper.includes('CASE-STUDY');
+
       const matchesCategory =
         selectedCategory === 'ALL' ||
-        article.category.toUpperCase().includes(selectedCategory);
+        (selectedCategory === 'CASE STUDIES' && isCaseStudy) ||
+        (selectedCategory === 'INSIGHTS' && !isCaseStudy);
 
       const query = searchQuery.toLowerCase().trim();
       const matchesQuery =
         !query ||
-        article.title.toLowerCase().includes(query) ||
-        article.excerpt.toLowerCase().includes(query) ||
-        article.category.toLowerCase().includes(query) ||
+        (article.title || '').toLowerCase().includes(query) ||
+        (article.excerpt || '').toLowerCase().includes(query) ||
+        (article.category || '').toLowerCase().includes(query) ||
         (article.author?.fields?.name && article.author.fields.name.toLowerCase().includes(query)) ||
         (article.keyTakeaways && article.keyTakeaways.some((t) => t.toLowerCase().includes(query)));
 
@@ -223,7 +228,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                   </div>
 
                   <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight leading-tight group-hover:text-teal-700 transition-colors mb-4">
-                    <Link href={`/insights/${featuredArticle.slug}`}>
+                    <Link href={`/insights/${encodeURIComponent(featuredArticle.slug.trim())}`}>
                       {featuredArticle.title}
                     </Link>
                   </h2>
@@ -254,7 +259,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                   </div>
 
                   <Link
-                    href={`/insights/${featuredArticle.slug}`}
+                    href={`/insights/${encodeURIComponent(featuredArticle.slug.trim())}`}
                     onClick={() => trackInsightView(featuredArticle.slug, featuredArticle.title, featuredArticle.category)}
                   >
                     <Button
@@ -292,7 +297,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                       : 'text-steel-700 hover:text-navy-900 hover:bg-steel-200/70'
                   }`}
                 >
-                  {cat === 'ALL' ? 'All Practice Areas' : cat}
+                  {cat === 'ALL' ? 'All' : cat === 'CASE STUDIES' ? 'Case Studies' : 'Insights'}
                 </button>
               ))}
             </div>
@@ -364,7 +369,7 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
                     keyTakeaways={article.keyTakeaways}
                     coverImage={coverUrl}
                     coverImageAlt={coverAlt}
-                    href={`/insights/${article.slug}`}
+                    href={`/insights/${encodeURIComponent(article.slug.trim())}`}
                     author={
                       article.author
                         ? {
@@ -398,44 +403,6 @@ export function InsightsClient({ articles: initialArticles, siteSettings: initia
               </button>
             </div>
           )}
-        </section>
-
-        {/* Lead Gen Banner: Executive Salary Benchmark Report */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-          <div className="p-8 sm:p-10 bg-navy-900 text-white border border-navy-700 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-teal-400" />
-            
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
-              <div className="space-y-2 max-w-2xl">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-teal-400" />
-                  <span className="font-sans text-xs font-semibold uppercase tracking-wider text-teal-300">
-                    Annual Sector Publication
-                  </span>
-                </div>
-                <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-white">
-                  2026/2027 Building Products Executive Salary &amp; Retention Benchmark
-                </h3>
-                <p className="text-xs sm:text-sm text-steel-300 leading-relaxed">
-                  Comprehensive compensation analysis covering 400+ board appointments across UK &amp; European manufacturing, merchants, and fabricators. Includes base pay matrices, LTIP structures, and PE equity sweat allocations.
-                </p>
-              </div>
-
-              <div className="shrink-0">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  icon={<Download className="w-4 h-4" />}
-                  onClick={() => {
-                    trackEvent('file_download', 'Research Report', '2026/2027 Building Products Executive Salary Benchmark');
-                    handleOpenSearchModal('Executive Salary Benchmark Report');
-                  }}
-                >
-                  Request Confidential Report
-                </Button>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* Commission Search Advisory Callout */}

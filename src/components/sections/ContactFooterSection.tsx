@@ -186,9 +186,9 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
             <ul className="space-y-2 text-xs text-steel-300">
               {footer.footerSpecialisms.map((spec, idx) => (
                 <li key={idx}>
-                  <a href="#specialisms" className="hover:text-teal-400 transition-colors">
+                  <Link href="/sectors" className="hover:text-teal-400 transition-colors">
                     {spec}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -241,23 +241,47 @@ export const ContactFooterSection: React.FC<ContactFooterSectionProps> = ({
 
         </div>
 
-        {/* Regulatory & GDPR Compliance Statement */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-steel-400 font-sans">
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-teal-400 shrink-0" />
-            <span>
-              {footer.complianceNotice}
-            </span>
-          </div>
+        {/* Practice Pages Directory & GDPR Compliance Statement */}
+        <div className="pt-8 space-y-5 text-xs text-steel-400 font-sans">
+          <nav
+            aria-label="Practice directory"
+            className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2 pb-5 border-b border-navy-800/80 text-steel-300"
+          >
+            <Link href="/sectors" className="hover:text-teal-400 transition-colors">
+              Sector Specialisms
+            </Link>
+            <Link href="/retained-search" className="hover:text-teal-400 transition-colors">
+              Retained Search Process
+            </Link>
+            <Link href="/difference" className="hover:text-teal-400 transition-colors">
+              The MGH Difference
+            </Link>
+            <Link href="/faq" className="hover:text-teal-400 transition-colors">
+              FAQ
+            </Link>
+            <Link href="/insights" className="hover:text-teal-400 transition-colors">
+              Case Studies &amp; Insights
+            </Link>
+            <Link href="/about" className="hover:text-teal-400 transition-colors">
+              About Mark Goldsmith
+            </Link>
+            <Link href="/contact" className="hover:text-teal-400 transition-colors">
+              Contact Desk
+            </Link>
+          </nav>
 
-          <div className="flex items-center gap-6">
-            <span>{footer.copyright}</span>
-            <Link href="/design-system" className="hover:text-teal-400 transition-colors">
-              Design System
-            </Link>
-            <Link href="/privacy" className="hover:text-teal-400 transition-colors">
-              Privacy &amp; Data Policy
-            </Link>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-teal-400 shrink-0" />
+              <span>{footer.complianceNotice}</span>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <span>{footer.copyright}</span>
+              <Link href="/privacy" className="hover:text-teal-400 transition-colors">
+                Privacy &amp; Data Policy
+              </Link>
+            </div>
           </div>
         </div>
 

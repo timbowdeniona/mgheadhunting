@@ -4,13 +4,12 @@ import React, { useState } from 'react';
 import { FaqAccordionBlockData } from '../../lib/contentful/types';
 import { Badge } from '../ui/Badge';
 import { SectionDivider } from '../ui/SectionDivider';
-import { ChevronDown, Plus, Minus } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { FaqSchema } from '../seo/JsonLd';
 
 export interface FaqAccordionBlockProps {
   data: FaqAccordionBlockData;
 }
-
 
 export const FaqAccordionBlock: React.FC<FaqAccordionBlockProps> = ({ data }) => {
   const [openIndices, setOpenIndices] = useState<number[]>([0]);
@@ -25,7 +24,6 @@ export const FaqAccordionBlock: React.FC<FaqAccordionBlockProps> = ({ data }) =>
     <section className="py-20 bg-canvas-light border-b border-steel-300">
       <FaqSchema items={data.items} />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Section Header */}
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-3">
@@ -36,11 +34,11 @@ export const FaqAccordionBlock: React.FC<FaqAccordionBlockProps> = ({ data }) =>
               FAQ &amp; ADVISORY
             </Badge>
           </div>
-          
+
           <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-navy-900 uppercase">
             {data.title || 'Frequently Asked Questions'}
           </h2>
-          
+
           {data.description && (
             <p className="text-sm sm:text-base text-steel-600 max-w-3xl mt-3 font-light leading-relaxed">
               {data.description}
@@ -52,10 +50,12 @@ export const FaqAccordionBlock: React.FC<FaqAccordionBlockProps> = ({ data }) =>
           </div>
         </div>
 
-        {/* Accordion List */}
+        {/* Accordion List — All answers remain mounted in initial SSR HTML via `hidden` so search & AI crawlers index every Q&A */}
         <div className="space-y-4">
           {data.items.map((item, idx) => {
             const isOpen = openIndices.includes(idx);
+            const answerId = `faq-answer-${idx}`;
+            const questionId = `faq-question-${idx}`;
 
             return (
               <div
@@ -66,47 +66,55 @@ export const FaqAccordionBlock: React.FC<FaqAccordionBlockProps> = ({ data }) =>
                     : 'border-steel-300 hover:border-steel-400'
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => toggleItem(idx)}
-                  className="w-full text-left p-5 sm:p-6 flex items-start justify-between gap-4 focus:outline-none"
-                >
-                  <div className="space-y-1">
-                    {item.category && (
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-teal-700 block">
-                        {item.category}
-                      </span>
-                    )}
-                    <span className="font-display text-base sm:text-lg font-bold text-navy-900 block uppercase">
-                      {item.question}
-                    </span>
-                  </div>
-
-                  <div
-                    className={`mt-1 w-6 h-6 flex items-center justify-center border shrink-0 transition-colors ${
-                      isOpen
-                        ? 'border-teal-600 bg-teal-50 text-teal-700'
-                        : 'border-steel-300 text-steel-500'
-                    }`}
+                <h3 className="m-0">
+                  <button
+                    id={questionId}
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={answerId}
+                    onClick={() => toggleItem(idx)}
+                    className="w-full text-left p-5 sm:p-6 flex items-start justify-between gap-4 focus:outline-none"
                   >
-                    {isOpen ? (
-                      <Minus className="w-3.5 h-3.5" />
-                    ) : (
-                      <Plus className="w-3.5 h-3.5" />
-                    )}
-                  </div>
-                </button>
+                    <div className="space-y-1">
+                      {item.category && (
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-teal-700 block">
+                          {item.category}
+                        </span>
+                      )}
+                      <span className="font-display text-base sm:text-lg font-bold text-navy-900 block uppercase">
+                        {item.question}
+                      </span>
+                    </div>
 
-                {isOpen && (
-                  <div className="px-5 pb-6 sm:px-6 sm:pb-6 text-sm text-steel-700 leading-relaxed border-t border-steel-100 pt-4 font-light">
-                    {item.answer}
-                  </div>
-                )}
+                    <div
+                      className={`mt-1 w-6 h-6 flex items-center justify-center border shrink-0 transition-colors ${
+                        isOpen
+                          ? 'border-teal-600 bg-teal-50 text-teal-700'
+                          : 'border-steel-300 text-steel-500'
+                      }`}
+                    >
+                      {isOpen ? (
+                        <Minus className="w-3.5 h-3.5" />
+                      ) : (
+                        <Plus className="w-3.5 h-3.5" />
+                      )}
+                    </div>
+                  </button>
+                </h3>
+
+                <div
+                  id={answerId}
+                  role="region"
+                  aria-labelledby={questionId}
+                  hidden={!isOpen}
+                  className="px-5 pb-6 sm:px-6 sm:pb-6 text-sm text-steel-700 leading-relaxed border-t border-steel-100 pt-4 font-light whitespace-pre-line"
+                >
+                  {item.answer}
+                </div>
               </div>
             );
           })}
         </div>
-
       </div>
     </section>
   );

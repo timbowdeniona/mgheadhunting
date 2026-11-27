@@ -21,9 +21,9 @@ const renderOptions: Options = {
   },
   renderNode: {
     [BLOCKS.HEADING_1]: (node, children) => (
-      <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight mt-10 mb-4 pb-2 border-b border-steel-200">
+      <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight mt-10 mb-4 pb-2 border-b border-steel-200">
         {children}
-      </h1>
+      </h2>
     ),
     [BLOCKS.HEADING_2]: (node, children) => (
       <h2 className="font-display text-xl sm:text-2xl font-bold text-navy-900 tracking-tight mt-8 mb-3 pb-2 border-b border-steel-200">
@@ -84,16 +84,27 @@ const renderOptions: Options = {
         </div>
       );
     },
-    [INLINES.HYPERLINK]: (node, children) => (
-      <a
-        href={node.data.uri}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-teal-700 font-medium underline decoration-teal-500 underline-offset-2 hover:text-teal-900 transition-colors"
-      >
-        {children}
-      </a>
-    ),
+    [INLINES.HYPERLINK]: (node, children) => {
+      const rawUri: string = node.data?.uri || '#';
+      const normalizedUri = rawUri.replace(
+        /^https?:\/\/(?:www\.)?mgheadhunting\.com(?=\/|$)/i,
+        'https://mgheadhunting.co.uk'
+      );
+      const isInternal =
+        normalizedUri.startsWith('/') ||
+        normalizedUri.startsWith('#') ||
+        /^https?:\/\/(?:www\.)?mgheadhunting\.co\.uk(?=\/|$)/i.test(normalizedUri);
+
+      return (
+        <a
+          href={normalizedUri}
+          {...(isInternal ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+          className="text-teal-700 font-medium underline decoration-teal-500 underline-offset-2 hover:text-teal-900 transition-colors"
+        >
+          {children}
+        </a>
+      );
+    },
   },
 };
 
