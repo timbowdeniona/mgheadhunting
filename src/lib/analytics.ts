@@ -7,7 +7,7 @@ declare global {
   interface Window {
     gtag?: (
       command: string,
-      targetIdOrAction: string,
+      targetIdOrAction: string | Date,
       params?: Record<string, any>
     ) => void;
     dataLayer?: any[];
@@ -17,7 +17,46 @@ declare global {
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-2SW09PVDCF';
 
 /**
- * Generic event tracker with safety checks for SSR and ad-blockers.
+ * Suppresses GA4 telemetry on staging (*.netlify.app), localhost,
+ * and internal workbench routes (/design-system, /storybook) so dev/CMS
+ * activity never pollutes live production analytics.
+ */
+export function shouldTrackCurrentPage(pathname?: string): boolean {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname.toLowerCase();
+  if (
+    host === 'localhost' ||
+    host === '127.0.0.1' ||
+    host.endsWith('.netlify.app')
+  ) {
+    return false;
+  }
+
+  const path = pathname || window.location.pathname || '';
+  if (path.startsWith('/design-system') || path.startsWith('/storybook')) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Dispatches SPA client-navigation pageviews in Next.js App Router.
+ */
+export const trackPageView = (pagePath: string) => {
+  if (!shouldTrackCurrentPage(pagePath) || !window.gtag) {
+    return;
+  }
+
+  window.gtag('event', 'page_view', {
+    page_path: pagePath,
+    page_location: window.location.href,
+    page_title: document.title,
+  });
+};
+
+/**
+ * Generic event tracker with safety checks for SSR, staging hosts, and ad-blockers.
  */
 export const trackEvent = (
   action: string,
@@ -26,7 +65,7 @@ export const trackEvent = (
   value?: number,
   additionalParams?: Record<string, any>
 ) => {
-  if (typeof window === 'undefined' || !window.gtag) {
+  if (!shouldTrackCurrentPage() || !window.gtag) {
     return;
   }
 
@@ -41,17 +80,25 @@ export const trackEvent = (
 /**
  * Retained Search Conversion: Form submission / Mandate inquiry
  */
-export const trackLeadSubmission = (inquiryType: 'mandate' | 'candidate' | 'general' = 'mandate', sector?: string) => {
-  trackEvent('generate_lead', 'Conversion', inquiryType, undefined, {
+export const trackLeadSubmission = (
+  inquiryType: 'mandate' | 'candidate' | 'general' = 'mandate',
+  sector?: string
+) => {
+  trackEvent('generate_lead', 'Conversion', inquiryType, 1, {
     inquiry_type: inquiryType,
     sector_interest: sector || 'general',
+    currency: 'GBP',
   });
 };
 
 /**
  * Direct Partner Contact click (email or tel link)
  */
-export const trackDirectContact = (type: 'email' | 'phone' | 'linkedin', value: string, location: string) => {
+export const trackDirectContact = (
+  type: 'email' | 'phone' | 'linkedin',
+  value: string,
+  location: string
+) => {
   trackEvent('contact_direct_click', 'Engagement', type, undefined, {
     contact_type: type,
     contact_value: value,
@@ -62,7 +109,11 @@ export const trackDirectContact = (type: 'email' | 'phone' | 'linkedin', value: 
 /**
  * Primary Call-to-Action button click
  */
-export const trackCtaClick = (ctaText: string, location: string, destination?: string) => {
+export const trackCtaClick = (
+  ctaText: string,
+  location: string,
+  destination?: string
+) => {
   trackEvent('cta_click', 'Navigation', ctaText, undefined, {
     cta_text: ctaText,
     cta_location: location,
@@ -73,7 +124,10 @@ export const trackCtaClick = (ctaText: string, location: string, destination?: s
 /**
  * Sector Matrix interaction (exploring specific executive search sectors)
  */
-export const trackSectorInteraction = (sectorName: string, action: 'select_tab' | 'view_details' = 'select_tab') => {
+export const trackSectorInteraction = (
+  sectorName: string,
+  action: 'select_tab' | 'view_details' = 'select_tab'
+) => {
   trackEvent('sector_matrix_interact', 'Sector Matrix', sectorName, undefined, {
     sector_name: sectorName,
     interaction_action: action,
@@ -83,7 +137,11 @@ export const trackSectorInteraction = (sectorName: string, action: 'select_tab' 
 /**
  * Insights / Whitepaper view & reading tracking
  */
-export const trackInsightView = (articleSlug: string, articleTitle: string, category?: string) => {
+export const trackInsightView = (
+  articleSlug: string,
+  articleTitle: string,
+  category?: string
+) => {
   trackEvent('view_insight_article', 'Insights', articleTitle, undefined, {
     article_slug: articleSlug,
     article_title: articleTitle,
@@ -104,4 +162,12 @@ export const updateGoogleConsent = (granted: boolean) => {
     ad_user_data: state,
     ad_personalization: state,
   });
+
+  if (granted && shouldTrackCurrentPage()) {
+    window.gtag('event', 'page_view', {
+      page_path: window.location.pathname + window.location.search,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  }
 };

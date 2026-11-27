@@ -93,7 +93,7 @@ export const ModularPageClient: React.FC<ModularPageClientProps> = ({ data: init
             navLinks: data.siteSettings.navLinks,
             footerSpecialisms: data.siteSettings.footerSpecialisms,
             footerSubSectors: data.siteSettings.footerSubSectors,
-            linkedinUrl: data.siteSettings.linkedinUrl || 'https://www.linkedin.com',
+            linkedinUrl: data.siteSettings.linkedinUrl || 'https://www.linkedin.com/in/markgoldsmith2/',
             logoDarkUrl: getMediaAssetUrl(data.siteSettings.mainLogoDark || data.siteSettings.mainLogo),
             logoDarkAlt: data.siteSettings.mainLogoDarkAlt || data.siteSettings.mainLogoAlt,
             logoUrl: getMediaAssetUrl(data.siteSettings.mainLogo),

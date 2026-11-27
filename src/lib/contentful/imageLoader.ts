@@ -40,7 +40,7 @@ export function contentfulImageLoader({ src, width, quality }: ImageLoaderProps)
 
   try {
     const isAbsolute = normalized.startsWith('http://') || normalized.startsWith('https://');
-    const url = isAbsolute ? new URL(normalized) : new URL(normalized, 'https://mgheadhunting.com');
+    const url = isAbsolute ? new URL(normalized) : new URL(normalized, 'https://mgheadhunting.co.uk');
 
     // Next.js custom loaders must implement the width parameter across all URLs
     url.searchParams.set('w', width.toString());

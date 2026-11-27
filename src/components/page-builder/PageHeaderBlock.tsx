@@ -75,9 +75,12 @@ export const PageHeaderBlock: React.FC<PageHeaderBlockProps> = ({ data }) => {
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight uppercase leading-tight">
             {data.title}
             {data.highlightedPhrase && (
-              <span className="block text-teal-400 font-sans normal-case text-2xl sm:text-3xl lg:text-4xl font-normal mt-2">
-                {data.highlightedPhrase}
-              </span>
+              <>
+                {' '}
+                <span className="block text-teal-400 font-sans normal-case text-2xl sm:text-3xl lg:text-4xl font-normal mt-2">
+                  {data.highlightedPhrase}
+                </span>
+              </>
             )}
           </h1>
 

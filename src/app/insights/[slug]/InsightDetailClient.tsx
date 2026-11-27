@@ -252,12 +252,17 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {relatedArticles.map((rel) => {
+              {relatedArticles.map((rawRel, idx) => {
+                const rel: InsightArticleFields = rawRel?.fields
+                  ? { ...rawRel.fields, sys: rawRel.sys }
+                  : rawRel;
+                const relSlug = typeof rel?.slug === 'string' ? rel.slug.trim() : '';
+                if (!relSlug || relSlug === 'undefined') return null;
                 const relCover = getArticleCoverUrl(rel);
                 const relAlt = getArticleCoverAlt(rel);
                 return (
                   <InsightCard
-                    key={rel.slug}
+                    key={relSlug || idx}
                     category={rel.category}
                     readTime={rel.readTime}
                     date={rel.publishedDate}
@@ -265,9 +270,9 @@ export const InsightDetailClient: React.FC<InsightDetailClientProps> = ({
                     excerpt={rel.excerpt}
                     coverImage={relCover}
                     coverImageAlt={relAlt}
-                    href={`/insights/${rel.slug}`}
+                    href={`/insights/${encodeURIComponent(relSlug)}`}
                     variant="compact"
-                    onClick={() => trackInsightView(rel.slug, rel.title, rel.category)}
+                    onClick={() => trackInsightView(relSlug, rel.title, rel.category)}
                   />
                 );
               })}
